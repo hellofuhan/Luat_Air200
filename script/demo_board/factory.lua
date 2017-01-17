@@ -119,9 +119,9 @@ local function read()
 		t1 = uart.read(3,"*l",0)
 		if string.len(t1) == 0 then
 			rd = false
-			continue
-		end
-		s1 = s1 .. t1
+		else
+		  s1 = s1 .. t1
+		end		
 	end
 
 	if s1 ~= "" then
