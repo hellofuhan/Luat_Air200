@@ -1,0 +1,2 @@
+1、参考《平台编译环境安装步骤.doc》，安装CSDTK，注意doc文档中最后的红色说明
+2、CSDTK安装成功后，运行安装后的coolwathcer工具，就可以连接设备debug，第一次打开coolwatcher运行时，会弹出命令行窗口自动配置运行环境，不要手动关闭这个命令行窗口，几秒钟之后就会自动关闭；coolwatcher工具的使用说明，参考《coolwathcer使用说明_V1.1.doc》
