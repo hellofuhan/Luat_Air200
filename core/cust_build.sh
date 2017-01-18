@@ -7,7 +7,11 @@
 #   Version： Date:       Author:   Modification:
 #   V0.1      2012.12.14  lifei     创建文件
 #********************************************************#
-
+export ROOT_DIR=`pwd`
+export PROJ_NAME=AM004_LUA
+export PROJ_DIR=$ROOT_DIR/project/$PROJ_NAME
+export PROJ_BUILD_DIR=$ROOT_DIR/project/$PROJ_NAME/build
+export BUILD_DIR=$ROOT_DIR
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # 分析传入的参数
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
