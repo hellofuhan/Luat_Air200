@@ -6,7 +6,9 @@
 
 ### 第一步:编写lua代码
 从github clone合宙开源代码到本地电脑，并进行自开发。
-所用LUA编辑工具以及合宙开源lua项目的开发步骤，请参考/doc/模块LUA程序设置指南 这篇文档。
+/core是模块基础软件，支持AT命令的解析和lua的运行。内含合宙自己开发的lua扩展库（位于\core\cust_src\elua\modules\src），扩展库文档位于/doc目录中。
+/script是合宙范例LUA脚本，是一款已经商用的定位器。对应的硬件参考和AT命令位于/doc/Air200。
+用户在开发中所用LUA编辑工具以及合宙开源lua项目的开发步骤，请参考/doc/模块LUA程序设置指南 这篇文档。
 
 ### 第二步：安装合宙lua开源项目编译调试环境Cygwin
 CSDTK Cygwin 是合宙lua开源项目编译调试环境。安装文件以及安装方法，请点开/tools/CSDTK 目录。CSDTK3.7_Cygwin安装完成后，用户将具备编译环境Cygwin和模块trace打印工具cool watcher.
@@ -20,7 +22,7 @@ lod是支持lua运行的模块基础软件。具体编译方法：
 4. 注意： 如果/core目录下的代码，用户未做修改，则这一步只需执行一次。
 
 ### 第四步：合并用户自己开发的LUA代码和第三步生成的lod，并下载到合宙模块中
-请点开/tools/LuaDB 目录，下载LuaDB合并及下载工具2.2.zip，解压后，无需安装，直接运行download.exe。压缩包内有一个简要的工具使用说明。
+请点开/tools/LuaDB 目录，下载LuaDB合并及下载工具.zip，解压后，无需安装，直接运行download.exe。压缩包内有一个简要的工具使用说明。
 
 ### 第五步：看模块trace打印
 用户需要查看模块的trace以检查和修改自己的lua代码。打印trace的工具是cool watcher。
