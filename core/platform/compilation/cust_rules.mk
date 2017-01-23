@@ -743,6 +743,8 @@ endif
 	cp -f $(BIN_FINAL) ${BAS_FINAL}_${PLT_LOD_VERSION}_map/
 	cp -f ${BAS_FINAL}_BASE_${AM_MODEL}.map ${BAS_FINAL}_${PLT_LOD_VERSION}_map/
 	cp -f $(LOD_FILE) ${BAS_FINAL}_${PLT_LOD_VERSION}_map/
+	#删除flash.lod文件，保留合并后的lod文件
+	rm -f $(LOD_FILE)
 
 	@${ECHO} "Creat map Zip..."
 	cd $(BINARY_PATH) && zip $(ZIP_BASENAME)_map.zip -r ${ZIP_BASENAME}_map;
