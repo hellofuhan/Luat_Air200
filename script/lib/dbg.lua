@@ -1,6 +1,6 @@
 module(...,package.seeall)
 
-local prot,server,port,FREQ,lid = "UDP","ota.airm2m.com",9072,1800000
+local prot,server,port,FREQ,lid = "UDP","test.nothing.com",9000,1800000
 local DBG_FILE,resinf,inf,luaerr,d1,d2 = "/dbg.txt",""
 
 local function readtxt(f)

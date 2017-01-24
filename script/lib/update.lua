@@ -16,7 +16,7 @@ local dispatch = sys.dispatch
 local updmode = base.UPDMODE or 0
 
 --通讯协议,服务器,后台
-local PROTOCOL,SERVER,PORT = "UDP","ota.airm2m.com",2233
+local PROTOCOL,SERVER,PORT = "UDP","test.nothing.com",2000
 --升级包位置
 local UPDATEPACK = "/luazip/update.bin"
 
