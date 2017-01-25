@@ -6,11 +6,12 @@ module(...,package.seeall)
 2、连接成功后，每隔10秒钟发送一次心跳包"heart data\r\n"到后台；每隔20秒钟发送一次位置包"loc data\r\n"到后台
 3、与后台保持长连接，断开后主动再去重连，连接成功仍然按照第2条发送数据
 4、收到后台的数据时，在rcv函数中打印出来
+测试时请搭建自己的服务器，并且修改下面的PROT，ADDR，PORT
 ]]
 
 local ssub,schar,smatch,sbyte = string.sub,string.char,string.match,string.byte
 --测试时请搭建自己的服务器
-local SCK_IDX,PROT,ADDR,PORT = 1,"TCP","120.209.197.147",6500
+local SCK_IDX,PROT,ADDR,PORT = 1,"TCP","www.test.com",6500
 local linksta
 
 local function print(...)
