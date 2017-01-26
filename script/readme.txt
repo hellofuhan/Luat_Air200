@@ -16,5 +16,7 @@ uart：串口demo项目
 call：语音通话demo项目
 nvm：参数存储读写demo项目
 sms：短信demo项目
-socket：基于TCP的socket通信demo项目（UDP使用方式和TCP完全相同）
+socket：基于TCP的socket长连接通信demo项目（UDP使用方式和TCP完全相同）
+socket_short_connection：基于TCP的socket短连接通信demo项目（UDP使用方式和TCP完全相同）
+mqtt：mqtt应用demo项目
 其余demo项目持续更新中......

@@ -1,21 +1,20 @@
 module(...,package.seeall)
 
 --[[
+此例子为短连接
 功能需求：
-1、数据网络准备就绪后，连接后台
-2、连接成功后，每隔10秒钟发送一次心跳包"heart data\r\n"到后台；每隔20秒钟发送一次位置包"loc data\r\n"到后台
-3、与后台保持长连接，断开后主动再去重连，连接成功仍然按照第2条发送数据
-4、收到后台的数据时，在rcv函数中打印出来
+1、每隔10秒钟发送一次心跳包"heart data\r\n"到后台，无论发送成功或者失败都断开连接；
+   每隔20秒钟发送一次位置包"loc data\r\n"到后台，无论发送成功或者失败都断开连接
+2、收到后台的数据时，在rcv函数中打印出来
 测试时请搭建自己的服务器，并且修改下面的PROT，ADDR，PORT 
-
-此例子为长连接，只要是软件上能够检测到的网络异常，可以自动去重新连接；
-有时会出现检测不到的异常，对于这种情况，我们一般按照如下方式处理，设置一个心跳包，每隔A时间发送一次到后台，后台回复应答，如果连续n倍的A时间都没有收到后台的任何数据，则认为出现了未知的网络异常，此时调用link.shut主动断开，然后自动重连
 ]]
 
 local ssub,schar,smatch,sbyte = string.sub,string.char,string.match,string.byte
 --测试时请搭建自己的服务器
 local SCK_IDX,PROT,ADDR,PORT = 1,"TCP","www.test.com",6500
-local linksta
+local linksta 
+--是否成功连接过服务器
+local hasconnected
 
 local function print(...)
 	_G.print("test",...)
@@ -29,36 +28,38 @@ end
 --发送位置包数据到后台
 function locrpt()
 	print("locrpt",linksta)
-	if linksta then
-		snd("loc data\r\n","LOCRPT")		
-	end
+	--if linksta then
+		if not snd("loc data\r\n","LOCRPT")	then locrptcb({data="loc data\r\n",para="LOCRPT"},false) end
+	--end
 end
 
 --位置包发送回调
 --启动定时器，20秒钟后再次发送位置包
 function locrptcb(item,result)
 	print("locrptcb",linksta)
-	if linksta then
+	--if linksta then
+		linkapp.sckdisc(SCK_IDX)
 		sys.timer_start(locrpt,20000)
-	end
+	--end
 end
 
 
 --发送心跳包数据到后台
 function heartrpt()
 	print("heartrpt",linksta)
-	if linksta then
-		snd("heart data\r\n","HEARTRPT")		
-	end
+	--if linksta then
+		if not snd("heart data\r\n","HEARTRPT")	then heartrptcb({data="heart data\r\n",para="HEARTRPT"},false) end	
+	--end
 end
 
 --心跳包发送回调
 --启动定时器，10秒钟后再次发送心跳包
 function heartrptcb(item,result)
 	print("heartrptcb",linksta)
-	if linksta then
+	--if linksta then
+		linkapp.sckdisc(SCK_IDX)
 		sys.timer_start(heartrpt,10000)
-	end
+	--end
 end
 
 local function sndcb(item,result)
@@ -78,7 +79,7 @@ end
 
 --socket状态的处理函数
 function ntfy(idx,evt,result,item)
-	print("ntfy",evt,result,item)
+	print("ntfy",evt,result,item,hasconnected)
 	--连接结果
 	if evt == "CONNECT" then
 		--连接成功
@@ -86,14 +87,22 @@ function ntfy(idx,evt,result,item)
 			linksta = true
 			--停止重连定时器
 			sys.timer_stop(reconn)
-			--发送心跳包到后台
-			heartrpt()
-			--发送位置包到后台
-			locrpt()
+			--开机后第一次连接成功
+			if not hasconnected then
+				hasconnected = true
+				--发送心跳包到后台
+				heartrpt()
+				--发送位置包到后台
+				locrpt()
+			end
 		--连接失败
 		else
-			--5秒后重连
-			sys.timer_start(reconn,5000)
+			if not hasconnected then
+				--5秒后重连
+				sys.timer_start(reconn,5000)
+			else
+				--补充自定义功能代码
+			end			
 		end	
 	--数据发送结果
 	elseif evt == "SEND" then
@@ -103,19 +112,15 @@ function ntfy(idx,evt,result,item)
 	--连接被动断开
 	elseif evt == "STATE" and result == "CLOSED" then
 		linksta = false
-		sys.timer_stop(heartrpt)
-		sys.timer_stop(locrpt)
-		reconn()
+		--补充自定义功能代码
 	--连接主动断开
 	elseif evt == "DISCONNECT" then
-		linksta = false
-		sys.timer_stop(heartrpt)
-		sys.timer_stop(locrpt)
-		reconn()		
+		linksta = false				
 	end
-	--其他错误处理，断开数据链路，重新连接
+	--其他错误处理
 	if smatch((type(result)=="string") and result or "","ERROR") then
-		link.shut()
+		--link.shut() --断开数据链路，重新连接
+		--补充自定义功能代码
 	end
 end
 
