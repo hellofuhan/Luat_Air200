@@ -507,6 +507,7 @@ local function qryrcd(packet)
 end
 
 local function sndqryrcdreq(s,w,t,c,tm,d)
+	if not (s and w and t and c and tm and d) then sys.dispatch("SND_QRYRCD_CNF",false,s,c) return end
 	mqttdup.rmv("PUBQRYRCD&"..s.."!"..c)
 	local dat,para = mqtt.pack(mqtt.PUBLISH,{qos=1,topic=entopic("soundrecord"),payload=protoair.pack(protoair.QRYRCDREQ,s,w,t,c,0,tm,d)})
 	para.usr = s.."!"..c
