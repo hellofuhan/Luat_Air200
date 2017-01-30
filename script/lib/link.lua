@@ -16,10 +16,10 @@ local tostring = base.tostring
 local req = ril.request
 
 local MAXLINKS = 7 -- id 0-7
-local IPSTART_INTVL = 10000 --IP环境建立失败时间隔10秒重连
+local IPSTART_INTVL = 5000 --IP环境建立失败时间隔5秒重连
 
 local linklist = {}
-local ipstatus = "IP INITIAL"
+local ipstatus,shuting = "IP INITIAL"
 local cgatt
 local apnname = "CMNET"
 local username=''
@@ -183,7 +183,7 @@ function connect(id,protocol,address,port)
 
 	local connstr = string.format("AT+CIPSTART=%d,\"%s\",\"%s\",%s",id,protocol,address,port)
 
-	if ipstatus ~= "IP STATUS" and ipstatus ~= "IP PROCESSING" then
+	if (ipstatus ~= "IP STATUS" and ipstatus ~= "IP PROCESSING") or shuting then
 		-- ip环境未准备好先加入等待
 		linklist[id].pending = connstr
 	else
@@ -351,13 +351,14 @@ local function setIPStatus(status)
 			req("AT+CIFSR")
 			req("AT+CIPSTATUS")
 		else -- 其他异常状态关闭至IP INITIAL
-			req("AT+CIPSHUT")
+			shut()
 			sys.timer_stop(req,"AT+CIPSTATUS")
 		end
 	end
 end
 
 local function shutcnf(result)
+	shuting = false
 	if result == "SHUT OK" then
 		setIPStatus("IP INITIAL")
 		for i = 0,MAXLINKS do
@@ -430,7 +431,7 @@ function urc(data,prefix)
 		linkstatus(data)
 	elseif prefix == "+PDP" then
 		--req("AT+CIPSTATUS")
-		req("AT+CIPSHUT")
+		shut()
 		sys.timer_stop(req,"AT+CIPSTATUS")
 	elseif prefix == "+RECEIVE" then
 		local lid,len = string.match(data,",(%d),(%d+)",string.len("+RECEIVE")+1)
@@ -449,6 +450,7 @@ end
 
 function shut()
 	req("AT+CIPSHUT")
+	shuting = true
 end
 reset = shut
 

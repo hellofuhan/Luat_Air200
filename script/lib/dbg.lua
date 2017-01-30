@@ -1,4 +1,6 @@
 module(...,package.seeall)
+local link = require"link"
+local misc = require"misc"
 
 local prot,server,port,FREQ,lid = "UDP","test.nothing.com",9000,1800000
 local DBG_FILE,resinf,inf,luaerr,d1,d2 = "/dbg.txt",""

@@ -29,8 +29,8 @@ end
 local function conrstpara(idx,suc)
 	if not checkidx(1,idx,"conrstpara") then return end
 	scks[idx].conretry,scks[idx].concause = 0
-	if not suc then	scks[idx].sndpending = {} end
-	scks[idx].sndingitem,scks[idx].waitingrspitem = {},{}
+	if not suc then	scks[idx].sndpending,scks[idx].sndingitem = {},{} end
+	scks[idx].waitingrspitem = {}
 end
 
 local function sndrstpara(idx)
@@ -68,8 +68,7 @@ function setwaitingrspitem(idx,item)
 	end
 end
 
-local function conack(idx,cause,suc)
-	conrstpara(idx,suc)
+local function conack(idx,cause,suc)	
 	if #scks[idx].sndpending ~= 0 and not suc then
 		while #scks[idx].sndpending ~= 0 do
 			scks[idx].rsp(idx,"SEND",suc,table.remove(scks[idx].sndpending,1))
@@ -77,6 +76,7 @@ local function conack(idx,cause,suc)
 	else
 		scks[idx].rsp(idx,"CONNECT",suc,cause)
 	end
+	conrstpara(idx,suc)
 end
 
 local function sndnxt(id,idx)
@@ -91,11 +91,11 @@ end
 local function sndack(idx,suc,item)
 	sndrstpara(idx)
 	scks[idx].rsp(idx,"SEND",suc,item)
-	if #scks[idx].sndpending ~= 0 and not suc then
+	--[[if #scks[idx].sndpending ~= 0 and not suc then
 		while #scks[idx].sndpending ~= 0 do
 			scks[idx].rsp(idx,"SEND",suc,table.remove(scks[idx].sndpending,1))
 		end
-	end
+	end]]
 end
 
 local function sckrsp(id,evt,val)--对此连接的状态通知和处理的程序
@@ -141,7 +141,7 @@ local function sckrsp(id,evt,val)--对此连接的状态通知和处理的程序
 		local cause = scks[idx].discause
 		discrstpara(idx)
 		if cause == SVR_CHANGE or #scks[idx].sndpending ~= 0 then
-			--link.connect(id,scks[idx].prot,scks[idx].addr,scks[idx].port)
+			link.connect(id,scks[idx].prot,scks[idx].addr,scks[idx].port)
 			scks[idx].concause = cause
 		end
 		scks[idx].rsp(idx,"DISCONNECT",true,cause)
@@ -229,12 +229,12 @@ function scksnd(idx,data,para,pos,ins)
 	local item,tail = {data = data, para = para},#scks[idx].sndpending+1
 
 	if lstate(sckid) ~= "CONNECTED" then
-		local res = link.connect(sckid,scks[idx].prot,scks[idx].addr,scks[idx].port)
+		--[[local res = link.connect(sckid,scks[idx].prot,scks[idx].addr,scks[idx].port)
 		if res or (not res and ins) then
 			table.insert(scks[idx].sndpending,pos or tail,item)
 		else
 			return
-		end
+		end]]
 		return
 	else
 		if scks[idx].sndingitem.data or scks[idx].waitingrspitem.data then
@@ -250,7 +250,6 @@ end
 
 function sckdisc(idx,cause)
 	if not checkidx1(idx,"sckdisc") then return end
-	if #scks[idx].sndpending ~= 0 and not scks[idx].sndingitem.data then return end
 	scks[idx].discause = cause
 	return link.disconnect(scks[idx].id) --关闭连接
 end

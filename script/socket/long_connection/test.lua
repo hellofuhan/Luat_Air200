@@ -15,7 +15,17 @@ module(...,package.seeall)
 local ssub,schar,smatch,sbyte = string.sub,string.char,string.match,string.byte
 --测试时请搭建自己的服务器
 local SCK_IDX,PROT,ADDR,PORT = 1,"TCP","www.test.com",6500
+--linksta:与后台的socket连接状态
 local linksta
+--一个连接周期内的动作：如果连接后台失败，会尝试重连，重连间隔为RECONN_PERIOD秒，最多重连RECONN_MAX_CNT次
+--如果一个连接周期内都没有连接成功，则等待RECONN_CYCLE_PERIOD秒后，重新发起一个连接周期
+--如果连续RECONN_CYCLE_MAX_CNT次的连接周期都没有连接成功，则重启软件
+local RECONN_MAX_CNT,RECONN_PERIOD,RECONN_CYCLE_MAX_CNT,RECONN_CYCLE_PERIOD = 3,5,3,20
+--reconncnt:当前连接周期内，已经重连的次数
+--reconncyclecnt:连续多少个连接周期，都没有连接成功
+--一旦连接成功，都会复位这两个标记
+--reconning:是否在尝试连接
+local reconncnt,reconncyclecnt,reconning = 0,0
 
 local function print(...)
 	_G.print("test",...)
@@ -72,8 +82,19 @@ local function sndcb(item,result)
 end
 
 local function reconn()
-	print("reconn")
-	connect(linkapp.NORMAL)
+	print("reconn",reconncnt,reconning,reconncyclecnt)
+	if reconning then return end
+	if reconncnt < RECONN_MAX_CNT then		
+		reconncnt = reconncnt+1
+		link.shut()
+		connect(linkapp.NORMAL)
+	else
+		reconncnt,reconncyclecnt = 0,reconncyclecnt+1
+		if reconncyclecnt >= RECONN_CYCLE_MAX_CNT then
+			dbg.restart("connect fail")
+		end
+		sys.timer_start(reconn,RECONN_CYCLE_PERIOD*1000)
+	end
 end
 
 --socket状态的处理函数
@@ -81,9 +102,10 @@ function ntfy(idx,evt,result,item)
 	print("ntfy",evt,result,item)
 	--连接结果
 	if evt == "CONNECT" then
+		reconning = false
 		--连接成功
 		if result then
-			linksta = true
+			reconncnt,reconncyclecnt,linksta = 0,0,true
 			--停止重连定时器
 			sys.timer_stop(reconn)
 			--发送心跳包到后台
@@ -93,7 +115,7 @@ function ntfy(idx,evt,result,item)
 		--连接失败
 		else
 			--5秒后重连
-			sys.timer_start(reconn,5000)
+			sys.timer_start(reconn,RECONN_PERIOD*1000)
 		end	
 	--数据发送结果
 	elseif evt == "SEND" then
@@ -130,6 +152,7 @@ end
 --rcv：socket接收数据的处理函数
 function connect(cause)	
 	linkapp.sckconn(SCK_IDX,cause,PROT,ADDR,PORT,ntfy,rcv)
+	reconning = true
 end
 
 connect(linkapp.NORMAL)
