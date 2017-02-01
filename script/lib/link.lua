@@ -480,11 +480,14 @@ local function rsp(cmd,success,response,intermediate)
 		if response == "ERROR" then
 			statusind(id,"ERROR")
 		end
-	elseif checkciicrtm and prefix == "+CIICR" then
+	elseif prefix == "+CIICR" then
 		if success then
-			if not sys.timer_is_active(sys.restart,"checkciicr") then
+			if checkciicrtm and not sys.timer_is_active(sys.restart,"checkciicr") then
 				sys.timer_start(sys.restart,checkciicrtm,"checkciicr")
 			end
+		else
+			shut()
+			sys.timer_stop(req,"AT+CIPSTATUS")
 		end
 	end
 end
@@ -498,6 +501,7 @@ ril.regrsp("+CIPSTART",rsp)
 ril.regrsp("+CIPSEND",rsp)
 ril.regrsp("+CIPCLOSE",rsp)
 ril.regrsp("+CIPSHUT",rsp)
+ril.regrsp("+CIICR",rsp)
 
 -- 在网络正常后初始化ip
 local QUERYTIME = 2000

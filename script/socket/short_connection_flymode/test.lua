@@ -3,7 +3,7 @@ module(...,package.seeall)
 --[[
 此例子为短连接，发送数据后，进入飞行模式，然后定时退出飞行模式再发送数据，如此循环
 功能需求：
-1、连接后台发送位置包"loc data\r\n"到后台，无论发送成功或者失败都进入飞行模式；
+1、连接后台发送位置包"loc data\r\n"到后台，“超时2分钟没有发起数据发送”或者“无论发送成功或者失败”都进入飞行模式；
 2、进入飞行模式20分钟后，退出飞行模式，然后继续第1步
 循环以上2个步骤
 2、收到后台的数据时，在rcv函数中打印出来
@@ -35,18 +35,26 @@ function snd(data,para,pos,ins)
 	return linkapp.scksnd(SCK_IDX,data,para,pos,ins)
 end
 
+local function locrptimeout()
+	locrptcb({data="loc data\r\n",para="LOCRPT"},false)
+end
 
 --发送位置包数据到后台
 function locrpt()
 	print("locrpt",linksta)
 	misc.setflymode(false)
 	--if linksta then
-		if not snd("loc data\r\n","LOCRPT")	then locrptcb({data="loc data\r\n",para="LOCRPT"},false) end	
+		if snd("loc data\r\n","LOCRPT")	then
+			--设置2分钟定时器，如果超时2分钟数据都没有发送成功，则直接进入飞行模式
+			sys.timer_start(locrptimeout,120000)
+		else
+			locrptimeout()
+		end	
 	--end
 end
 
 --位置包发送回调
---进入飞行模式，10秒后再退出飞行模式，连接后台发送数据
+--进入飞行模式，20分钟后再退出飞行模式，连接后台发送数据
 function locrptcb(item,result)
 	print("locrptcb",linksta)
 	--if linksta then
@@ -54,6 +62,7 @@ function locrptcb(item,result)
 		link.shut()
 		misc.setflymode(true)
 		sys.timer_start(locrpt,1200000)
+		sys.timer_stop(locrptimeout)
 	--end
 end
 
