@@ -26,7 +26,7 @@ local username=''
 local password=''
 local connectnoretrestart = false
 local connectnoretinterval
-local apnflag,checkciicrtm=true
+local apnflag,checkciicrtm,flymode=true
 
 function setapn(a,b,c)
 	apnname,username,password = a,b or '',c or ''
@@ -62,8 +62,8 @@ function setconnectnoretrestart(flag,interval)
 end
 
 local function setupIP()
-	print("link.setupIP:",ipstatus,cgatt)
-	if ipstatus ~= "IP INITIAL" then
+	print("link.setupIP:",ipstatus,cgatt,flymode)
+	if ipstatus ~= "IP INITIAL" or flymode then
 		return
 	end
 
@@ -530,7 +530,7 @@ local function cgattrsp(cmd,success,response,intermediate)
 end
 
 querycgatt = function()
-	req("AT+CGATT?",nil,cgattrsp)
+	if not flymode then req("AT+CGATT?",nil,cgattrsp) end
 end
 
 -- ≈‰÷√Ω”ø⁄
@@ -569,14 +569,21 @@ local apntable =
 	["46006"] = "UNINET",
 }
 
-local function proc(id)
-	if apnflag then
-		if apn then
-			local temp1,temp2,temp3=apn.get_default_apn(tonumber(sim.getmcc(),16),tonumber(sim.getmnc(),16))
-			if temp1 == '' or temp1 == nil then temp1="CMNET" end
-			setapn(temp1,temp2,temp3)
-		else
-			setapn(apntable[sim.getmcc()..sim.getmnc()] or "CMNET")
+local function proc(id,para)
+	if id=="IMSI_READY" then
+		if apnflag then
+			if apn then
+				local temp1,temp2,temp3=apn.get_default_apn(tonumber(sim.getmcc(),16),tonumber(sim.getmnc(),16))
+				if temp1 == '' or temp1 == nil then temp1="CMNET" end
+				setapn(temp1,temp2,temp3)
+			else
+				setapn(apntable[sim.getmcc()..sim.getmnc()] or "CMNET")
+			end
+		end
+	elseif id=="FLYMODE_IND" then
+		flymode = para
+		if para then
+			sys.timer_stop(req,"AT+CIPSTATUS")
 		end
 	end
 	return true
@@ -587,6 +594,6 @@ function checkciicr(tm)
 	ril.regrsp("+CIICR",rsp)
 end
 
-sys.regapp(proc,"IMSI_READY")
+sys.regapp(proc,"IMSI_READY","FLYMODE_IND")
 sys.regapp(netmsg,"NET_STATE_CHANGED")
 

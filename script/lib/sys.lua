@@ -31,6 +31,9 @@ local para = {}
 local loop = {}
 local lprfun,lpring
 local LIB_ERR_FILE,liberr = "/lib_err.txt",""
+--工作模式：简单模式，用户自定义模式，完整模式
+SIMPLE_MODE,USER_MODE,FULL_MODE = 0,1,2
+local workmode = FULL_MODE
 
 local function timerfnc(tid)
 	if tpool[tid] ~= nil then
@@ -202,6 +205,18 @@ end
 -- 启动gsm
 function poweron()
 	rtos.poweron(1)
+end
+
+--设置工作模式
+function setworkmode(v)
+	if v==SIMPLE_MODE or v==USER_MODE or v==FULL_MODE then
+		workmode = v
+		dispatch("SYS_WORKMODE_IND")
+	end
+end
+
+function getworkmode()
+	return workmode
 end
 
 --应用消息分发,消息通知

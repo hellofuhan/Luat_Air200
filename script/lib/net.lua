@@ -14,7 +14,7 @@ local tonumber,tostring = base.tonumber,base.tostring
 local state = "INIT"
 local lac,ci,rssi = "","",0
 local csqqrypriod,cengqrypriod = 60*1000
-local cellinfo = {}
+local cellinfo,flymode,csqswitch,cengswitch = {}
 
 local function creg(data)
 	local p1,s
@@ -94,7 +94,7 @@ end
 
 local function neturc(data,prefix)
 	if prefix == "+CREG" then
-		req("AT+CSQ") -- 收到网络状态变化时,更新一下信号值
+		csqquery() -- 收到网络状态变化时,更新一下信号值
 		creg(data)
 	elseif prefix == "+CENG" then
 		ceng(data)
@@ -161,27 +161,41 @@ end
 
 function startquerytimer() end
 
-local function SimInd(id,para)
-	if para ~= "RDY" then
-		state = "UNREGISTER"
-		dispatch("NET_STATE_CHANGED",state)
-	end
-	if para == "NIST" then
-		sys.timer_stop(queryfun)
+local function ind(id,para)
+	if id=="SIM_IND" then
+		if para ~= "RDY" then
+			state = "UNREGISTER"
+			dispatch("NET_STATE_CHANGED",state)
+		end
+		if para == "NIST" then
+			sys.timer_stop(queryfun)
+		end
+	elseif id=="FLYMODE_IND" then
+		flymode = para
+		if not para then
+			startcsqtimer()
+			startcengtimer()
+		end
+	elseif id=="SYS_WORKMODE_IND" then
+		startcengtimer()
+		startcsqtimer()
 	end
 
 	return true
 end
 
 function startcsqtimer()
-	req("AT+CSQ")
-	sys.timer_start(startcsqtimer,csqqrypriod)
+	if not flymode and (csqswitch or sys.getworkmode()==sys.FULL_MODE) then
+		csqquery()
+		sys.timer_start(startcsqtimer,csqqrypriod)
+	end
 end
 
 function startcengtimer()
-	req("AT+CENG?")
-	req("AT+CREG?")
-	sys.timer_start(startcengtimer,cengqrypriod)
+	if not flymode and (cengswitch or sys.getworkmode()==sys.FULL_MODE) then
+		cengquery()
+		sys.timer_start(startcengtimer,cengqrypriod)
+	end
 end
 
 local function rsp(cmd,success,response,intermediate)
@@ -217,15 +231,27 @@ function setcengqueryperiod(period)
 end
 
 function cengquery()
-	req("AT+CENG?")
-	req("AT+CREG?")
+	if not flymode then
+		if cengswitch or sys.getworkmode()==sys.FULL_MODE then req("AT+CENG?") end
+		req("AT+CREG?")
+	end
+end
+
+function setcengswitch(v)
+	cengswitch = v
+	if v and not flymode then startcengtimer() end
 end
 
 function csqquery()
-	req("AT+CSQ")
+	if not flymode and (csqswitch or sys.getworkmode()==sys.FULL_MODE) then req("AT+CSQ") end
 end
 
-sys.regapp(SimInd,"SIM_IND")
+function setcsqswitch(v)
+	csqswitch = v
+	if v and not flymode then startcsqtimer() end
+end
+
+sys.regapp(ind,"SIM_IND","FLYMODE_IND","SYS_WORKMODE_IND")
 ril.regurc("+CREG",neturc)
 ril.regurc("+CENG",neturc)
 ril.regrsp("+CSQ",rsp)

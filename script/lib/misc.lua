@@ -8,7 +8,7 @@ local io = require"io"
 module(...)
 
 local tonumber,tostring,print,req,smatch = base.tonumber,base.tostring,base.print,ril.request,string.match
-local sn,snrdy,imeirdy,ver,imei
+local sn,snrdy,imeirdy,ver,imei,clkswitch
 
 local CCLK_QUERY_TIMER_PERIOD = 60*1000
 local clk,calib,cbfunc={},false
@@ -35,6 +35,8 @@ local function rsp(cmd,success,response,intermediate)
 		else
 			calib = false
 		end
+	elseif smatch(cmd,"AT%+CFUN=[01]") then
+		sys.dispatch("FLYMODE_IND",smatch(cmd,"AT%+CFUN=(%d)")=="0")
 	end
 	if cbfunc then
 		local tmp = cbfunc
@@ -69,14 +71,23 @@ local CclkQueryTimerFun = function()
 end
 
 function startclktimer()
-	sys.dispatch("CLOCK_IND")
-	print('CLOCK_IND',os.date("*t").sec)
-	sys.timer_start(CclkQueryTimerFun,(60-os.date("*t").sec)*1000)
+	if clkswitch or sys.getworkmode()==sys.FULL_MODE then
+		sys.dispatch("CLOCK_IND")
+		print('CLOCK_IND',os.date("*t").sec)
+		sys.timer_start(CclkQueryTimerFun,(60-os.date("*t").sec)*1000)
+	end
 end
 
-function chingeclktimer()
-	sys.timer_stop(startclktimer)
-	sys.timer_start(CclkQueryTimerFun,(60-os.date("*t").sec)*1000)
+function changeclktimer()
+	if clkswitch or sys.getworkmode()==sys.FULL_MODE then
+		sys.timer_stop(startclktimer)
+		sys.timer_start(CclkQueryTimerFun,(60-os.date("*t").sec)*1000)
+	end
+end
+
+function setclkswitch(v)
+	clkswitch = v
+	if v then startclktimer() end
 end
 
 function getsn()
@@ -119,6 +130,14 @@ function getcalib()
 	return calib
 end
 
+local function ind(id,para)
+	if id=="SYS_WORKMODE_IND" then
+		startclktimer()
+	end
+
+	return true
+end
+
 ril.regrsp("+ATWMFT",rsp)
 ril.regrsp("+WISN",rsp)
 ril.regrsp("+VER",rsp,4,"^[%w_]+$")
@@ -131,3 +150,4 @@ req("AT+WISN?")
 req("AT+VER")
 req("AT+CGSN")
 startclktimer()
+sys.regapp(ind,"SYS_WORKMODE_IND")
