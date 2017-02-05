@@ -219,6 +219,13 @@ function getworkmode()
 	return workmode
 end
 
+local baseprint = base.print
+local function empty()
+end
+function opntrace(v)
+	base.print = v and baseprint or empty
+end
+
 --应用消息分发,消息通知
 local apps = {}
 
