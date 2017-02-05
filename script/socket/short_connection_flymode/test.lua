@@ -4,7 +4,7 @@ module(...,package.seeall)
 此例子为短连接，发送数据后，进入飞行模式，然后定时退出飞行模式再发送数据，如此循环
 功能需求：
 1、连接后台发送位置包"loc data\r\n"到后台，超时时间为2分钟，2分钟内如果失败，会一直重试，发送成功或者超时后都进入飞行模式；
-2、进入飞行模式20分钟后，退出飞行模式，然后继续第1步
+2、进入飞行模式5分钟后，退出飞行模式，然后继续第1步
 循环以上2个步骤
 2、收到后台的数据时，在rcv函数中打印出来
 测试时请搭建自己的服务器，并且修改下面的PROT，ADDR，PORT 
@@ -12,7 +12,7 @@ module(...,package.seeall)
 
 local ssub,schar,smatch,sbyte = string.sub,string.char,string.match,string.byte
 --测试时请搭建自己的服务器
-local SCK_IDX,PROT,ADDR,PORT = 1,"TCP","120.209.197.147",6500
+local SCK_IDX,PROT,ADDR,PORT = 1,"TCP","www.test.com",6500
 --每次连接后台，会有如下异常处理
 --一个连接周期内的动作：如果连接后台失败，会尝试重连，重连间隔为RECONN_PERIOD秒，最多重连RECONN_MAX_CNT次
 --如果一个连接周期内都没有连接成功，则等待RECONN_CYCLE_PERIOD秒后，重新发起一个连接周期
@@ -80,7 +80,7 @@ end
 
 --[[
 函数名：sndcb
-功能  ：位置包发送结果处理，发送成功或者超时，都会进入飞行模式，启动20分钟的“退出飞行模式，连接后台”定时器
+功能  ：位置包发送结果处理，发送成功或者超时，都会进入飞行模式，启动5分钟的“退出飞行模式，连接后台”定时器
 参数  ：  
         result： bool类型，发送结果或者是否超时，true为成功或者超时，其他为失败
 		item：table类型，{data=,para=}，消息回传的参数和数据，例如调用linkapp.scksnd时传入的第2个和第3个参数分别为dat和par，则item={data=dat,para=par}
@@ -152,9 +152,6 @@ end
 		result： bool类型，消息事件结果，true为成功，其他为失败
 		item：table类型，{data=,para=}，消息回传的参数和数据，目前只是在SEND类型的事件中用到了此参数，例如调用linkapp.scksnd时传入的第2个和第3个参数分别为dat和par，则item={data=dat,para=par}
 返回值：无
-
-注意：如果当前没有调用linkapp.sckconn，则不会返回CONNECT事件通知
-      例如直接调用linkapp.scksnd发送数据，在linkapp中会自动去连接后台，连接成功后，不会返回CONNECT事件通知，而是直接去发送数据，然后返回SEND事件通知
 ]]
 function ntfy(idx,evt,result,item)
 	print("ntfy",evt,result,item)

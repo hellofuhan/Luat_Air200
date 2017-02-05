@@ -73,9 +73,8 @@ local function conack(idx,cause,suc)
 		while #scks[idx].sndpending ~= 0 do
 			scks[idx].rsp(idx,"SEND",suc,table.remove(scks[idx].sndpending,1))
 		end
-	else
-		scks[idx].rsp(idx,"CONNECT",suc,cause)
 	end
+	scks[idx].rsp(idx,"CONNECT",suc,cause)
 	conrstpara(idx,suc)
 end
 
