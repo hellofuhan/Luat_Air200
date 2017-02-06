@@ -216,18 +216,26 @@ provide relevant and powerful tooling.
 	
 	To flexibly debug LUA, AirM2M develop a middleware, AMWatchDll.
 	
-	1) Download Lua Development Tools(LDT)
-	   http://www.eclipse.org/ldt, Windows 32-bit or 64-bit
+	1) Install JDK
+	   Java SE Development Kit(JDK):
+	     www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 	   
-	2) Download simulator
+	   The latest JDK:
+	     Windows x86(32-bit), 'jdk-8u121-windows-i586.exe'
+	     Windows x64(64-bit), 'jdk-8u121-windows-x64.exe'
+	
+	2) Download Lua Development Tools(LDT)
+	   www.eclipse.org/ldt/#installation, Windows 32-bit or 64-bit
+	   
+	3) Download simulator
 	   git@github.com:airm2m-open/luat.git
 	   AMWatchDll is source code of middleware, sample-script is a project LDT create a 'Lua Project'.
 	
-	3) Install C Run-Time(CRT) library
+	4) Install C Run-Time(CRT) library
 		Windows 32-bit, sample-script --> Win32_lib --> 'VC_x86Runtime.exe'
 		Windows 64-bit, sample-script --> x64_lib --> 'VC_x64Runtime.exe'
 	
-	4) Configure LDT's interpreters
+	5) Configure LDT's interpreters
 		a) Window --> Preferences --> Lua --> Interpreters --> Add
 		Windows 32-bit, sample-script --> Win32_lib --> Lua5.1
 		Windows 64-bit, sample-script --> x64_lib --> Lua5.1
@@ -241,12 +249,16 @@ provide relevant and powerful tooling.
 		c) Run --> Debug Configurations --> Runtime Interpreter
 		'Launch script' must select 'sample-script\src\init.lua'
 		'Runtime Interpreter' must select default interpreter.
+		
+		AMWatchDll don't run on Windows XP. you must modify a lua file, 'init.lua':
+		Windows 32-bit, The value 'os_type' is 'Win32_lib'.
+		Windows 64-bit, The value 'os_type' is 'x64_lib'.
 	
-	5) Import existing project
+	6) Import existing project
 		After to create a Workspace, to copy 'sample-script' in Workspace's directory.
 	  File --> Import... --> General --> Existing Projects into Workspace
 	  
-	6) Run/Debug project
+	7) Run/Debug project
 	  resources file, 'sample-script\src\ldata', such as .mp3, .bmp, .png and .gif.
 	  lua shell, 'sample-script\src\ldata', copy your lua shell in 'ldata'.
 	  'AMLuaDebug.log' is log file of 'AMWatchDll' in 'sample-script'.
