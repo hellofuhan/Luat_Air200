@@ -16,7 +16,7 @@ local dispatch = sys.dispatch
 local updmode = base.UPDMODE or 0
 
 --通讯协议,服务器,后台
-local PROTOCOL,SERVER,PORT = "UDP","test.nothing.com",2000
+local PROTOCOL,SERVER,PORT
 --升级包位置
 local UPDATEPACK = "/luazip/update.bin"
 
@@ -25,7 +25,7 @@ local CMD_GET_TIMEOUT = 10000
 -- 错误包(包ID或者长度不匹配) 在一段时间后进行重新获取
 local ERROR_PACK_TIMEOUT = 10000
 -- 每次GET命令重试次数
-local CMD_GET_RETRY_TIMES = 3
+local CMD_GET_RETRY_TIMES = 5
 
 local lid
 local state = "IDLE"
@@ -149,16 +149,18 @@ function upend(succ)
 	if updmode == 1 and tmpsta ~= "IDLE" then
 		dispatch("UP_EVT","UP_END_IND",succ)
 	end
+	dispatch("UPDATE_END_IND")
 end
 
 function reqcheck()
 	state = "CHECK"
-	send(lid,string.format("%s,%s,%s",misc.getsn(),base.PROJECT,base.VERSION))
+	send(lid,string.format("%s,%s,%s",misc.getimei(),base.PROJECT,base.VERSION))
 	sys.timer_start(retry,CMD_GET_TIMEOUT)
 end
 
 local function nofity(id,evt,val)
 	if evt == "CONNECT" then
+		dispatch("UPDATE_BEGIN_IND")
 		if val == "CONNECT OK" then
 			reqcheck()
 		else
@@ -176,6 +178,7 @@ local upselcb = function(sel)
 		upbegin(chkrspdat)
 	else
 		link.close(lid)
+		dispatch("UPDATE_END_IND")
 	end
 end
 
@@ -218,8 +221,15 @@ function settimezone(zone)
 	timezone = zone
 end
 
--- 只有当定义了项目标识与版本号才支持远程升级
-if base.PROJECT ~= nil and base.VERSION ~= nil and updmode ~= nil then
-	lid = link.open(nofity,recv)
-	link.connect(lid,PROTOCOL,SERVER,PORT)
+function setup(prot,server,port)
+	if prot and server and port then
+		PROTOCOL,SERVER,PORT = prot,server,port
+		-- 只有当定义了项目标识与版本号才支持远程升级
+		if base.PROJECT ~= nil and base.VERSION ~= nil and updmode ~= nil then
+			lid = link.open(nofity,recv)
+			link.connect(lid,PROTOCOL,SERVER,PORT)
+		end
+	end
 end
+
+

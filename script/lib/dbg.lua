@@ -2,7 +2,7 @@ module(...,package.seeall)
 local link = require"link"
 local misc = require"misc"
 
-local prot,server,port,FREQ,lid = "UDP","test.nothing.com",9000,1800000
+local FREQ,prot,addr,port,lid = 1800000
 local DBG_FILE,resinf,inf,luaerr,d1,d2 = "/dbg.txt",""
 
 local function readtxt(f)
@@ -51,6 +51,7 @@ local function snd()
 	if string.len(data) > 0 then
 		link.send(lid,_G.PROJECT .. "," .. (_G.VERSION and (_G.VERSION .. ",") or "") .. misc.getimei() .. "," .. data)
 		sys.timer_start(snd,FREQ)
+		sys.timer_start(endntfy,20000)
 	end
 end
 
@@ -60,8 +61,15 @@ local reconntimes = 0
 local function reconn()
 	if reconntimes < 3 then
 		reconntimes = reconntimes+1
-		link.connect(lid,prot,server,port)
+		link.connect(lid,prot,addr,port)
+	else
+		endntfy()
 	end
+end
+
+function endntfy()
+	sys.dispatch("DBG_END_IND")
+	sys.timer_stop(sys.dispatch,"DBG_END_IND")
 end
 
 local function notify(id,evt,val)
@@ -90,6 +98,8 @@ local function recv(id,data)
 		writepara()
 		luaerr = ""
 		os.remove("/luaerrinfo.txt")
+		endntfy()
+		sys.timer_stop(endntfy)
 	end
 end
 
@@ -98,7 +108,9 @@ local function init()
 	getlasterr()
 	if valid() then
 		lid = link.open(notify,recv)
-		link.connect(lid,prot,server,port)
+		link.connect(lid,prot,addr,port)
+		sys.dispatch("DBG_BEGIN_IND")
+		sys.timer_start(sys.dispatch,120000,"DBG_END_IND")
 	end
 end
 
@@ -108,4 +120,9 @@ function restart(r)
 	rtos.restart()
 end
 
-init()
+function setup(inProt,inAddr,inPort)
+	if inProt and inAddr and inPort then
+		prot,addr,port = inProt,inAddr,inPort
+		init()
+	end
+end

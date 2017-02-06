@@ -8,7 +8,7 @@ local io = require"io"
 module(...)
 
 local tonumber,tostring,print,req,smatch = base.tonumber,base.tostring,base.print,ril.request,string.match
-local sn,snrdy,imeirdy,ver,imei,clkswitch
+local sn,snrdy,imeirdy,ver,imei,clkswitch,updating,dbging,flypending
 
 local CCLK_QUERY_TIMER_PERIOD = 60*1000
 local clk,calib,cbfunc={},false
@@ -112,7 +112,11 @@ function getimei()
 end
 
 function setflymode(val)
+	if val then
+		if updating or dbging then flypending = true return end
+	end
 	req("AT+CFUN="..(val and 0 or 1))
+	flypending = false
 end
 
 function set(typ,val,cb)
@@ -133,6 +137,16 @@ end
 local function ind(id,para)
 	if id=="SYS_WORKMODE_IND" then
 		startclktimer()
+	elseif id=="UPDATE_BEGIN_IND" then
+		updating = true
+	elseif id=="UPDATE_END_IND" then
+		updating = false
+		if flypending then setflymode(true) end
+	elseif id=="DBG_BEGIN_IND" then
+		dbging = true
+	elseif id=="DBG_END_IND" then
+		dbging = false
+		if flypending then setflymode(true) end
 	end
 
 	return true
@@ -150,4 +164,4 @@ req("AT+WISN?")
 req("AT+VER")
 req("AT+CGSN")
 startclktimer()
-sys.regapp(ind,"SYS_WORKMODE_IND")
+sys.regapp(ind,"SYS_WORKMODE_IND","UPDATE_BEGIN_IND","UPDATE_END_IND","DBG_BEGIN_IND","DBG_END_IND")

@@ -26,7 +26,7 @@ local username=''
 local password=''
 local connectnoretrestart = false
 local connectnoretinterval
-local apnflag,checkciicrtm,flymode=true
+local apnflag,checkciicrtm,flymode,updating,dbging,shutpending=true
 
 function setapn(a,b,c)
 	apnname,username,password = a,b or '',c or ''
@@ -320,16 +320,18 @@ function statusind(id,state)
 end
 
 local function connpend()
-	for k,v in pairs(linklist) do
-		if v.pending then
-			req(v.pending)
-			local id = string.match(v.pending,"AT%+CIPSTART=(%d)")
-			if id then
-				startconnectingtimer(tonumber(id))
+	for i = 0,MAXLINKS do
+		if linklist[i] ~= nil then
+			if linklist[i].pending then
+				req(linklist[i].pending)
+				local id = string.match(linklist[i].pending,"AT%+CIPSTART=(%d)")
+				if id then
+					startconnectingtimer(tonumber(id))
+				end
+				linklist[i].pending = nil
 			end
-			v.pending = nil
 		end
-	end
+	end	
 end
 
 local function setIPStatus(status)
@@ -448,9 +450,11 @@ function urc(data,prefix)
 	end
 end
 
-function shut()
+function shut()	
+	if updating or dbging then shutpending = true return end
 	req("AT+CIPSHUT")
 	shuting = true
+	shutpending = false
 end
 reset = shut
 
@@ -585,6 +589,16 @@ local function proc(id,para)
 		if para then
 			sys.timer_stop(req,"AT+CIPSTATUS")
 		end
+	elseif id=="UPDATE_BEGIN_IND" then
+		updating = true
+	elseif id=="UPDATE_END_IND" then
+		updating = false
+		if shutpending then shut() end
+	elseif id=="DBG_BEGIN_IND" then
+		dbging = true
+	elseif id=="DBG_END_IND" then
+		dbging = false
+		if shutpending then shut() end
 	end
 	return true
 end
@@ -594,6 +608,6 @@ function checkciicr(tm)
 	ril.regrsp("+CIICR",rsp)
 end
 
-sys.regapp(proc,"IMSI_READY","FLYMODE_IND")
+sys.regapp(proc,"IMSI_READY","FLYMODE_IND","UPDATE_BEGIN_IND","UPDATE_END_IND","DBG_BEGIN_IND","DBG_END_IND")
 sys.regapp(netmsg,"NET_STATE_CHANGED")
 
