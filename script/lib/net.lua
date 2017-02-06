@@ -192,7 +192,7 @@ function startcsqtimer()
 end
 
 function startcengtimer()
-	if not flymode and (cengswitch or sys.getworkmode()==sys.FULL_MODE) then
+	if cengqrypriod and not flymode and (cengswitch or sys.getworkmode()==sys.FULL_MODE) then
 		cengquery()
 		sys.timer_start(startcengtimer,cengqrypriod)
 	end
