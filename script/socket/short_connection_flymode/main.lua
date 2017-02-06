@@ -14,5 +14,5 @@ sys.init(0,0)
 --ril.request("AT*TRACE=\"DSS\",1,0")
 --ril.request("AT*TRACE=\"RDA\",1,0")
 --设置工作模式为简单模式
---sys.setworkmode(sys.SIMPLE_MODE)
+sys.setworkmode(sys.SIMPLE_MODE)
 sys.run()
