@@ -124,7 +124,7 @@ end
 参数  ：无
 返回值：无
 ]]
-local function reconn()
+function reconn()
 	print("reconn",reconncnt,conning,reconncyclecnt)
 	--conning表示正在尝试连接后台，一定要判断此变量，否则有可能发起不必要的重连，导致reconncnt增加，实际的重连次数减少
 	if conning then return end
