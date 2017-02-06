@@ -232,8 +232,9 @@ end
 
 function cengquery()
 	if not flymode then
-		if cengswitch or sys.getworkmode()==sys.FULL_MODE then req("AT+CENG?") end
-		req("AT+CREG?")
+		--if cengswitch or sys.getworkmode()==sys.FULL_MODE then req("AT+CENG?") end
+		req("AT+CENG?")
+		--req("AT+CREG?")
 	end
 end
 
@@ -243,7 +244,7 @@ function setcengswitch(v)
 end
 
 function csqquery()
-	if not flymode and (csqswitch or sys.getworkmode()==sys.FULL_MODE) then req("AT+CSQ") end
+	if not flymode --[[and (csqswitch or sys.getworkmode()==sys.FULL_MODE)]] then req("AT+CSQ") end
 end
 
 function setcsqswitch(v)
