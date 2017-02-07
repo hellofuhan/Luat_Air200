@@ -3,18 +3,22 @@ local base = _G
 local string = require"string"
 local sys = require "sys"
 local ril = require "ril"
+local pio = require"pio"
 require"sim"
 module("net")
 
 local dispatch = sys.dispatch
 local req = ril.request
 local smatch = string.match
-local tonumber,tostring = base.tonumber,base.tostring
+local tonumber,tostring,print = base.tonumber,base.tostring,base.print
 
 local state = "INIT"
 local lac,ci,rssi = "","",0
 local csqqrypriod,cengqrypriod = 60*1000
 local cellinfo,flymode,csqswitch,cengswitch = {}
+--ledstate:IDLE,CREG,CGATT,SCK
+local ledflg,ledpin,ledvalid,ledcregon,ledcregoff,ledcgatton,ledcgattoff,ledsckon,ledsckoff = false,pio.P0_15,1,300,700,300,1700,100,100
+local ledstate,ledontime,ledofftime,usersckconnect = "IDLE",0,0
 
 local function creg(data)
 	local p1,s
@@ -40,6 +44,7 @@ local function creg(data)
 		end
 		state = s
 		dispatch("NET_STATE_CHANGED",s)
+		procled()
 	end
 
 	if state == "REGISTERED" then
@@ -161,26 +166,33 @@ end
 
 function startquerytimer() end
 
-local function ind(id,para)
-	if id=="SIM_IND" then
-		if para ~= "RDY" then
-			state = "UNREGISTER"
-			dispatch("NET_STATE_CHANGED",state)
-		end
-		if para == "NIST" then
-			sys.timer_stop(queryfun)
-		end
-	elseif id=="FLYMODE_IND" then
-		flymode = para
-		if not para then
-			startcsqtimer()
-			startcengtimer()
-		end
-	elseif id=="SYS_WORKMODE_IND" then
-		startcengtimer()
-		startcsqtimer()
+local function simind(para)
+	if para ~= "RDY" then
+		state = "UNREGISTER"
+		dispatch("NET_STATE_CHANGED",state)
 	end
+	if para == "NIST" then
+		sys.timer_stop(queryfun)
+	end
+	return true
+end
 
+local function flyind(para)
+	if flymode~=para then
+		flymode = para
+		procled()
+	end
+	if not para then
+		startcsqtimer()
+		startcengtimer()
+		neturc("2","+CREG")
+	end
+	return true
+end
+
+local function workmodeind(para)
+	startcengtimer()
+	startcsqtimer()
 	return true
 end
 
@@ -252,7 +264,91 @@ function setcsqswitch(v)
 	if v and not flymode then startcsqtimer() end
 end
 
-sys.regapp(ind,"SIM_IND","FLYMODE_IND","SYS_WORKMODE_IND")
+local function ledblinkon()
+	--print("ledblinkon",ledstate,ledontime,ledofftime)
+	pio.pin.setval(ledvalid==1 and 1 or 0,ledpin)
+	if ledstate~="IDLE" then
+		sys.timer_start(ledblinkoff,ledontime)
+	else
+		sys.timer_stop(ledblinkon)
+		sys.timer_stop(ledblinkoff)
+	end
+end
+
+function ledblinkoff()
+	--print("ledblinkoff",ledstate,ledontime,ledofftime)
+	pio.pin.setval(ledvalid==1 and 0 or 1,ledpin)
+	if ledstate~="IDLE" then
+		sys.timer_start(ledblinkon,ledofftime)
+	else
+		sys.timer_stop(ledblinkon)
+		sys.timer_stop(ledblinkoff)
+	end
+end
+
+function procled()
+	print("procled",ledflg,ledstate,flymode,usersckconnect,cgatt,state)
+	if ledflg then
+		local newstate = "IDLE"
+		if flymode then
+		elseif usersckconnect then
+			newstate,newontime,newofftime = "SCK",ledsckon,ledsckoff
+		elseif cgatt then
+			newstate,newontime,newofftime = "CGATT",ledcgatton,ledcgattoff
+		elseif state=="REGISTERED" then
+			newstate,newontime,newofftime = "CREG",ledcregon,ledcregoff
+		end
+		if newstate~=ledstate then
+			ledstate,ledontime,ledofftime = newstate,newontime,newofftime
+			ledblinkoff()
+		end
+	end
+end
+
+local function usersckind(v)
+	print("usersckind",v)
+	if usersckconnect~=v then
+		usersckconnect = v
+		procled()
+	end
+end
+
+local function cgattind(v)
+	print("cgattind",v)
+	if cgatt~=v then
+		cgatt = v
+		procled()
+	end
+end
+
+function setled(v,pin,valid,cregon,cregoff,cgatton,cgattoff,sckon,sckoff)
+	if ledflg~=v then
+		ledflg = v
+		if v then
+			ledpin,ledvalid,ledcregon,ledcregoff = pin or ledpin,valid or ledvalid,cregon or ledcregon,cregoff or ledcregoff
+			ledcgatton,ledcgattoff,ledsckon,ledsckoff = cgatton or ledcgatton,cgattoff or ledcgattoff,sckon or ledsckon,sckoff or ledsckoff
+			pio.pin.setdir(pio.OUTPUT,ledpin)
+			procled()
+		else
+			sys.timer_stop(ledblinkon)
+			sys.timer_stop(ledblinkoff)
+			pio.pin.setval(valid==1 and 0 or 1,ledpin)
+			pio.pin.close(ledpin)
+			ledstate = "IDLE"
+		end		
+	end
+end
+
+local procer =
+{
+	SIM_IND = simind,
+	FLYMODE_IND = flyind,
+	SYS_WORKMODE_IND = workmodeind,
+	USER_SOCKET_CONNECT = usersckind,
+	NET_GPRS_READY = cgattind,
+}
+
+sys.regapp(procer)
 ril.regurc("+CREG",neturc)
 ril.regurc("+CENG",neturc)
 ril.regrsp("+CSQ",rsp)

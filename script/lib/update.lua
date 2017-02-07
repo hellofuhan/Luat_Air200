@@ -226,7 +226,7 @@ function setup(prot,server,port)
 		PROTOCOL,SERVER,PORT = prot,server,port
 		-- 只有当定义了项目标识与版本号才支持远程升级
 		if base.PROJECT ~= nil and base.VERSION ~= nil and updmode ~= nil then
-			lid = link.open(nofity,recv)
+			lid = link.open(nofity,recv,"update")
 			link.connect(lid,PROTOCOL,SERVER,PORT)
 		end
 	end

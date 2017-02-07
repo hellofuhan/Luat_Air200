@@ -289,7 +289,7 @@ local function flycb()
 end
 
 local function connectcb()
-	lid = link.open(nofity,rcv)
+	lid = link.open(nofity,rcv,"agps")
 	link.connect(lid,PROT,SVR,PORT)
 end
 
