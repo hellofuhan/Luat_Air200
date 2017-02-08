@@ -332,7 +332,7 @@ function setled(v,pin,valid,cregon,cregoff,cgatton,cgattoff,sckon,sckoff)
 		else
 			sys.timer_stop(ledblinkon)
 			sys.timer_stop(ledblinkoff)
-			pio.pin.setval(valid==1 and 0 or 1,ledpin)
+			pio.pin.setval(ledvalid==1 and 0 or 1,ledpin)
 			pio.pin.close(ledpin)
 			ledstate = "IDLE"
 		end		
