@@ -8,9 +8,33 @@ local function GetShellPath()
   return path
 end
 
+local function GetProcessorArch()
+  local t=io.popen("set PROCESSOR_ARCHITECTURE")
+  local s=t:read("*all"):sub(1,-2)
+  t:close()
+  
+  local arch = string.match(s,"=(.+)")
+  
+  return arch
+end
+
 local shellRoot = GetShellPath()
+local arch = GetProcessorArch()
 --Win32_lib,x64_lib
-local os_type = "x64_lib"
+local os_type = "dummy_lib"
+if arch == "AMD64" then
+  os_type="x64_lib"
+elseif arch == "x86" then
+  os_type="Win32_lib"
+else
+  os_type="dummy_lib"
+end
+
+if os_type=="dummy_lib" then
+  print("[AMWatch Debug-Engine] Init FAIL! ",arch," is invalid processor-architecture.")
+  return
+end
+
 local mAMWatchDllPath = string.format("%s/%s/AMWatchDll.dll",GetShellPath(),os_type)
 print("mAMWatchDllPath=",mAMWatchDllPath)
 local mAMWatchDll = package.loadlib(mAMWatchDllPath, "luaopen_AMWatch")
