@@ -46,12 +46,17 @@ local function valid()
 	return ((string.len(luaerr) > 0) or (string.len(inf) > 0)) and _G.PROJECT
 end
 
+local function rcvtimeout()
+	endntfy()
+	link.close(lid)
+end
+
 local function snd()
 	local data = (luaerr or "") .. (inf or "")
 	if string.len(data) > 0 then
 		link.send(lid,_G.PROJECT .. "," .. (_G.VERSION and (_G.VERSION .. ",") or "") .. misc.getimei() .. "," .. data)
 		sys.timer_start(snd,FREQ)
-		sys.timer_start(endntfy,20000)
+		sys.timer_start(rcvtimeout,20000)
 	end
 end
 
@@ -90,7 +95,7 @@ local function notify(id,evt,val)
 end
 
 local function recv(id,data)
-	if data == "OK" then
+	if string.upper(data) == "OK" then
 		sys.timer_stop(snd)
 		link.close(lid)
 		resinf = ""
@@ -99,7 +104,7 @@ local function recv(id,data)
 		luaerr = ""
 		os.remove("/luaerrinfo.txt")
 		endntfy()
-		sys.timer_stop(endntfy)
+		sys.timer_stop(rcvtimeout)
 	end
 end
 
@@ -107,7 +112,7 @@ local function init()
 	initpara()
 	getlasterr()
 	if valid() then
-		lid = link.open(notify,recv)
+		lid = link.open(notify,recv,"dbg")
 		link.connect(lid,prot,addr,port)
 		sys.dispatch("DBG_BEGIN_IND")
 		sys.timer_start(sys.dispatch,120000,"DBG_END_IND")

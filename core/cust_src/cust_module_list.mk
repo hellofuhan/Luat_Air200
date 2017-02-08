@@ -31,3 +31,5 @@ LOCAL_MODULE_DEPENDS  += cust_src/elua/lib/lpng/lpng_pal
 endif
 #-\NEW\zhutianhua\2014.1.24\Ìí¼Ólibpng¿â
 
+LOCAL_MODULE_DEPENDS  += cust_src/elua/lib/json
+

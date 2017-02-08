@@ -11,6 +11,7 @@ require"update"
 update.setup("udp","www.test.com",2233)
 require"test"
 
+net.setled(true)
 sys.init(0,0)
 --需要抓core中的trace时，打开如下三行
 --ril.request("AT*TRACE=\"SXS\",1,0")

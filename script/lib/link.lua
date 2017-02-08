@@ -112,7 +112,7 @@ local function validaction(id,action)
 	return true
 end
 
-function openid(id,notify,recv)
+function openid(id,notify,recv,tag)
 	if id > MAXLINKS or linklist[id] ~= nil then
 		print("openid:error",id)
 		return false
@@ -122,6 +122,7 @@ function openid(id,notify,recv)
 		notify = notify,
 		recv = recv,
 		state = "INITIAL",
+		tag = tag,
 	}
 
 	linklist[id] = link
@@ -137,14 +138,14 @@ function openid(id,notify,recv)
 	return true
 end
 
-function open(notify,recv)
+function open(notify,recv,tag)
 	local id = emptylink()
 
 	if id == nil then
 		return nil,"no empty link"
 	end
 
-	openid(id,notify,recv)
+	openid(id,notify,recv,tag)
 
 	return id
 end
@@ -254,6 +255,18 @@ end
 function linkstatus(data)
 end
 
+local function usersckisactive()
+	for i = 0,MAXLINKS do
+		if linklist[i] and not linklist[i].tag and linklist[i].state=="CONNECTED" then
+			return true
+		end
+	end
+end
+
+local function usersckntfy(id,v)
+	if not linklist[id].tag then sys.dispatch("USER_SOCKET_CONNECT",usersckisactive()) end
+end
+
 local function sendcnf(id,result)
 	local str = string.match(result,"([%u ])")
 	if str == "TCP ERROR" or str == "UDP ERROR" or str == "ERROR" then
@@ -271,13 +284,15 @@ function closecnf(id,result)
 	if linklist[id].state == "DISCONNECTING" then
 		linklist[id].state = "CLOSED"
 		linklist[id].notify(id,"DISCONNECT","OK")
+		usersckntfy(id,false)
 		stopconnectingtimer(id)
 	elseif linklist[id].state == "CLOSING" then
 		-- 连接注销,清除维护的连接信息,清除urc关注
 		local tlink = linklist[id]
+		usersckntfy(id,false)
 		linklist[id] = nil
 		ril.deregurc(tostring(id),urc)
-		tlink.notify(id,"CLOSE","OK")
+		tlink.notify(id,"CLOSE","OK")		
 		stopconnectingtimer(id)
 	else
 		print("link.closecnf:error",linklist[id].state)
@@ -303,17 +318,19 @@ function statusind(id,state)
 	local evt
 
 	if linklist[id].state == "CONNECTING" or state == "CONNECT OK" then
-		evt = "CONNECT"
+		evt = "CONNECT"		
 	else
 		evt = "STATE"
 	end
 
 	-- 除非连接成功,否则连接仍然还是在关闭状态
 	if state == "CONNECT OK" then
-		linklist[id].state = "CONNECTED"
+		linklist[id].state = "CONNECTED"		
 	else
-		linklist[id].state = "CLOSED"
+		linklist[id].state = "CLOSED"		
 	end
+	
+	usersckntfy(id,state == "CONNECT OK")
 
 	linklist[id].notify(id,evt,state)
 	stopconnectingtimer(id)
@@ -371,6 +388,7 @@ local function shutcnf(result)
 				else
 					linklist[i].state = "CLOSED"
 					linklist[i].notify(i,"STATE","CLOSED")
+					usersckntfy(i,false)
 				end
 				stopconnectingtimer(i)
 			end
@@ -588,6 +606,8 @@ local function proc(id,para)
 		flymode = para
 		if para then
 			sys.timer_stop(req,"AT+CIPSTATUS")
+		else
+			req("AT+CGATT?",nil,cgattrsp)
 		end
 	elseif id=="UPDATE_BEGIN_IND" then
 		updating = true

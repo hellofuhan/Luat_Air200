@@ -72,6 +72,8 @@ LUALIB_API int ( luaopen_rtos )( lua_State *L );
 #define AUXLIB_DISP     "disp"
 LUALIB_API int ( luaopen_disp )( lua_State *L );
 #endif
+#define AUXLIB_JSON     "json"
+LUALIB_API int ( luaopen_cjson)( lua_State *L );
 
 #define AUXLIB_PMD     "pmd"
 LUALIB_API int ( luaopen_pmd )( lua_State *L );
