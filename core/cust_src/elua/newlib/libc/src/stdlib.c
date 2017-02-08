@@ -51,6 +51,6 @@ char *lualibc_getenv(const char *name)
 
 void lualibc_abort(void)
 {
-    
+    ASSERT(0);
 }
 
