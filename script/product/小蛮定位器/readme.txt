@@ -10,7 +10,8 @@ lib：“库脚本”，请注意：这个目录中的脚本是所有应用使用LuaDB工具下载时都需要包含
 
 第2部分：
 以下所有项目的“应用脚本”都可以在开发板上运行，由于时间有限，部分项目没有仔细测试，运行过程中可能出错，请自行验证，有问题QQ交流，谢谢！
-whole_project：是合宙量产的一个项目，有配套的后台以及app支持，app的名字为“时间线”，项目需求以及脚本设计参考《whole_project.docx》
+\product\小蛮定位器\whole_project：是合宙量产的一个项目，有配套的后台以及app支持，app的名字为“时间线”，项目需求以及脚本设计参考《whole_project.docx》
+
 call：语音通话demo项目
 gpio\gpio_single：纯gpio控制demo项目
 gpio\i2c_gpio_switch：i2c和gpio功能切换控制demo项目
