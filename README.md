@@ -10,8 +10,11 @@ Luat = Lua +  AT = 合宙AirM2M open source project
 \core是模块基础软件，支持AT命令的解析和lua的运行。内含合宙自己开发的lua扩展库（位于\core\cust_src\elua\modules\src），扩展库文档位于\doc目录中。
 
 \script是合宙范例LUA脚本，其中
+
 \product\whole_project 是一款已经商用的GPS定位器软件，可以下到合宙小蛮GPS定位器（基于Air200开发）中运行。
+
 \demo下timer、 UART 等是各种应用例程，可下载到合宙EVB板中运行。合宙EVB开发板对应的硬件参考和Air200相关的AT命令位于\doc\Air200模块相关文档。 
+
 \lib 是所有用户脚本都需要用到的库文件，这些库文件将经常使用的AT命令以函数形式封装，方便用户使用。
 
 用户在开发中所用LUA编辑工具lua5.1 for Windows以及合宙开源lua项目的开发步骤，请参考\doc\模块LUA程序设计指南 这篇文档。
