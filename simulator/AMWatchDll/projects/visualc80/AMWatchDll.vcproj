@@ -226,7 +226,7 @@
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -244,10 +244,10 @@
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\..\$(PlatformName)_lib\zlib&quot;;&quot;$(SolutionDir)..\..\$(PlatformName)_lib\lpng&quot;;&quot;$(SolutionDir)..\..\$(PlatformName)_lib\giflib&quot;;&quot;$(SolutionDir)..\..\$(PlatformName)_lib\lua5.1&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				EntryPointSymbol=""
-				ResourceOnlyDLL="false"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				EntryPointSymbol=""
+				ResourceOnlyDLL="false"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -325,10 +325,10 @@
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\..\$(PlatformName)_lib\zlib&quot;;&quot;$(SolutionDir)..\..\$(PlatformName)_lib\lpng&quot;;&quot;$(SolutionDir)..\..\$(PlatformName)_lib\giflib&quot;;&quot;$(SolutionDir)..\..\$(PlatformName)_lib\lua5.1&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				EntryPointSymbol=""
-				ResourceOnlyDLL="false"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				EntryPointSymbol=""
+				ResourceOnlyDLL="false"
 				TargetMachine="17"
 			/>
 			<Tool
