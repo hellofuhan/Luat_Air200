@@ -178,11 +178,11 @@ void WinUtil::separator_strrpl(char* pDstOut, char* pSrcIn, const char* pSrcRpl,
 	char* pi = pSrcIn; 
 	char* po = pDstOut; 
 
-	int nSrcRplLen = strlen(pSrcRpl); 
-	int nDstRplLen = strlen(pDstRpl); 
+	size_t nSrcRplLen = strlen(pSrcRpl); 
+	size_t nDstRplLen = strlen(pDstRpl); 
 
 	char *p = NULL; 
-	int nLen = 0; 
+	intptr_t nLen = 0; 
 
 	do 
 	{
@@ -210,7 +210,7 @@ void WinUtil::separator_strrpl(char* pDstOut, char* pSrcIn, const char* pSrcRpl,
 int WinUtil::trim(char s[])
 {
 	int n;
-	for (n = strlen(s)-1; n >= 0; n--)
+	for (n = (int)strlen(s)-1; n >= 0; n--)
 		if (s[n] != ' ' && s[n] != '\r' && s[n] != '\n')
 			break;
 	s[n+1] = '\0';

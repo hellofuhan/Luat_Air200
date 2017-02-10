@@ -985,7 +985,6 @@ void SimCom::simulate_uart_tx_thread(void)
 	char *cmd_name, *cmdString;
 	UINT8 index = 0; 
 	UINT16 length;
-	UINT16 i;
 	custom_cmdLine command_line;
 	custom_atcmd *atcmd = NULL;
 

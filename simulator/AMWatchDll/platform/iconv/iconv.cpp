@@ -21,7 +21,7 @@ typedef struct builtin_iconv_map_tag
     const iconv_fct fct;
 }builtin_iconv_map;
 
-const builtin_iconv_map iconv_map[] =
+static const builtin_iconv_map iconv_map[] =
 {
     {"ucs2",    "gb2312",   iconv_ucs2_to_gb2312},
 /*+\NEW\liweiqiang\2013.11.26\ÍêÉÆgb2312<->ucs2(ucs2be)±àÂë×ª»»*/

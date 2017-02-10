@@ -24,7 +24,6 @@ extern QRcode* qrencode(const unsigned char *intext, int length);
 
 static int qr_encode_show(lua_State *L) {
     size_t  len      = 0;
-    int width;
     
     char* url_string = (char*)luaL_checklstring(L, 1, &len);
 
