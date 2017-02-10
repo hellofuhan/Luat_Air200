@@ -20,13 +20,14 @@ CSDTK Cygwin 是合宙lua开源项目编译调试环境。安装文件以及安�
 CSDTK3.7_Cygwin安装完成后，用户将具备编译环境Cygwin和模块trace打印工具cool watcher.
 
 ### 第三步：编译基础软件lod
-lod是支持lua运行的模块基础软件。
-\core目录下，已经编译好了lod文件（形式如：SW\_V0001\_Air200\_LUA\_B3887.lod），如果不想修改源码，直接使用此lod文件就行了。
-如果修改了源码，或者想编译源码，参照如下步骤编译：
+lod是支持lua运行的模块基础软件。具体编译方法：
+
 1. 点击 启动菜单->Cygwin-> Cygwin bash shell，运行之
 2. 用cd命令进入 \core 目录，输入 ./cust_build.sh，回车
 3. 编译成功后，在\core\hex会有一个子目录，lod文件（形式如：SW\_V0001\_Air200\_LUA\_B3887.lod）就放在子目录里
-4. 注意： 如果\core目录下的代码，用户未做修改，则这一步只需执行一次。
+4. 注意：
+ -  如果\core目录下的代码，用户未做修改，则这一步只需执行一次。
+ -  Cywin对WIN10的支持不太好。请把mount.exe做成兼容模式，给管理员权限。WIN10下Cygwin安装目录尽量不要放在C盘。
 
 ### 第四步：合并用户自己开发的LUA代码和第三步生成的lod，并下载到合宙模块中
 请点开/tools/LuaDB 目录，下载LuaDB合并及下载工具.zip，解压后，无需安装，直接运行download.exe。压缩包内有一个简要的工具使用说明。
