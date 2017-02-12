@@ -404,7 +404,6 @@ static int pio_sli3108_setworkmode( lua_State *L )
     UINT8 arg_index = 1;
 
     UINT8 work_mode;
-    UINT8 value;
 
     work_mode = (UINT8)luaL_checkinteger(L, 1);
 

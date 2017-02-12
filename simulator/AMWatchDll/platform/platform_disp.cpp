@@ -351,7 +351,6 @@ void Disp::charBitbmp_bpp24(const DispBitmap *pBitmap,
 	UINT16 endX, endY;
 	UINT32 *buffer24 = (UINT32*)gdi_w32_lcd_buffer;
 	UINT16 srcbx,srcby;
-	HBITMAP hBitmap;
 
 	assert(pBitmap->bpp == 1);
 
@@ -553,7 +552,6 @@ INT Disp::platform_get_png_file_resolution(const char *filename, UINT32* width, 
 	png_FILE_p fp;
 	png_structp read_ptr;
 	png_infop read_info_ptr;
-	png_size_t row_bytes;
 
 	fp = fopen(filename, "rb");
 	if(NULL == fp)
@@ -582,7 +580,9 @@ INT Disp::platform_get_png_file_resolution(const char *filename, UINT32* width, 
 	*height = png_get_image_height(read_ptr, read_info_ptr);
 
 	png_destroy_read_struct(&read_ptr, &read_info_ptr, NULL);
-	fclose(fp);    
+	fclose(fp);
+
+	return PLATFORM_OK;
 }
 
 int Disp::put_png_file_buff(const char *filename, int x, int y, int transcolor, int left, int top, int right, int bottom, int transtype)
@@ -596,16 +596,13 @@ int Disp::put_png_file_buff(const char *filename, int x, int y, int transcolor, 
     png_size_t row_bytes;
 
     UINT16 *buffer16 = (UINT16*)gdi_w32_lcd_buffer;
-    UINT16 data_r,data_g,data_b;
     UINT8 data_alpha,proc;
     UINT16 rgb16;
-    UINT32 bgrgb888,fgrgb888,dstrgb888;
     short fr,fg,fb,fa;
     short br,bg,bb,ba;
     UINT8 dr,dg,db,da;
     UINT8 fpercent, bpercent;
 
-    UINT32 rgb888;
     UINT8 *buffer24 = (UINT8*)gdi_w32_lcd_buffer;
     UINT32 layer_width = lua_lcd_width;
     
@@ -1694,8 +1691,7 @@ void Disp::w32_ReadKeyProfile(CHAR in_path[], HWND hwnd)
 	CHAR		buffer[512], old_path[512], path[512];
 	INT			buffer_size = 512;
 	HDC			hdc;
-	RECT		window_info, client_info, menu_info, show_info;
-	INT			menuheight, i;
+	INT			i;
 	CHAR profile_section_name[256];
 
 	SIZE main_window_size;
@@ -2127,7 +2123,6 @@ INT Disp::putimage(CHAR *filename,
 	BITMAP bitmap = {0,0,0,0,0,0, NULL};
 	UINT8 *buf = (UINT8*)gdi_w32_lcd_buffer;
 	INT clientWidth, clientHeight, dWidth, dHeight;
-	LONG fSize;
 
 
 	if(strstr(filename,".bmp") || strstr(filename,".BMP"))
@@ -2527,7 +2522,7 @@ void Disp::platform_lcd_powersave(int sleep_wake)
 
 void Disp::put_qr_code_buff(unsigned char* buff, int width)
 {
-	int i, j;
+	int i;
 
 	UINT32 margin;
 	UINT32 size;
@@ -2538,7 +2533,7 @@ void Disp::put_qr_code_buff(unsigned char* buff, int width)
 #endif
 
 	unsigned char *row, *p, *q;
-	int x, y, xx, yy, bit;
+	int x, y, xx, yy;
 	int realwidth;
 
 	int height = 0;
@@ -2621,5 +2616,6 @@ void Disp::poweroff(void)
 
 void Disp::platform_layer_hang_stop(void)
 {
+	BOOL dealBool = FALSE;
 	update();
 }

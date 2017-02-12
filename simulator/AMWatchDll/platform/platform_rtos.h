@@ -309,7 +309,7 @@ int platform_rtos_poweron(int flag);
 void platform_poweron_try(void);
 int platform_rtos_setalarm(void *pParam);
 int platform_rtos_repoweron(void);
-char*  platform_base64_encode(const char *str, int length);
+char*  platform_base64_encode(const char *str, size_t length);
 
 char* platform_base64_decode (const char *src, int length,int* decodedLen);
 long platform_rtos_disk_free(int drvtype);

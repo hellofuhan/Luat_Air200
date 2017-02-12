@@ -69,6 +69,10 @@ BOOL WINAPI DllMain(HMODULE hModule,
 		break;
 
 	case DLL_PROCESS_DETACH:
+		if(mutex_handle != NULL)
+		{
+			CloseHandle(mutex_handle);
+		}		
 		break;
 	}
 	return TRUE;

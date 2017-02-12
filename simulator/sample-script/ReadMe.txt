@@ -51,9 +51,7 @@ provide relevant and powerful tooling.
 		'Launch script' must select 'sample-script\src\init.lua'
 		'Runtime Interpreter' must select default interpreter.
 		
-		AMWatchDll can't run on Windows XP. you must modify a lua file according to OS architecture, 'init.lua':
-		Windows 32-bit, The value 'os_type' is 'Win32_lib'.
-		Windows 64-bit, The value 'os_type' is 'x64_lib'.
+		AMWatchDll can't run on Windows OS previous to Win7.
  
 	7) Run/Debug project
 	  resources file, 'sample-script\src\ldata', such as .mp3, .bmp, .png and .gif.
