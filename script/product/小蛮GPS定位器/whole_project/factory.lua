@@ -128,11 +128,11 @@ local function read()
 	local rd = true
 	while rd == true do
 		t1 = uart.read(3,"*l",0)
-		if string.len(t1) == 0 then
+		if t1 and t1~="" then
+			s1 = s1 .. t1
+		else
 			rd = false
-			continue
-		end
-		s1 = s1 .. t1
+		end		
 	end
 
 	if s1 ~= "" then
