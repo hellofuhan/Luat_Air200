@@ -12,7 +12,14 @@
 #  版本定义文件                                                            #
 # ------------------------------------------------------------------------ #
 
-# 规范：SW_21_10 软件版本命名规范
+# 版本生成规则 Luat_V$(BUILD_VER)_$(HW_VER)[_$(FUNCTION)]
+
+#BUILD号
+BUILD_VER =0001
+#硬件版本号
+HW_VER = Air200
+#可选功能，例如TTS等，表明该版本具有特定功能
+OPTION_FUN = TTS
 
 ### 需要设置的内容 ###
 # 模块/手机项目号
@@ -21,12 +28,12 @@ MODULE_TYPE=A6390
 # 客户同一项目不同硬件版本或同一项目不同应用
 CUST_HW_TYPE=H
 
-SVN_REVISION=0001
+
 # 软件版本号
-ifeq "${SVN_REVISION}" ""
-${error MUST define SVN_REVISION}
+ifeq "${BUILD_VER}" ""
+${error MUST define BUILD_VER}
 else
-SW_SN=${SVN_REVISION}
+SW_SN=${BUILD_VER}
 endif
 
 # 模块/手机主板号
@@ -35,18 +42,20 @@ MODULE_HW_TYPE=13
 # 平台软件版本号
 PLATFORM_VER=CT8851BL
 
-# 客户产品项目号名
-CUST_PROJ_NAME=Air200
+
 
 # ------------------------------------------------------------------------ #
 # 版本号定义
 # ------------------------------------------------------------------------ #
 # 内部版本号
-IN_VER=SW_$(MODULE_TYPE)_$(CUST_HW_TYPE)_V$(SW_SN)_M$(MODULE_HW_TYPE)_$(PLATFORM_VER)_$(CUST_PROJ_NAME)
+IN_VER=SW_$(MODULE_TYPE)_$(CUST_HW_TYPE)_V$(SW_SN)_M$(MODULE_HW_TYPE)_$(PLATFORM_VER)_$(HW_VER)
 
 # 外部版本号（默认定义）
-EX_VER=Luat_V$(SW_SN)_$(CUST_PROJ_NAME)
-
+ifneq "${OPTION_FUN}"  ""
+EX_VER=Luat_V$(SW_SN)_$(HW_VER)_$(OPTION_FUN)
+else
+EX_VER=Luat_V$(SW_SN)_$(HW_VER)
+endif
 # ------------------------------------------------------------------------ #
 # 版本宏
 # ------------------------------------------------------------------------ #
