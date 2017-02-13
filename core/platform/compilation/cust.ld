@@ -25,6 +25,21 @@ SECTIONS
         KEEP(*(.am_openat_custvtbl))
         . = ALIGN(0x10);
     }
+	_am_openat_ro_lma_end = .;
+	_am_openat_ro_lma_size = _am_openat_ro_lma_end - _am_openat_ro_lma;
+	
+	LD_ASSERT(ABSOLUTE(_am_openat_ro_lma_size) <= ABSOLUTE(0x40),
+              "AM OpenAT", "CUST VTBL size bigger than 0x40")
+	
+	. = AM_OPENAT_ROM_BASE + 0x40;
+			  
+	.lua_info . : AT (ADDR(.lua_info))
+    {
+        _lua_info_ro_lma = .;
+        _lua_info_ro_vma = .;
+        KEEP(*(.lua_info))
+        . = ALIGN(0x10);
+    }
     
     .cust_rotext . : AT (ADDR(.cust_rotext))
     {

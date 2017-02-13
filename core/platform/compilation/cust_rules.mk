@@ -315,12 +315,12 @@ BINARY_PATH := ${HEX_PATH}/${LODBASE_NO_PATH}
 BIN_PATH := ${BUILD_ROOT}/${LOCAL_NAME}
 
 BAS := ${BIN_PATH}/${LODBASE_NO_PATH}
-BIN := ${BAS}.elf
+BIN := ${BAS}_APP.elf
 MAP := ${BAS}.map
 HEX := ${BAS}.srec
 BAS_FINAL := ${BINARY_PATH}/${LODBASE_NO_PATH}
 ifneq "${AM_PLT_ELF_FILE}" ""
-BIN_FINAL := ${BAS_FINAL}_BASE_${AM_MODEL}.elf
+BIN_FINAL := ${BAS_FINAL}.elf
 else
 BIN_FINAL := ${BAS_FINAL}.elf
 endif
@@ -410,7 +410,8 @@ endif #AM_CONFIG_SUPPORT
 
 ifneq "${AM_PLT_LOD_FILE}" ""
 PLT_LOD_VERSION := $(shell echo ${AM_PLT_LOD_FILE} | sed 's/.*SW_V\([0-9]*\).*\.lod$$/B\1/')
-WITH_PLT_LOD_FILE := ${BAS_FINAL}_${PLT_LOD_VERSION}.lod
+#WITH_PLT_LOD_FILE := ${BAS_FINAL}_${PLT_LOD_VERSION}.lod
+WITH_PLT_LOD_FILE := ${BAS_FINAL}.lod
 CFG_Lod_File_WITH_PLT := `echo ${BAS_FINAL}_\`echo ${AM_PLT_LOD_FILE} | sed 's/.*SW_\(V[0-9]*\)\(.*\)$$/\1/'\`.lod  | sed 's/.*\(SW_.*\.lod\)$$/\1/'`
 endif
 
@@ -721,7 +722,8 @@ endif
 
 AM_PROJECT_ZIP: force
 	mkdir -p ${BAS_FINAL}_${PLT_LOD_VERSION}
-	cp -f ${BAS_FINAL}_${PLT_LOD_VERSION}.lod ${BAS_FINAL}_${PLT_LOD_VERSION}/
+	#cp -f ${BAS_FINAL}_${PLT_LOD_VERSION}.lod ${BAS_FINAL}_${PLT_LOD_VERSION}/
+	cp -f ${BAS_FINAL}.lod ${BAS_FINAL}_${PLT_LOD_VERSION}/
 ifeq ($(strip $(AM_CONFIG_SUPPORT)), TRUE)
 	cp -f $(AM_CONFIG_FILE) ${BAS_FINAL}_${PLT_LOD_VERSION}/
 endif
@@ -741,7 +743,7 @@ endif
 	cp -f $(AM_PLT_LOD_FILE) ${BAS_FINAL}_${PLT_LOD_VERSION}_map/
 	cp -f $(AM_PLT_ELF_FILE) ${BAS_FINAL}_${PLT_LOD_VERSION}_map/
 	cp -f $(BIN_FINAL) ${BAS_FINAL}_${PLT_LOD_VERSION}_map/
-	cp -f ${BAS_FINAL}_BASE_${AM_MODEL}.map ${BAS_FINAL}_${PLT_LOD_VERSION}_map/
+	cp -f ${BAS_FINAL}.map ${BAS_FINAL}_${PLT_LOD_VERSION}_map/
 	cp -f $(LOD_FILE) ${BAS_FINAL}_${PLT_LOD_VERSION}_map/
 	#删除flash.lod文件，保留合并后的lod文件
 	rm -f $(LOD_FILE)
@@ -784,13 +786,14 @@ ifneq "${AM_PLT_ELF_FILE}" ""
 	#将客户的elf中的symbol去掉
 	@${ECHO}
 	${ECHO} "GEN               stripped (rm syms) elf file ${notdir ${BIN}}"
-	${OBJCOPY} --strip-symbols=${STRIP_SYMBOL_FILE} ${BAS_FINAL}.elf ${BAS_FINAL}.elf
+	#${OBJCOPY} --strip-symbols=${STRIP_SYMBOL_FILE} ${BAS_FINAL}.elf ${BAS_FINAL}.elf
+	${OBJCOPY} --strip-symbols=${STRIP_SYMBOL_FILE} ${BINARY_PATH}/${notdir ${BIN}} ${BINARY_PATH}/${notdir ${BIN}}
 	
 	#合并elf
-	${ELFCOMBINE_TOOL} -e1 ${BAS_FINAL}.elf -e2 ${BINARY_PATH}/${AM_PLT_ELF_FILE_BASENAME} -o ${BIN_FINAL}
+	${ELFCOMBINE_TOOL} -e1 ${BINARY_PATH}/${notdir ${BIN}} -e2 ${BINARY_PATH}/${AM_PLT_ELF_FILE_BASENAME} -o ${BIN_FINAL}
 
 	#删除掉拷贝过来的elf
-	-rm -f ${BAS_FINAL}.elf
+	-rm -f ${BINARY_PATH}/${notdir ${BIN}}
 	-rm -f ${BINARY_PATH}/${AM_PLT_ELF_FILE_BASENAME}
 	@${ECHO}	
 	
@@ -905,11 +908,19 @@ ASFLAGS += -march=xcpu -mtune=xcpu -EL
 C++_SPECIFIC_CFLAGS += -Wno-write-strings
 
 #------------------- pp file flags --------------------------------------
+    
+PLT_LOD_FILE := ${notdir ${wildcard ${SOFT_WORKDIR}/platform/${strip ${AM_MODEL}}/*.lod}}
+PLA_LOD_VER := $(shell echo ${PLT_LOD_FILE} | sed 's/.*SW_V\([0-9]*\).*\.lod$$/B\1/')
+
 ASCPPFLAGS += -DCT_ASM
 MYCPPFLAGS += -D__NEW_GCC__ \
               -DUSE_GCC_4=1 -DUSE_BINUTILS_2_19=1 \
-              -D__REDUCED_REGS__
-
+              -D__REDUCED_REGS__ \
+			  -DLUA_SCRIPT_BASE=$(LUA_SCRIPT_BASE) \
+			  -DLUA_SCRIPT_SIZE=$(LUA_SCRIPT_SIZE) \
+			  -DAM_OPENAT_ROM_BASE=$(AM_OPENAT_ROM_BASE) \
+			  -DAM_OPENAT_ROM_SIZE=$(AM_OPENAT_ROM_SIZE) \
+			  -DPLT_LOD_VERSION=\"${PLA_LOD_VER}\"
 # User flags
 ALL_EXPORT_FLAG := $(sort ${ALL_EXPORT_FLAG} ${LOCAL_EXPORT_FLAG})
 MYCPPFLAGS := ${MYCPPFLAGS} ${foreach tmpFlag, ${ALL_EXPORT_FLAG}, -D${tmpFlag}}
