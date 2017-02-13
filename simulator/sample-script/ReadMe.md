@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>OpenAT模拟器说明书</title>
+    <title>LuaT模拟器说明书</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <body>
@@ -8,7 +8,7 @@
 <dl>
   <dt><a href="#title10">1. 安装JDK(Java SE Development Kit)</a></dt>
   <dt><a href="#title20">2. 下载LDT(Lua Development Tools)</a></dt>
-  <dt><a href="#title30">3. 克隆OpenAT模拟器</a></dt>
+  <dt><a href="#title30">3. 克隆LuaT模拟器</a></dt>
   <dt><a href="#title40">4. 安装C运行时库</a></dt>
   <dt><a href="#title50">5. 导入样例工程</a></dt>
   <dt><a href="#title60">6. 配置LDT的默认的Lua解释器</a></dt>
@@ -41,19 +41,19 @@
 <p>LDT(Lua Development Tools)是一个免安装的Lua调试工具，解压后即可运行。在Win8/Win10系统运行时，必须赋予"LuaDevelopmentTools.exe"管理员权限。</p>
 
 <a name="title30"></a>
-<h2 id="title30" name="title30">3. 克隆OpenAT模拟器</h2>
-<p>克隆整个OpenAT的开源，需用Git执行下述命令：</p>
+<h2 id="title30" name="title30">3. 克隆LuaT模拟器</h2>
+<p>克隆整个LuaT的开源，需用Git执行下述命令：</p>
 <pre><code>
 git clone git@github.com:airm2m-open/luat.git
 </pre></code>
-<p>首次克隆OpenAT需要花费较长时间，请耐心等待。若克隆失败，再次执行相同的克隆命令，直至克隆成功。</p>
+<p>首次克隆LuaT需要花费较长时间，请耐心等待。若克隆失败，再次执行相同的克隆命令，直至克隆成功。</p>
 
 <p>AMWatchDll：模拟器的中间件源码。</p>
 <p>sample-script：一个由LDT创建的样例工程。</p>
 
 <a name="title40"></a>
 <h2 id="title40" name="title40">4. 安装C运行时库</h2>
-<p>OpenAT模拟器不支持Win7之前的系统，比如：Windows XP。要运行OpenAT模拟器，必须安装C运行时库。对应的C运行时库已放入样例工程内：</p>
+<p>LuaT模拟器不支持Win7之前的系统，比如：Windows XP。要运行LuaT模拟器，必须安装C运行时库。对应的C运行时库已放入样例工程内：</p>
 
 <p>Windows 32-bit，sample-script --> Win32_lib --> 'VC_x86Runtime.exe'</p>
 
@@ -90,7 +90,7 @@ git clone git@github.com:airm2m-open/luat.git
 
 <a name="title60"></a>
 <h2 id="title60" name="title60">6. 配置LDT的默认的Lua解释器</h2>
-<p>OpenAT模拟器必须使用定制化的Lua解释器。</p>
+<p>LuaT模拟器必须使用定制化的Lua解释器。</p>
 
 <p>6.1 配置默认解释器</p>
 <p>Window --> Preferences --> Lua --> Interpreters --> Add</p>
@@ -121,7 +121,7 @@ git clone git@github.com:airm2m-open/luat.git
 
 <img src="http://i.imgur.com/aewqH05.png" alt="LDT-DOC-11">
 
-<p>启动脚本"Launch script"必须选择样例脚本"sample-script"下的"init.lua"，脚本"init.lua"为OpenAT模拟器的入口。</p>
+<p>启动脚本"Launch script"必须选择样例脚本"sample-script"下的"init.lua"，脚本"init.lua"为LuaT模拟器的入口。</p>
 
 <img src="http://i.imgur.com/uBu9oNK.png" alt="LDT-DOC-12">
 
