@@ -36,7 +36,7 @@ MODULE_HW_TYPE=13
 PLATFORM_VER=CT8851BL
 
 # 客户产品项目号名
-CUST_PROJ_NAME=Air200_LUA
+CUST_PROJ_NAME=Air200
 
 # ------------------------------------------------------------------------ #
 # 版本号定义
@@ -45,7 +45,7 @@ CUST_PROJ_NAME=Air200_LUA
 IN_VER=SW_$(MODULE_TYPE)_$(CUST_HW_TYPE)_V$(SW_SN)_M$(MODULE_HW_TYPE)_$(PLATFORM_VER)_$(CUST_PROJ_NAME)
 
 # 外部版本号（默认定义）
-EX_VER=SW_V$(SW_SN)_$(CUST_PROJ_NAME)
+EX_VER=Luat_V$(SW_SN)_$(CUST_PROJ_NAME)
 
 # ------------------------------------------------------------------------ #
 # 版本宏

@@ -29,6 +29,18 @@ typedef struct {
     PVOID data;
 }CustMessage;
 
+typedef struct{
+    UINT32 magic_num; //= 0x11113456
+    char   app_ver[32];
+    char   base_ver[32];
+    UINT32 script_addr;
+    UINT32 script_size;
+    UINT32 base_addr;
+    UINT32 base_size;
+    char   reserved[32];
+}LUA_INFO;
+
+
 /*+\NEW\rufei\2013.9.13\处理lua文件可能被破坏导致持续重启问题*/
 extern void LuaDeleteMainFile(void);
 /*-\NEW\rufei\2013.9.13\处理lua文件可能被破坏导致持续重启问题*/
@@ -78,6 +90,21 @@ static const volatile T_AMOPENAT_CUST_VTBL __attribute__((section (".am_openat_c
     cust_init,  /* cannot changed to other name */
     cust_main,  /* cannot changed to other name */
 };
+
+
+static const LUA_INFO __attribute__((section (".lua_info")))
+    g_s_luaInfo = 
+{
+    0x11113456,
+    {EX_VER},
+    {PLT_LOD_VERSION},
+    LUA_SCRIPT_BASE,
+    LUA_SCRIPT_SIZE,
+    AM_OPENAT_ROM_BASE,
+    AM_OPENAT_ROM_SIZE,
+    {0}
+};
+
 /*******************************************************
 ** ATTENTION:
 ** END .. END .. END .. END .. END .. END .. END ..
@@ -186,6 +213,17 @@ VOID cust_main(VOID)
     pmdcfg.ic.TimeOutMinutes = 240;
 #endif
     ASSERT(IVTBL(init_pmd)(pmdmode, &pmdcfg, cust_pm_message));
+
+    
+    IVTBL(print)("====================================");
+    IVTBL(print)("INTR VER :%s", g_s_luaInfo.app_ver);
+    IVTBL(print)("BASE VER :%s", g_s_luaInfo.base_ver);
+    IVTBL(print)("SCRIPT ADDR :0x%08x", g_s_luaInfo.script_addr);
+    IVTBL(print)("SCRIPT SIZE :0x%08x", g_s_luaInfo.script_size);
+    IVTBL(print)("BASE   ADDR :0x%08x", g_s_luaInfo.base_addr);
+    IVTBL(print)("BASE   SIZE :0x%08x", g_s_luaInfo.base_size);
+    IVTBL(print)("====================================");
+    
     
     /* 创建custom app线程 */
     g_CustTaskHandle = IVTBL(create_task)((PTASK_MAIN)cust_task_main, 
