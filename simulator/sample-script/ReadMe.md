@@ -17,7 +17,6 @@
 
 <hr/>
 
-<div "width:100%;height:100px;">
 <a name="title10"></a>
 <h2 id="title10" name="title10">1. 安装JDK(Java SE Development Kit)</h2>
 
@@ -30,9 +29,6 @@
 
 <p>Windows X64 195.51MB <a href="http://download.oracle.com/otn-pub/java/jdk/8u121-b13/e9e7ea248e2c4826b92b3f075a80e441/jdk-8u121-windows-x64.exe" >jdk-8u121-windows-x64.exe</a></p>
 
-</div>
-
-<div width:100%;height:100px;>
 <a name="title20"></a>
 <h2 id="title20" name="title20">2. 下载LDT(Lua Development Tools)</h2>
 
@@ -42,11 +38,8 @@
 
 <p>&emsp;&emsp;LDT基于Eclipse公共许可证。</p>
 
-<p>LDT(Lua Development Tools)的官方下载地址：</p>
+<p>LDT(Lua Development Tools)是一个免安装的Lua调试工具，解压后即可运行。在Win8/Win10系统运行时，必须赋予"LuaDevelopmentTools.exe"管理员权限。</p>
 
-</div>
-
-<div "width:100%;height:150px;">
 <a name="title30"></a>
 <h2 id="title30" name="title30">3. 克隆OpenAT模拟器</h2>
 <p>克隆整个OpenAT的开源，需用Git执行下述命令：</p>
@@ -58,9 +51,6 @@ git clone git@github.com:airm2m-open/luat.git
 <p>AMWatchDll：模拟器的中间件源码。</p>
 <p>sample-script：一个由LDT创建的样例工程。</p>
 
-</div>
-
-<div "width:100%;height:150px;">
 <a name="title40"></a>
 <h2 id="title40" name="title40">4. 安装C运行时库</h2>
 <p>OpenAT模拟器不支持Win7之前的系统，比如：Windows XP。要运行OpenAT模拟器，必须安装C运行时库。对应的C运行时库已放入样例工程内：</p>
@@ -69,9 +59,6 @@ git clone git@github.com:airm2m-open/luat.git
 
 <p>Windows 64-bit，sample-script --> x64_lib --> 'VC_x64Runtime.exe'</p>
 
-</div>
-
-<div "width:100%;height:150px;">
 <a name="title50"></a>
 <h2 id="title50" name="title50">5. 导入样例工程</h2>
 <p>导入样例工程前，必须创建一个自己的工作空间(Workspace)，并选择此工作空间作为调试Lua脚本的目录。</p>
@@ -101,9 +88,6 @@ git clone git@github.com:airm2m-open/luat.git
 
 执行"Finish"后，即可成功导入sample-script。
 
-</div>
-
-<div "width:100%;height:150px;">
 <a name="title60"></a>
 <h2 id="title60" name="title60">6. 配置LDT的默认的Lua解释器</h2>
 <p>OpenAT模拟器必须使用定制化的Lua解释器。</p>
@@ -147,9 +131,6 @@ git clone git@github.com:airm2m-open/luat.git
 
 <p>执行"Apply"存储所有的配置。</p>
 
-</div>
-
-<div "width:100%;height:150px;">
 <a name="title70"></a>
 <h2 id="title70" name="title70">7. 开始运行/调试</h2>
 <p>资源文件 'sample-script\src\ldata'，比如： .mp3，.bmp，.png和.gif，把需要的资源文件拷贝到ldata目录。</p>
@@ -159,8 +140,6 @@ git clone git@github.com:airm2m-open/luat.git
 <img src="http://i.imgur.com/RRI5hft.png" alt="LDT-DOC-13">
 
 <p>到目前为止，只能运行Run模式，Debug模式还无法正常运行。</p>
-
-</div>
 
 <div style="height:130px;">&nbsp;</div>
 <div style="height:130px;">&nbsp;</div>
