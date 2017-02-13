@@ -38,7 +38,7 @@
 
 #if !HAVE_STRDUP
 #undef strdup
-char *strdup(const char *s)
+char* __cdecl strdup(const char *s)
 {
 	size_t len = strlen(s) + 1;
 	void *newp = malloc(len);

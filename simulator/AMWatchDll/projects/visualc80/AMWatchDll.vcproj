@@ -74,6 +74,8 @@
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\..\$(PlatformName)_lib\zlib&quot;;&quot;$(SolutionDir)..\..\$(PlatformName)_lib\lpng&quot;;&quot;$(SolutionDir)..\..\$(PlatformName)_lib\giflib&quot;;&quot;$(SolutionDir)..\..\$(PlatformName)_lib\lua5.1&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				EntryPointSymbol=""
+				ResourceOnlyDLL="false"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -136,7 +138,7 @@
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName).pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CallingConvention="0"
 			/>
 			<Tool
@@ -160,7 +162,8 @@
 				IgnoreAllDefaultLibraries="false"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				EntryPointSymbol="DllMain"
+				EntryPointSymbol=""
+				ResourceOnlyDLL="false"
 				ImportLibrary=""
 				TargetMachine="17"
 				CLRThreadAttribute="2"
@@ -243,6 +246,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				EntryPointSymbol=""
+				ResourceOnlyDLL="false"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -322,6 +327,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				EntryPointSymbol=""
+				ResourceOnlyDLL="false"
 				TargetMachine="17"
 			/>
 			<Tool

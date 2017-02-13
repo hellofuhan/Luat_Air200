@@ -287,7 +287,7 @@ int platform_rtos_setalarm(void *pParam)
 	return PLATFORM_OK;
 }
 
-char*  platform_base64_encode(const char *str, int length)
+char*  platform_base64_encode(const char *str, size_t length)
 {
 	static char  base64_pad = '=';       
 	const char *current = (const   char*)str;     

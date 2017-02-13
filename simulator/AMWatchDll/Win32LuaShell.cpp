@@ -32,39 +32,6 @@ HANDLE gLuaShellThread = NULL;
 
 lua_State* gL = NULL;
 
-void separator_strrpl(char* pDstOut, char* pSrcIn, const char* pSrcRpl, const char* pDstRpl)
-{ 
-	char* pi = pSrcIn; 
-	char* po = pDstOut; 
-
-	int nSrcRplLen = strlen(pSrcRpl); 
-	int nDstRplLen = strlen(pDstRpl); 
-
-	char *p = NULL; 
-	int nLen = 0; 
-
-	do 
-	{
-		p = strstr(pi, pSrcRpl); 
-
-		if(p != NULL) 
-		{ 
-			nLen = p - pi; 
-			memcpy(po, pi, nLen);
-
-			memcpy(po + nLen, pDstRpl, nDstRplLen); 
-		} 
-		else 
-		{ 
-			strcpy(po, pi); 
-
-			break;
-		} 
-
-		pi = p + nSrcRplLen; 
-		po = po + nLen + nDstRplLen;    
-	} while (p != NULL); 
-}
 
 void join_lroot(lua_State* L, CHAR* path, CHAR* name)
 {
@@ -76,7 +43,7 @@ void join_lroot(lua_State* L, CHAR* path, CHAR* name)
 	root = (CHAR*)lua_tostring(L,-1);
 	if(strlen(root) != 0)
 	{
-		separator_strrpl(regPath, (CHAR*)name, "/", "\\");
+		WinUtil::separator_strrpl(regPath, (CHAR*)name, "/", "\\");
 		strcat(prefix, root);
 		strcat(prefix,"\\src");
 		strcat(prefix,regPath);
@@ -86,7 +53,7 @@ void join_lroot(lua_State* L, CHAR* path, CHAR* name)
 		strcat(prefix,name);
 	}
 
-	separator_strrpl(path, prefix, "\\", "\\\\");
+	WinUtil::separator_strrpl(path, prefix, "\\", "\\\\");
 
 	lua_pop(L,1);
 }

@@ -1848,9 +1848,7 @@ void mthl_query_info_req_hdlr(MSG *msg)
 {
     mthl_query_sock_info_req_struct   *mthl_query_sock_info_req;
     mthl_query_sock_info_cnf_struct    mthl_query_sock_info_cnf;
-    INT32 ret;
     int i,j;
-    UINT8 *buff;
 
     mthl_query_sock_info_req = (mthl_query_sock_info_req_struct*)msg->wParam;
     memset(&mthl_query_sock_info_cnf, 0x00, sizeof(mthl_query_sock_info_cnf_struct));
@@ -1919,9 +1917,7 @@ void mthl_get_host_by_name_req_hdlr(MSG* msg)
     mthl_get_host_by_name_req_struct   *mthl_get_host_by_name_req;
     mthl_get_host_by_name_cnf_struct    mthl_get_host_by_name_cnf;
     INT8 ret;
-    int i,j;
-    UINT8 *buff;
-    UINT32 nwk_account_id;
+    int i;
     UINT32 param_index;
     mthl_get_host_by_name_req = (mthl_get_host_by_name_req_struct*)msg->wParam;
     memset(&mthl_get_host_by_name_cnf, 0x00, sizeof(mthl_get_host_by_name_cnf_struct));
@@ -2045,7 +2041,6 @@ void mthl_get_host_by_addr_req_hdlr(MSG *msg)
 	mthl_get_host_by_addr_cnf_struct    mthl_get_host_by_addr_cnf;
     INT8 ret;
 	int i,j = 0;
-	UINT8 *buff;
 	UINT32 nwk_account_id;
 
 	mthl_get_host_by_addr_req = (mthl_get_host_by_addr_req_struct*)msg->wParam;
@@ -3092,7 +3087,6 @@ BOOL mthl_check_udp_address_valid(sockaddr_struct *sockaddr)
     /*----------------------------------------------------------------*/
     /* Local Variables                                                */
     /*----------------------------------------------------------------*/
-	socket_type_enum sock_type;
 
     /*----------------------------------------------------------------*/
     /* Code Body                                                      */
@@ -3345,7 +3339,6 @@ void mthl_transparent_mem_dealloc ()
 static void mthl_transparent_send_data()
 {
     INT32 ret;
-	int i,j;
     mthl_transport_buff_head_struct *ibuff_head_ptr = mthl_transparent_mode_context.ibuff_head_ptr;
 
 	if(mthl_get_transparent_mode_status()==FALSE ||(mthl_transparent_mode_uart_get_owner_id (mthl_transparent_mode_context.port)!= -1))
@@ -3451,7 +3444,6 @@ static void mthl_transparent_send_data()
 static void mthl_transparent_reveive_data()
 {
     INT32 ret;
-	int i,j;
     mthl_transport_buff_head_struct *pDec;
     BOOL is_frame_decode = FALSE;
     BOOL is_release_flc_buff = FALSE;
@@ -3722,8 +3714,6 @@ void mthl_transparent_ready_to_write_uart_ind_hdlr ()
 
     /* Locals in Stack */
     UINT16 w_len = 0;
-    UINT8 dl_pool_id;
-    UINT8 context_id;
 
 	LogWriter::LOGX("[MTHL] mthl_transparent_ready_to_write_uart_ind_hdlr");
 
@@ -3843,7 +3833,6 @@ void mthl_transparent_uart_plugout_ind_hdlr (uart_plugout_ind_struct *plugout_p)
 	/*----------------------------------------------------------------*/
 	/* Local Variables												  */
 	/*----------------------------------------------------------------*/
-	mthl_transparent_trans_end_ind_struct *trans_end_ind;
 	/*----------------------------------------------------------------*/
 	/* Code Body													  */
 	/*----------------------------------------------------------------*/
@@ -3876,7 +3865,6 @@ void mthl_transparent_uart_escape_detected_ind_hdlr(uart_escape_detected_ind_str
     /*----------------------------------------------------------------*/
     /* Local Variables                                                */
     /*----------------------------------------------------------------*/
-	mthl_transparent_trans_end_ind_struct *trans_end_ind;
     /*----------------------------------------------------------------*/
     /* Code Body                                                      */
     /*----------------------------------------------------------------*/
@@ -4289,11 +4277,9 @@ void mthl_soc_notify(MSG *inMsg)
     mthl_recv_data_ind_struct mthl_recv_data_ind;
     mthl_server_accept_ind_struct    mthl_server_accept_ind;
     //mthl_close_sock_cnf_struct    mthl_close_cnf;
-    mthl_close_sock_ind_struct mthl_close_ind;
 
     int i = 0;
     int j = 0;
-    INT8 error;
     INT8 conn_sock_id = SOC_ERROR;
     sockaddr_struct client_addr;
 

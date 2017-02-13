@@ -134,6 +134,11 @@ function getcalib()
 	return calib
 end
 
+function getvbatvolt()
+	local v1,v2,v3,v4,v5 = pmd.param_get()
+	return v2
+end
+
 local function ind(id,para)
 	if id=="SYS_WORKMODE_IND" then
 		startclktimer()

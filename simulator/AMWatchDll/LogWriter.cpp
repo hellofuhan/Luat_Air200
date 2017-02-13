@@ -13,7 +13,6 @@
  **************************************************************************/
 
 #include "stdafx.h"
-#include "LogWriter.h"
 #include "share.h"
 
 #define MAXFRACT     10000
