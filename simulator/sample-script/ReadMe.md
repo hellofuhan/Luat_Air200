@@ -141,6 +141,13 @@ git clone git@github.com:airm2m-open/luat.git
 
 <p>到目前为止，只能运行Run模式，Debug模式还无法正常运行。</p>
 
+<p>
+<a><b>注意事项：</a></b><br/>
+1.用浏览器阅读md文件，必须安装对应的插件，否则无法查看。<br/>
+2.建议使用MarkdownPad来阅读，而且必须破解，否则无法查看ReadMe.md中的图片。</br>
+3.当前，用手机上的浏览器阅读本帖子无法查看图片。</br>
+</p>
+
 <div style="height:130px;">&nbsp;</div>
 <div style="height:130px;">&nbsp;</div>
 <div style="height:130px;">&nbsp;</div>
