@@ -9,7 +9,6 @@ module("agps")
 
 local print = base.print
 local tonumber = base.tonumber
-local fly = base.fly
 local sfind = string.find
 local slen = string.len
 local ssub = string.sub
@@ -19,7 +18,7 @@ local send = link.send
 local dispatch = sys.dispatch
 
 local lid,isfix
-local ispt,itv,PROT,SVR,PORT,WRITE_INTERVAL = true,(2*3600),"UDP","zx1.clouddatasrv.com",8072,400
+local ispt,itv,PROT,SVR,PORT,WRITE_INTERVAL = true,(2*3600),"UDP","zx1.clouddatasrv.com",8072,50
 local mode,pwrcb = 0
 local gpssupport,eph = true,""
 local GET_TIMEOUT,ERROR_PACK_TIMEOUT,GET_RETRY_TIMES,PACKET_LEN,RETRY_TIMES = 10000,5000,3,1024,3
@@ -283,11 +282,6 @@ local function nofity(id,evt,val)
 	end
 end
 
-local function flycb()
-	retries = RETRY_TIMES
-	upend(false)
-end
-
 local function connectcb()
 	lid = link.open(nofity,rcv,"agps")
 	link.connect(lid,PROT,SVR,PORT)
@@ -334,4 +328,3 @@ end
 
 sys.regapp(gpsstateind,gps.GPS_STATE_IND)
 load()
-if fly then fly.setcb(flycb) end

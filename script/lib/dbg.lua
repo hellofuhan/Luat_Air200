@@ -34,7 +34,7 @@ local function writepara()
 end
 
 local function initpara()
-	inf = readtxt(DBG_FILE) or ""
+	inf = (sys.getextliberr() or "")..(readtxt(DBG_FILE) or "")
 	print("dbg inf",inf)
 end
 

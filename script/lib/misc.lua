@@ -1,33 +1,72 @@
--- 其他配置
+--[[
+模块名称：杂项管理
+模块功能：序列号、IMEI、底层软件版本号、时钟、是否校准、飞行模式、查询电池电量等功能
+模块最后修改时间：2017.02.14
+]]
+
+--定义模块,导入依赖库
 local string = require"string"
 local ril = require"ril"
 local sys = require"sys"
 local base = _G
 local os = require"os"
 local io = require"io"
+local rtos = require"rtos"
+local pmd = require"pmd"
 module(...)
 
+--加载常用的全局函数至本地
 local tonumber,tostring,print,req,smatch = base.tonumber,base.tostring,base.print,ril.request,string.match
-local sn,snrdy,imeirdy,ver,imei,clkswitch,updating,dbging,flypending
 
-local CCLK_QUERY_TIMER_PERIOD = 60*1000
-local clk,calib,cbfunc={},false
+--sn：序列号
+--snrdy：是否已经成功读取过序列号
+--imei：IMEI
+--imeirdy：是否已经成功读取过IMEI
+--ver：底层软件版本号
+--clkswitch：整分时钟通知开关
+--updating：是否正在执行远程升级功能(update.lua)
+--dbging：是否正在执行dbg功能(dbg.lua)
+--flypending：是否有等待处理的进入飞行模式请求
+local sn,snrdy,imeirdy,--[[ver,]]imei,clkswitch,updating,dbging,flypending
 
+--calib：校准标志，true为已校准，其余未校准
+--cbfunc：执行AT命令，处理完应答后的用户自定义回调函数
+local calib,cbfunc
+
+--[[
+函数名：rsp
+功能  ：本功能模块内“通过虚拟串口发送到底层core软件的AT命令”的应答处理
+参数  ：
+		cmd：此应答对应的AT命令
+		success：AT命令执行结果，true或者false
+		response：AT命令的应答中的执行结果字符串
+		intermediate：AT命令的应答中的中间信息
+返回值：无
+]]
 local function rsp(cmd,success,response,intermediate)
 	local prefix = string.match(cmd,"AT(%+%u+)")
+	--查询序列号
 	if cmd == "AT+WISN?" then
 		sn = intermediate
+		--如果没有成功读取过序列号，则产生一个内部消息SN_READY，表示已经读取到序列号
 		if not snrdy then sys.dispatch("SN_READY") snrdy = true end
-	elseif cmd == "AT+VER" then
-		ver = intermediate
+	--查询底层软件版本号
+	--[[elseif cmd == "AT+VER" then
+		ver = intermediate]]
+	--查询IMEI
 	elseif cmd == "AT+CGSN" then
 		imei = intermediate
+		--如果没有成功读取过IMEI，则产生一个内部消息IMEI_READY，表示已经读取到IMEI
 		if not imeirdy then sys.dispatch("IMEI_READY") imeirdy = true end
+	--写IMEI
 	elseif smatch(cmd,"AT%+WIMEI=") then
+	--写序列号
 	elseif smatch(cmd,"AT%+WISN=") then
 		req("AT+WISN?")
+	--设置系统时间
 	elseif prefix == "+CCLK" then
 		startclktimer()
+	--查询是否校准
 	elseif cmd == "AT+ATWMFT=99" then
 		print('ATWMFT',intermediate)
 		if intermediate == "SUCC" then
@@ -35,120 +74,197 @@ local function rsp(cmd,success,response,intermediate)
 		else
 			calib = false
 		end
+	--进入或退出飞行模式
 	elseif smatch(cmd,"AT%+CFUN=[01]") then
+		--产生一个内部消息FLYMODE_IND，表示飞行模式状态发生变化
 		sys.dispatch("FLYMODE_IND",smatch(cmd,"AT%+CFUN=(%d)")=="0")
 	end
+	--AT命令应答处理结束，如果有回调函数
 	if cbfunc then
 		local tmp = cbfunc
 		cbfunc = nil
+		--调用回调
 		tmp(cmd,success,response,intermediate)
 	end
 end
 
+--[[
+函数名：setclock
+功能  ：设置系统时间
+参数  ：
+		t：系统时间表，格式参考：{year=2017,month=2,day=14,hour=14,min=2,sec=58}
+		rspfunc：设置系统时间后的用户自定义回调函数
+返回值：无
+]]
 function setclock(t,rspfunc)
 	if t.year - 2000 > 38 then return end
 	cbfunc = rspfunc
 	req(string.format("AT+CCLK=\"%02d/%02d/%02d,%02d:%02d:%02d+32\"",string.sub(t.year,3,4),t.month,t.day,t.hour,t.min,t.sec),nil,rsp)
 end
 
+--[[
+函数名：getclockstr
+功能  ：获取系统时间字符串
+参数  ：无
+返回值：系统时间字符串，格式为YYMMDDhhmmss，例如170214141602，17年2月14日14时16分02秒
+]]
 function getclockstr()
-	clk = os.date("*t")
+	local clk = os.date("*t")
 	clk.year = string.sub(clk.year,3,4)
 	return string.format("%02d%02d%02d%02d%02d%02d",clk.year,clk.month,clk.day,clk.hour,clk.min,clk.sec)
 end
 
+--[[
+函数名：getweek
+功能  ：获取星期
+参数  ：无
+返回值：星期，number类型，1-7分别对应周一到周日
+]]
 function getweek()
-	clk = os.date("*t")
+	local clk = os.date("*t")
 	return ((clk.wday == 1) and 7 or (clk.wday - 1))
 end
 
+--[[
+函数名：getclock
+功能  ：获取系统时间表
+参数  ：无
+返回值：table类型的时间，例如{year=2017,month=2,day=14,hour=14,min=19,sec=23}
+]]
 function getclock()
 	return os.date("*t")
 end
 
-local CclkQueryTimerFun = function()
-	startclktimer()
-end
-
+--[[
+函数名：startclktimer
+功能  ：选择性的启动整分时钟通知定时器
+参数  ：无
+返回值：无
+]]
 function startclktimer()
+	--开关开启 或者 工作模式为完整模式
 	if clkswitch or sys.getworkmode()==sys.FULL_MODE then
+		--产生一个内部消息CLOCK_IND，表示现在是整分，例如12点13分00秒、14点34分00秒
 		sys.dispatch("CLOCK_IND")
 		print('CLOCK_IND',os.date("*t").sec)
-		sys.timer_start(CclkQueryTimerFun,(60-os.date("*t").sec)*1000)
+		--启动下次通知的定时器
+		sys.timer_start(startclktimer,(60-os.date("*t").sec)*1000)
 	end
 end
 
-function changeclktimer()
-	if clkswitch or sys.getworkmode()==sys.FULL_MODE then
-		sys.timer_stop(startclktimer)
-		sys.timer_start(CclkQueryTimerFun,(60-os.date("*t").sec)*1000)
-	end
-end
-
+--[[
+函数名：setclkswitch
+功能  ：设置“整分时钟通知”开关
+参数  ：
+		v：true为开启，其余为关闭
+返回值：无
+]]
 function setclkswitch(v)
 	clkswitch = v
 	if v then startclktimer() end
 end
 
+--[[
+函数名：getsn
+功能  ：获取序列号
+参数  ：无
+返回值：序列号，如果未获取到返回""
+]]
 function getsn()
 	return sn or ""
 end
 
-function getbasever()
-	if ver ~= nil and base._INTERNAL_VERSION ~= nil then
-		local d1,d2,bver,bprj,lver
-		d1,d2,bver,bprj = string.find(ver,"_V(%d+)_(.+)")
-		d1,d2,lver = string.find(base._INTERNAL_VERSION,"_V(%d+)")
-
-		if bver ~= nil and bprj ~= nil and lver ~= nil then
-			return "SW_V" .. lver .. "_" .. bprj .. "_B" .. bver
-		end
-	end
-	return ""
-end
-
+--[[
+函数名：getimei
+功能  ：获取IMEI
+参数  ：无
+返回值：IMEI号，如果未获取到返回""
+]]
 function getimei()
 	return imei or ""
 end
 
+
+--[[
+函数名：setflymode
+功能  ：控制飞行模式
+参数  ：
+		val：true为进入飞行模式，false为退出飞行模式
+返回值：无
+]]
 function setflymode(val)
+	--如果是进入飞行模式
 	if val then
+		--如果正在执行远程升级功能或者dbg功能，则延迟进入飞行模式
 		if updating or dbging then flypending = true return end
 	end
+	--发送AT命令进入或者退出飞行模式
 	req("AT+CFUN="..(val and 0 or 1))
 	flypending = false
 end
 
-function set(typ,val,cb)
-	cbfunc = cb
-	if typ == "WIMEI" or typ == "WISN" then
-		req("AT+" .. typ .. "=\"" .. val .. "\"")
-	elseif typ == "AMFAC" then
-		req("AT+" .. typ .. "=" .. val)
-	elseif typ == "CFUN" then
-		req("AT+" .. typ .. "=" .. val)
-	end
-end
+--[[
+函数名：set
+功能  ：兼容之前写的旧程序，目前为空函数
+参数  ：无
+返回值：无
+]]
+function set() end
 
+--[[
+函数名：getcalib
+功能  ：获取是否校准标志
+参数  ：无
+返回值：true为校准，其余为没校准
+]]
 function getcalib()
 	return calib
 end
 
+--[[
+函数名：getvbatvolt
+功能  ：获取VBAT的电池电压
+参数  ：无
+返回值：电压，number类型，单位毫伏
+]]
 function getvbatvolt()
 	local v1,v2,v3,v4,v5 = pmd.param_get()
 	return v2
 end
 
+--[[
+函数名：getcorever
+功能  ：获取底层软件版本号
+参数  ：无
+返回值：版本号字符串
+]]
+function getcorever()
+	return rtos.get_version()
+end
+
+--[[
+函数名：ind
+功能  ：本模块注册的内部消息的处理函数
+参数  ：
+		id：内部消息id
+		para：内部消息参数
+返回值：true
+]]
 local function ind(id,para)
+	--工作模式发生变化
 	if id=="SYS_WORKMODE_IND" then
 		startclktimer()
+	--远程升级开始
 	elseif id=="UPDATE_BEGIN_IND" then
 		updating = true
+	--远程升级结束
 	elseif id=="UPDATE_END_IND" then
 		updating = false
 		if flypending then setflymode(true) end
+	--dbg功能开始
 	elseif id=="DBG_BEGIN_IND" then
 		dbging = true
+	--dbg功能结束
 	elseif id=="DBG_END_IND" then
 		dbging = false
 		if flypending then setflymode(true) end
@@ -157,16 +273,23 @@ local function ind(id,para)
 	return true
 end
 
+--注册以下AT命令的应答处理函数
 ril.regrsp("+ATWMFT",rsp)
 ril.regrsp("+WISN",rsp)
-ril.regrsp("+VER",rsp,4,"^[%w_]+$")
+--ril.regrsp("+VER",rsp,4,"^[%w_]+$")
 ril.regrsp("+CGSN",rsp)
 ril.regrsp("+WIMEI",rsp)
 ril.regrsp("+AMFAC",rsp)
 ril.regrsp("+CFUN",rsp)
+--查询是否校准
 req("AT+ATWMFT=99")
+--查询序列号
 req("AT+WISN?")
-req("AT+VER")
+--查询底层软件版本号
+--req("AT+VER")
+--查询IMEI
 req("AT+CGSN")
+--启动整分时钟通知定时器
 startclktimer()
+--注册本模块关注的内部消息的处理函数
 sys.regapp(ind,"SYS_WORKMODE_IND","UPDATE_BEGIN_IND","UPDATE_END_IND","DBG_BEGIN_IND","DBG_END_IND")

@@ -1,4 +1,10 @@
+--[[
+模块名称：短信功能
+模块功能：短信发送，接收，读取，删除
+模块最后修改时间：2017.02.13
+]]
 
+--定义模块,导入依赖库
 local base = _G
 local string = require "string"
 local table = require "table"
@@ -8,11 +14,13 @@ local common = require "common"
 local bit = require"bit"
 module("sms")
 
+--加载常用的全局函数至本地
 local print = base.print
 local tonumber = base.tonumber
 local dispatch = sys.dispatch
 local req = ril.request
 
+--ready：底层短信功能是否准备就绪
 local ready,isn,tlongsms = false,255,{}
 local ssub,slen,sformat,smatch = string.sub,string.len,string.format,string.match
 

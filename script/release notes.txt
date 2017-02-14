@@ -1,0 +1,9 @@
+版本号：Luat_V0001_Air200.lod
+发布时间：2017/2/15 00:42:44
+修改记录：
+    一、lib脚本修改
+        lib脚本版本号：1.0.0
+        支持lib脚本的最小core软件版本号：Luat_V0001_Air200
+        (1)misc.lua中新增getvbatvolt()接口，可实时获取VBAT电池电压
+	(2)misc.lua中新增getcorever()接口，可获取core软件版本号
+	(3)脚本添加注释
