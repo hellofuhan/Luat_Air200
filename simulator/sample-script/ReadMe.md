@@ -63,28 +63,28 @@ git clone git@github.com:airm2m-open/luat.git
 <h2 id="title50" name="title50">5. 导入样例工程</h2>
 <p>导入样例工程前，必须创建一个自己的工作空间(Workspace)，并选择此工作空间作为调试Lua脚本的目录。</p>
 
-<img src="http://i.imgur.com/tciIKyb.png" alt="LDT-DOC-1">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100045vs8ikza3z93iv9j9.png" alt="LDT-DOC-1">
 
 <p>把sample-script样例工程导入上述的工作空间，且必须选中sample-script的根目录，否则无法引入正确的工程配置信息。</p>
 <p>File --> Import... </p>
 
-<img src="http://i.imgur.com/NWwnfNG.png" alt="LDT-DOC-2">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100045csyjk6rkyg5jhtrk.png" alt="LDT-DOC-2">
 
 <p> --> General --> Existing Projects into Workspace</p>
 
-<img src="http://i.imgur.com/DhtyG01.png" alt="LDT-DOC-3">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100046h2gkn6ivkdbdbhm4.png" alt="LDT-DOC-3">
 
 <p> --> Next --> Select root directory</p>
 
-<img src="http://i.imgur.com/iEDFPLX.png" alt="LDT-DOC-4">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100047tr1rsrshf01te19h.png" alt="LDT-DOC-4">
 
 <p> --> Browse... </p>
 
-<img src="http://i.imgur.com/023XqPl.png" alt="LDT-DOC-5">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100047p77rz3r757ta797f.png" alt="LDT-DOC-5">
 
 <p> --> OK </p>
 
-<img src="http://i.imgur.com/AEGAKg9.png" alt="LDT-DOC-6">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100048x0iloio2q64b6pfj.png" alt="LDT-DOC-6">
 
 执行"Finish"后，即可成功导入sample-script。
 
@@ -95,7 +95,7 @@ git clone git@github.com:airm2m-open/luat.git
 <p>6.1 配置默认解释器</p>
 <p>Window --> Preferences --> Lua --> Interpreters --> Add</p>
 
-<img src="http://i.imgur.com/6Shk3JN.png" alt="LDT-DOC-7">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100048p33whrskhrrgo4ok.png" alt="LDT-DOC-7">
 
 <p>Add interpreter --> Browse...</p>
 <p>lua5.1.exe Lua脚本的解释器。</p>
@@ -104,30 +104,30 @@ git clone git@github.com:airm2m-open/luat.git
 
 <p>Windows 64-bit, sample-script --> x64_lib --> Lua5.1 --> lua5.1.exe</p>
 
-<img src="http://i.imgur.com/rjW6Iu6.png" alt="LDT-DOC-8">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100049o7ask1aaa292299s.png" alt="LDT-DOC-8">
 
 <p>可以给定制化的解释器取个别名(Interpreter name)，比如：AM Lua 5.1。执行"OK"。</p>
 
-<img src="http://i.imgur.com/pnIt7Wd.png" alt="LDT-DOC-9">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100049zdylysplx1d5h5x0.png" alt="LDT-DOC-9">
 
 <p>必须把上述定制化的Lua解释器，"AM Lua 5.1",置为选中状态。</p>
 
 <p>6.2 配置运行时解释器</p>
 <p>Run/Debug --> Run/Debug Configurations --> Runtime Interpreter</p>
 
-<img src="http://i.imgur.com/iWObbV8.png" alt="LDT-DOC-10">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100050p0pz6230ao239bq3.png" alt="LDT-DOC-10">
 
 <p>按"New"按钮为Lua应用"Lua Application"创建一个新的Run/Debug配置。</p>
 
-<img src="http://i.imgur.com/aewqH05.png" alt="LDT-DOC-11">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100050u577hc2m3id33m2w.png" alt="LDT-DOC-11">
 
 <p>启动脚本"Launch script"必须选择样例脚本"sample-script"下的"init.lua"，脚本"init.lua"为LuaT模拟器的入口。</p>
 
-<img src="http://i.imgur.com/uBu9oNK.png" alt="LDT-DOC-12">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100051vahib2w69ubozop0.png" alt="LDT-DOC-12">
 
 <p>执行"OK"确定启动脚本的配置。运行解释器"Runtime Interpreter"必须配置为6.1中的默认解释器，"AM Lua 5.1"。</p>
 
-<img src="http://i.imgur.com/eXv82N1.png" alt="LDT-DOC-13">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100051glmm7zftmj4u44t1.png" alt="LDT-DOC-13">
 
 <p>执行"Apply"存储所有的配置。</p>
 
@@ -137,7 +137,7 @@ git clone git@github.com:airm2m-open/luat.git
 <p>Lua源文件 'sample-script\src\lua'，把工程源文件或库(lib)源文件拷贝到lua目录，也可在lua中创建新的Lua源文件。</p>
 <p>日志文件 'sample-script\AMLuaDebug.log'，存储模拟器和Lua脚本的日志。</p>
 
-<img src="http://i.imgur.com/RRI5hft.png" alt="LDT-DOC-13">
+<img src="http://bbs.airm2m.com/data/attachment/album/201702/14/100052cn09rfrmrun1g0gr.png" alt="LDT-DOC-14">
 
 <p>到目前为止，只能运行Run模式，Debug模式还无法正常运行。</p>
 
