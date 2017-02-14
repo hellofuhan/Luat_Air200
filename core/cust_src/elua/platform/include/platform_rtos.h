@@ -165,6 +165,10 @@ int platform_rtos_stop_timer(int timer_id);
 int platform_rtos_tick(void);
 /*-\NEW\liweiqiang\2013.4.5\增加rtos.tick接口*/
 
+/*-\NEW\zhuwangbin\2017.2.12\添加版本查询接口 */
+char *platform_rtos_get_version(void);
+/*-\NEW\zhuwangbin\2017.2.12\添加版本查询接口 */
+
 /*+\NEW\liweiqiang\2013.12.12\增加充电开机时由用户自行决定是否启动系统 */
 int platform_get_poweron_reason(void);
 

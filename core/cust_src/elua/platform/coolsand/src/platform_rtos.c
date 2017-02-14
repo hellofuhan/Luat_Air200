@@ -344,3 +344,10 @@ int platform_rtos_tick(void)
 }
 /*-\NEW\liweiqiang\2013.4.5\增加rtos.tick接口*/
 
+/*-\NEW\zhuwangbin\2017.2.12\添加版本查询接口 */
+extern char * cust_luaInfo_version(void);
+char *platform_rtos_get_version(void)
+{
+	return cust_luaInfo_version();
+}
+/*-\NEW\zhuwangbin\2017.2.12\添加版本查询接口 */

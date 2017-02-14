@@ -237,6 +237,18 @@ static int l_rtos_poweroff(lua_State *L)
 	return 0;
 }
 
+/*-\NEW\zhuwangbin\2017.2.12\添加版本查询接口 */
+static int l_get_version(lua_State *L)
+{
+	char *ver;
+
+	ver = platform_rtos_get_version();
+	lua_pushlstring(L, ver, strlen(ver));
+	
+	return 1;
+}
+/*-\NEW\zhuwangbin\2017.2.12\添加版本查询接口 */
+
 static int l_get_env_usage(lua_State *L)
 {
 	lua_pushinteger(L,platform_get_env_usage());	
@@ -281,6 +293,10 @@ const LUA_REG_TYPE rtos_map[] =
     { LSTRKEY( "tick" ), LFUNCVAL( l_rtos_tick ) },
 /*-\NEW\liweiqiang\2013.4.5\增加rtos.tick接口*/
     { LSTRKEY( "get_env_usage" ), LFUNCVAL( l_get_env_usage ) },
+/*-\NEW\zhuwangbin\2017.2.12\添加版本查询接口 */
+    { LSTRKEY( "get_version" ), LFUNCVAL( l_get_version ) },
+/*-\NEW\zhuwangbin\2017.2.12\添加版本查询接口 */
+
 	{ LNILKEY, LNILVAL }
 };
 

@@ -121,6 +121,12 @@ struct
     E_AMOPENAT_POWERON_REASON reason;
 }g_PowronInfo;
 
+/*-\NEW\zhuwangbin\2017.2.12\添加版本查询接口 */
+char * cust_luaInfo_version(void)
+{
+	return g_s_luaInfo.app_ver;
+}
+/*-\NEW\zhuwangbin\2017.2.12\添加版本查询接口 */
 /* The first function called by OpenAT platform */
 /* Return value see more E_AMOPENAT_CUST_INIT_RESUL */
 UINT8 cust_init(T_AMOPENAT_INTERFACE_VTBL *pVtable)
