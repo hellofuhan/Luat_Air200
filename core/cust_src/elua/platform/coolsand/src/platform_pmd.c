@@ -141,3 +141,13 @@ int platform_pmd_get_charger(void)
 /*-\NEW\liweiqiang\2014.2.13\增加pmd.charger查询充电器状态接口 */
 
 
+/*+NEW\zhuwangbin\2017.2.10\添加充电参数查询接口*/
+int platform_pmd_get_chg_param(BOOL *battStatus, u16 *battVolt, u8 *battLevel, BOOL *chargerStatus, u8 *chargeState)
+{
+	IVTBL(get_chg_param)(battStatus, battVolt, battLevel, chargerStatus, chargeState);
+
+	IVTBL(print)("zwb4 platform_pmd_get_chg_param %d,%d,%d,%d,%d", 
+				*battStatus, *battVolt, *battLevel, *chargerStatus, *chargeState);
+	return PLATFORM_OK;
+}
+/*+NEW\zhuwangbin\2017.2.10\添加充电参数查询接口*/

@@ -376,6 +376,9 @@ typedef struct T_AMOPENAT_INTERFACE_VTBL_TAG
     E_AMOPENAT_CHR_HW_STATUS (*get_chargerHwStatus)(
                             VOID
                             );
+/*+NEW\zhuwangbin\2017.2.10\添加充电参数查询接口*/
+	int (*get_chg_param)(BOOL *battStatus, u16 *battVolt, u8 *battLevel, BOOL *chargerStatus, u8 *chargeState);
+/*+NEW\zhuwangbin\2017.2.10\添加充电参数查询接口*/
 /*-\NEW\RUFEI\2014.2.13\增加OPENAT查询充电器HW状态接口*/
     BOOL (*poweron_system)(                                     /* 正常开机 */  
                             E_AMOPENAT_STARTUP_MODE simStartUpMode,/* 开启SIM卡方式 */

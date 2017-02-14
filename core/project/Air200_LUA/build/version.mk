@@ -19,7 +19,7 @@ BUILD_VER =0001
 #硬件版本号
 HW_VER = Air200
 #可选功能，例如TTS等，表明该版本具有特定功能
-OPTION_FUN = TTS
+OPTION_FUN = 
 
 ### 需要设置的内容 ###
 # 模块/手机项目号

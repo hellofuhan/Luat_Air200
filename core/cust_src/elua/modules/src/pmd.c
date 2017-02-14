@@ -82,6 +82,34 @@ static int pmd_ldo_set(lua_State *L) {
     return 0; 
 }
 
+/*
+present  battStatus BOOL
+voltage 电池电压battVolt  INT
+level 电池等级 battLevel INT 
+charger 充电器是否连接chargerStatus BOOL
+state 充电状态chargeState INT
+*/
+/*+NEW\zhuwangbin\2017.2.10\添加充电参数查询接口*/
+static int pmd_chg_param_get(lua_State *L)
+{
+	BOOL    battStatus;
+    BOOL    chargerStatus;
+    u8      chargeState;
+    u8      battLevel;
+    u16     battVolt;
+
+	platform_pmd_get_chg_param(&battStatus, &battVolt, &battLevel, &chargerStatus, &chargeState);
+	lua_pushboolean(L, battStatus);
+	lua_pushinteger(L, battVolt);
+	lua_pushinteger(L, battLevel);
+	lua_pushboolean(L, chargerStatus);
+	lua_pushinteger(L, chargeState);
+	
+	return 5;
+}
+/*+NEW\zhuwangbin\2017.2.10\添加充电参数查询接口*/
+
+
 // pmd.sleep(sleepornot)
 static int pmd_deepsleep(lua_State *L) {    
     int sleep = luaL_checkinteger(L,1);
@@ -112,6 +140,9 @@ const LUA_REG_TYPE pmd_map[] =
   /*+\NEW\liweiqiang\2014.2.13\增加pmd.charger查询充电器状态接口 */
   { LSTRKEY( "charger" ),  LFUNCVAL( pmd_charger ) },
   /*-\NEW\liweiqiang\2014.2.13\增加pmd.charger查询充电器状态接口 */
+/*+NEW\zhuwangbin\2017.2.10\添加充电参数查询接口*/
+  { LSTRKEY( "param_get" ),  LFUNCVAL( pmd_chg_param_get ) },
+/*+NEW\zhuwangbin\2017.2.10\添加充电参数查询接口*/
 
   { LNILKEY, LNILVAL }
 };
