@@ -1,3 +1,15 @@
+发布时间：2017/2/15 13:58:56
+修改记录：
+    一、lib脚本修改（注意，使用此版本的lib脚本，core软件版本号必须是Luat_V0001_Air200或者比Luat_V0001_Air200新的版本，否则开机就会一直重启）
+        lib脚本版本号：1.0.1
+        支持lib脚本的最小core软件版本号：Luat_V0001_Air200
+        (1)ril.lua中新增接口setransparentmode和sendtransparentdata，支持通过物理串口透传AT命令的功能（使用方式参考demo/uart_at_transparent）
+    二、demo脚本修改
+        (1)新增uart_at_transparent项目，可通过开发板上的物理串口uart2，透传AT命令，波特率为115200，数据位8，停止位1，校验位和流控无；
+           PC上的串口调试工具通过串口线和Air200开发板上的uart2相连，配置好串口参数，开发板上电开机，就可以支持AT命令的透传了
+
+
+
 发布时间：2017/2/15 10:37:44
 修改记录：
     一、lib脚本修改（注意，使用此版本的lib脚本，core软件版本号必须是Luat_V0001_Air200或者比Luat_V0001_Air200新的版本，否则开机就会一直重启）
