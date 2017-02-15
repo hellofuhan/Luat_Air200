@@ -12,6 +12,7 @@ local rtos = require"rtos"
 local uart = require"uart"
 local io = require"io"
 local os = require"os"
+local string = require"string"
 module("sys")
 
 --加载常用的全局函数至本地
@@ -21,6 +22,7 @@ local ipairs = base.ipairs
 local type = base.type
 local pairs = base.pairs
 local assert = base.assert
+local tonumber = base.tonumber
 
 --lib脚本版本号，只要lib中的任何一个脚本做了修改，都需要更新此版本号
 SCRIPT_LIB_VER = "1.0.0"
@@ -295,6 +297,7 @@ end
 返回值：无
 ]]
 local function appenderr(s)
+	print("appenderr",s)
 	liberr = liberr..s
 	writetxt(LIB_ERR_FILE,liberr)	
 end
@@ -336,6 +339,44 @@ function restart(r)
 end
 
 --[[
+函数名：getcorever
+功能  ：获取底层软件版本号
+参数  ：无
+返回值：版本号字符串
+]]
+function getcorever()
+	return rtos.get_version()
+end
+
+--[[
+函数名：checkcorever
+功能  ：检查底层软件版本号和lib脚本需要的最小底层软件版本号是否匹配
+参数  ：无
+返回值：无
+]]
+local function checkcorever()
+	local realver = getcorever()
+	--如果没有获取到底层软件版本号
+	if not realver or realver=="" then
+		appenderr("checkcorever[no core ver error];")
+		return
+	end
+	
+	local buildver = string.match(realver,"Luat_V(%d+)_Air200")
+	--如果底层软件版本号格式错误
+	if not buildver then
+		appenderr("checkcorever[core ver format error]"..realver..";")
+		return
+	end
+	
+	--lib脚本需要的底层软件版本号大于底层软件的实际版本号
+	if tonumber(string.match(CORE_MIN_VER,"Luat_V(%d+)_Air200"))>tonumber(buildver) then
+		appenderr("checkcorever[core ver match error]"..realver..","..CORE_MIN_VER..";")
+	end
+end
+
+
+--[[
 函数名：init
 功能  ：lua应用程序初始化
 参数  ：
@@ -348,7 +389,7 @@ function init(mode,lprfnc)
 	assert(base.PROJECT and base.PROJECT ~= "" and base.VERSION and base.VERSION ~= "","Undefine PROJECT or VERSION")
 	--设置AT命令的虚拟串口
 	uart.setup(uart.ATC,0,0,uart.PAR_NONE,uart.STOP_1)
-	print("poweron reason:",rtos.poweron_reason(),base.PROJECT,base.VERSION,SCRIPT_LIB_VER,CORE_MIN_VER)
+	print("poweron reason:",rtos.poweron_reason(),base.PROJECT,base.VERSION,SCRIPT_LIB_VER,CORE_MIN_VER,getcorever())
 	if mode == 1 then
 		--充电开机
 		if rtos.poweron_reason() == rtos.POWERON_CHARGER then
@@ -365,6 +406,7 @@ function init(mode,lprfnc)
 	--保存 用户应用脚本中定义的“低电关机处理函数”
 	lprfun = lprfnc
 	initerr()
+	checkcorever()
 end
 
 --[[

@@ -233,16 +233,6 @@ function getvbatvolt()
 end
 
 --[[
-函数名：getcorever
-功能  ：获取底层软件版本号
-参数  ：无
-返回值：版本号字符串
-]]
-function getcorever()
-	return rtos.get_version()
-end
-
---[[
 函数名：ind
 功能  ：本模块注册的内部消息的处理函数
 参数  ：
