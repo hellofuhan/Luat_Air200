@@ -1,12 +1,19 @@
+--[[
+模块名称：socket功能
+模块功能：socket连接，应用数据传输
+模块最后修改时间：2017.02.16
+]]
+--测试时请搭建自己的服务器，并且修改下面的PROT，ADDR，PORT 
 module(...,package.seeall)
 
 --[[
 功能需求：
 1、数据网络准备就绪后，连接后台
-2、连接成功后，每隔10秒钟发送一次心跳包"heart data\r\n"到后台；每隔20秒钟发送一次位置包"loc data\r\n"到后台
+2、每隔HEART_RPT_FREQ秒发送一次心跳包"heart data\r\n"到后台；
+3、每隔LOC_RPT_FREQ秒，检查一下此周期内是否发生震动，如果发生震动，打开GPS（最长GPS_OPEN_MAX秒），GPS定位成功或者定位超时，发送一次位置包到后台
 3、与后台保持长连接，断开后主动再去重连，连接成功仍然按照第2条发送数据
 4、收到后台的数据时，在rcv函数中打印出来
-测试时请搭建自己的服务器，并且修改下面的PROT，ADDR，PORT 
+
 
 此例子为长连接，只要是软件上能够检测到的网络异常，可以自动去重新连接；
 有时会出现检测不到的异常，对于这种情况，我们一般按照如下方式处理，设置一个心跳包，每隔A时间发送一次到后台，后台回复应答，如果连续n倍的A时间都没有收到后台的任何数据，则认为出现了未知的网络异常，此时调用link.shut主动断开，然后自动重连
@@ -15,6 +22,12 @@ module(...,package.seeall)
 local ssub,schar,smatch,sbyte = string.sub,string.char,string.match,string.byte
 --测试时请搭建自己的服务器
 local SCK_IDX,PROT,ADDR,PORT = 1,"TCP","www.test.com",6500
+--位置包和心跳包上报间隔，单位秒
+local LOC_RPT_FREQ,HEART_RPT_FREQ = 20,300
+--每次开启GPS的最长时间
+local GPS_OPEN_MAX = 120
+--在一个位置包上报间隔内，设备是否发生了震动
+local shkflg
 --linksta:与后台的socket连接状态
 local linksta
 --一个连接周期内的动作：如果连接后台失败，会尝试重连，重连间隔为RECONN_PERIOD秒，最多重连RECONN_MAX_CNT次
@@ -29,12 +42,12 @@ local reconncnt,reconncyclecnt,reconning = 0,0
 
 --[[
 函数名：print
-功能  ：打印接口，此文件中的所有打印都会加上test前缀
+功能  ：打印接口，此文件中的所有打印都会加上sck前缀
 参数  ：无
 返回值：无
 ]]
 local function print(...)
-	_G.print("test",...)
+	_G.print("sck",...)
 end
 
 --[[
@@ -51,22 +64,50 @@ end
 
 
 --[[
+函数名：opngpscb
+功能  ：“打开gps功能”的回调处理函数
+参数  ：
+		cause：打开gps功能时传入的标记，在此回调函数中回传过来
+返回值：无
+]]
+function opngpscb(cause)
+	print("opngpscb",cause)
+	local data = "gps fix error\r\n"
+	--定位成功
+	if gps.isfix() then
+		--经纬度信息
+		data = gps.getgpslocation().."\r\n"
+	end
+	if not snd(data,"LOCRPT") then
+		locrptcb()
+	end
+end
+
+--[[
 函数名：locrpt
-功能  ：发送位置包数据到后台
+功能  ：发送位置包预处理
 参数  ：无
 返回值：无
 ]]
 function locrpt()
-	print("locrpt",linksta)
+	print("locrpt",linksta,shkflg)
+	--连接上后台并且设备发生了震动
 	if linksta then
-		snd("loc data\r\n","LOCRPT")		
+		--snd("loc data\r\n","LOCRPT")
+		if shkflg then
+			--打开GPS，最长时间GPS_OPEN_MAX秒
+			--在GPS_OPEN_MAX内定位成功或者超时定位失败，都会调用opngpscb回调函数，传入的参数为cause的值"LOCRPT"
+			gpsapp.open(gpsapp.TIMERORSUC,{cause="LOCRPT",val=GPS_OPEN_MAX,cb=opngpscb})
+		else
+			locrptcb()
+		end
 	end
 end
 
 
 --[[
 函数名：locrptcb
-功能  ：位置包发送回调，启动定时器，20秒钟后再次发送位置包
+功能  ：位置包发送回调，启动定时器，LOC_RPT_FREQ秒钟后再次发送位置包
 参数  ：		
 		item：table类型，{data=,para=}，消息回传的参数和数据，例如调用linkapp.scksnd时传入的第2个和第3个参数分别为dat和par，则item={data=dat,para=par}
 		result： bool类型，发送结果，true为成功，其他为失败
@@ -74,8 +115,10 @@ end
 ]]
 function locrptcb(item,result)
 	print("locrptcb",linksta)
+	--清除震动标志
+	shkflg = false
 	if linksta then
-		sys.timer_start(locrpt,20000)
+		sys.timer_start(locrpt,LOC_RPT_FREQ*1000)
 	end
 end
 
@@ -89,13 +132,15 @@ end
 function heartrpt()
 	print("heartrpt",linksta)
 	if linksta then
-		snd("heart data\r\n","HEARTRPT")		
+		if not snd("heart data\r\n","HEARTRPT")	then
+			heartrptcb()
+		end
 	end
 end
 
 --[[
-函数名：locrptcb
-功能  ：心跳包发送回调，启动定时器，10秒钟后再次发送心跳包
+函数名：heartrptcb
+功能  ：心跳包发送回调，启动定时器，HEART_RPT_FREQ秒钟后再次发送心跳包
 参数  ：		
 		item：table类型，{data=,para=}，消息回传的参数和数据，例如调用linkapp.scksnd时传入的第2个和第3个参数分别为dat和par，则item={data=dat,para=par}
 		result： bool类型，发送结果，true为成功，其他为失败
@@ -104,7 +149,7 @@ end
 function heartrptcb(item,result)
 	print("heartrptcb",linksta)
 	if linksta then
-		sys.timer_start(heartrpt,10000)
+		sys.timer_start(heartrpt,HEART_RPT_FREQ*1000)
 	end
 end
 
@@ -235,5 +280,24 @@ function connect()
 	linkapp.sckconn(SCK_IDX,linkapp.NORMAL,PROT,ADDR,PORT,ntfy,rcv)
 	reconning = true
 end
+
+--[[
+函数名：shkind
+功能  ：GSENSOR_SHK_IND消息处理，会设置shkflg标志，下次位置包上报时间到达时，检查shkflg标志
+参数  ：无
+返回值：true，表示其余应用可以接着处理GSENSOR_SHK_IND消息
+]]
+local function shkind()
+	shkflg = true
+	return true
+end
+
+--本模块关注的内部消息处理函数表
+local procer =
+{
+	GSENSOR_SHK_IND = shkind,
+}
+--注册消息处理函数表
+sys.regapp(procer)
 
 connect()

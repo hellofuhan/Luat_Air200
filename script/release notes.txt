@@ -1,3 +1,15 @@
+发布时间：2017/2/16 17:33:20
+修改记录：
+    一、demo脚本修改
+        (1)新增小蛮GPS定位器的whole_test项目，项目路径为：xiaoman_gps_tracker\whole_test，只能用于小蛮GPS定位器硬件
+           A.支持小蛮GPS定位器的各种硬件功能：gps、gsensor、keypad、指示灯、硬件看门狗
+           B.根据gsensor是否震动，定时开启gps，然后上报位置给服务器，参考sck.lua，注意修改服务器地址
+        (2)新增小蛮GPS定位器的gps_test项目，项目路径为：xiaoman_gps_tracker\gps_test，只能用于小蛮GPS定位器硬件
+           A.重点演示如何使用gps，参考testgps.lua
+        (3)修改gpio\gpio_single项目下的一处笔误(pins.lua中pio.INPUT误写成了pio.INTPUT)
+        (4)为socket\long_connection项目下的test.lua文件添加注释
+
+
 发布时间：2017/2/15 13:58:56
 修改记录：
     一、lib脚本修改（注意，使用此版本的lib脚本，core软件版本号必须是Luat_V0001_Air200或者比Luat_V0001_Air200新的版本，否则开机就会一直重启）

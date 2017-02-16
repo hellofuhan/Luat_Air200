@@ -31,6 +31,8 @@ socket\short_connection_flymode：基于TCP的socket短连接通信demo项目，会进入飞行模
 timer：定时器demo项目
 uart：串口demo项目
 uart_at_transparent：物理串口UART2透传AT命令demo项目（可通过开发板上的物理串口uart2，透传AT命令，波特率为115200，数据位8，停止位1，校验位和流控无；PC上的串口调试工具通过串口线和Air200开发板上的uart2相连，配置好串口参数，开发板上电开机，就可以支持AT命令的透传了）
+xiaoman_gps_tracker\whole_test：针对小蛮GPS定位器硬件写的一个完整的demo项目，支持硬件的各种功能，只能用于小蛮GPS定位器硬件，不能用于开发板，也不能配合时间线APP使用，注意修改sck.lua中的后台地址
+xiaoman_gps_tracker\gps_test：针对小蛮GPS定位器硬件写的一个测试gps的demo项目，只能用于小蛮GPS定位器硬件，不能用于开发板，也不能配合时间线APP使用。gps接口的使用参考testgps.lua
 
 其余demo项目持续更新中......
 
