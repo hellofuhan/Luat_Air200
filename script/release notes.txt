@@ -1,3 +1,14 @@
+发布时间：2017/2/17 15:09:21
+修改记录：
+    一、lib脚本修改（注意，使用此版本的lib脚本，core软件版本号必须是Luat_V0001_Air200或者比Luat_V0001_Air200新的版本，否则开机就会一直重启）
+        lib脚本版本号：1.0.2
+        支持lib脚本的最小core软件版本号：Luat_V0001_Air200
+        (1)net.lua中扩展setled接口的参数，可支持未注册上网络时的指示灯控制（默认常灭）
+    二、demo脚本修改
+        (1)uart_at_transparent项目：增加对网络指示灯的控制，一直闪烁，亮100毫秒，灭2900毫秒
+
+
+
 发布时间：2017/2/16 17:33:20
 修改记录：
     一、demo脚本修改
@@ -8,6 +19,7 @@
            A.重点演示如何使用gps，参考testgps.lua
         (3)修改gpio\gpio_single项目下的一处笔误(pins.lua中pio.INPUT误写成了pio.INTPUT)
         (4)为socket\long_connection项目下的test.lua文件添加注释
+
 
 
 发布时间：2017/2/15 13:58:56

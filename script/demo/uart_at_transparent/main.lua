@@ -2,6 +2,9 @@ PROJECT = "UART_AT_TRANSPARENT"
 VERSION = "1.0.0"
 require"sys"
 require"ril"
+require"net"
+--开机后网络指示灯一直闪烁，亮100毫秒，灭2900毫秒
+net.setled(true,nil,nil,100,2900)
 require"uartat"
 
 --设置虚拟ATC串口工作模式为透传模式

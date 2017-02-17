@@ -1,7 +1,7 @@
 --[[
 模块名称：程序运行框架
 模块功能：初始化，程序运行框架、消息分发处理、定时器接口
-模块最后修改时间：2017.02.09
+模块最后修改时间：2017.02.17
 ]]
 
 --定义模块,导入依赖库
@@ -25,7 +25,7 @@ local assert = base.assert
 local tonumber = base.tonumber
 
 --lib脚本版本号，只要lib中的任何一个脚本做了修改，都需要更新此版本号
-SCRIPT_LIB_VER = "1.0.1"
+SCRIPT_LIB_VER = "1.0.2"
 --支持lib脚本的最小core软件版本号
 CORE_MIN_VER = "Luat_V0001_Air200"
 

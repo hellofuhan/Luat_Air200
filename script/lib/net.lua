@@ -1,7 +1,7 @@
 --[[
 模块名称：网络管理
 模块功能：信号查询、GSM网络状态查询、网络指示灯控制、临近小区信息查询
-模块最后修改时间：2017.02.14
+模块最后修改时间：2017.02.17
 ]]
 
 --定义模块,导入依赖库
@@ -40,7 +40,8 @@ local csqqrypriod,cengqrypriod = 60*1000
 --cengswitch：定时查询当前和临近小区信息开关
 local cellinfo,flymode,csqswitch,cengswitch = {}
 
---ledstate：网络指示灯状态IDLE,CREG,CGATT,SCK
+--ledstate：网络指示灯状态INIT,IDLE,CREG,CGATT,SCK
+--INIT：功能关闭状态
 --IDLE：未注册GSM网络
 --CREG：已注册GSM网络
 --CGATT：已附着GPRS数据网络
@@ -48,12 +49,12 @@ local cellinfo,flymode,csqswitch,cengswitch = {}
 --ledontime：指示灯点亮时长(毫秒)
 --ledofftime：指示灯熄灭时长(毫秒)
 --usersckconnect：用户socket是否连接上后台
-local ledstate,ledontime,ledofftime,usersckconnect = "IDLE",0,0
+local ledstate,ledontime,ledofftime,usersckconnect = "INIT",0,0
 --ledflg：网络指示灯开关
 --ledpin：网络指示灯控制引脚
 --ledvalid：引脚输出何种电平会点亮指示灯，1为高，0为低
---ledcregon,ledcregoff,ledcgatton,ledcgattoff,ledsckon,ledsckoff：CREG,CGATT,SCK状态下指示灯的点亮和熄灭时长(毫秒)
-local ledflg,ledpin,ledvalid,ledcregon,ledcregoff,ledcgatton,ledcgattoff,ledsckon,ledsckoff = false,pio.P0_15,1,300,700,300,1700,100,100
+--ledidleon,ledidleoff,ledcregon,ledcregoff,ledcgatton,ledcgattoff,ledsckon,ledsckoff：IDLE,CREG,CGATT,SCK状态下指示灯的点亮和熄灭时长(毫秒)
+local ledflg,ledpin,ledvalid,ledidleon,ledidleoff,ledcregon,ledcregoff,ledcgatton,ledcgattoff,ledsckon,ledsckoff = false,pio.P0_15,1,0,0xFFFF,300,700,300,1700,100,100
 
 --[[
 函数名：creg
@@ -522,15 +523,19 @@ local function ledblinkon()
 	--print("ledblinkon",ledstate,ledontime,ledofftime)
 	--引脚输出电平控制指示灯点亮
 	pio.pin.setval(ledvalid==1 and 1 or 0,ledpin)
-	--不是IDLE状态
-	if ledstate~="IDLE" then
-		--启动点亮时长定时器，定时到了之后，熄灭指示灯
-		sys.timer_start(ledblinkoff,ledontime)
-	else
+	--常灭
+	if ledontime==0 and ledofftime==0xFFFF then
+		ledblinkoff()
+	--常亮
+	elseif ledontime==0xFFFF and ledofftime==0 then
 		--关闭点亮时长定时器和熄灭时长定时器
 		sys.timer_stop(ledblinkon)
 		sys.timer_stop(ledblinkoff)
-	end
+	--闪烁
+	else
+		--启动点亮时长定时器，定时到了之后，熄灭指示灯
+		sys.timer_start(ledblinkoff,ledontime)
+	end	
 end
 
 --[[
@@ -543,15 +548,19 @@ function ledblinkoff()
 	--print("ledblinkoff",ledstate,ledontime,ledofftime)
 	--引脚输出电平控制指示灯熄灭
 	pio.pin.setval(ledvalid==1 and 0 or 1,ledpin)
-	--不是IDLE状态
-	if ledstate~="IDLE" then
-		--启动熄灭时长定时器，定时到了之后，点亮指示灯
-		sys.timer_start(ledblinkon,ledofftime)
-	else
+	--常灭
+	if ledontime==0 and ledofftime==0xFFFF then
 		--关闭点亮时长定时器和熄灭时长定时器
 		sys.timer_stop(ledblinkon)
 		sys.timer_stop(ledblinkoff)
-	end
+	--常亮
+	elseif ledontime==0xFFFF and ledofftime==0 then
+		ledblinkon()
+	--闪烁
+	else
+		--启动熄灭时长定时器，定时到了之后，点亮指示灯
+		sys.timer_start(ledblinkon,ledofftime)
+	end	
 end
 
 --[[
@@ -564,7 +573,7 @@ function procled()
 	print("procled",ledflg,ledstate,flymode,usersckconnect,cgatt,state)
 	--如果开启了网络指示灯功能
 	if ledflg then
-		local newstate = "IDLE"
+		local newstate,newontime,newofftime = "IDLE",ledidleon,ledidleoff
 		--飞行模式
 		if flymode then
 		--用户socket连接到了后台
@@ -622,16 +631,16 @@ end
 		v：指示灯开关，true为开启，其余为关闭
 		pin：指示灯控制引脚，可选
 		valid：引脚输出何种电平会点亮指示灯，1为高，0为低，可选
-		cregon,cregoff,cgatton,cgattoff,sckon,sckoff：CREG,CGATT,SCK状态下指示灯的点亮和熄灭时长(毫秒)，可选
+		idleon,idleoff,cregon,cregoff,cgatton,cgattoff,sckon,sckoff：IDLE,CREG,CGATT,SCK状态下指示灯的点亮和熄灭时长(毫秒)，可选
 返回值：无
 ]]
-function setled(v,pin,valid,cregon,cregoff,cgatton,cgattoff,sckon,sckoff)
+function setled(v,pin,valid,idleon,idleoff,cregon,cregoff,cgatton,cgattoff,sckon,sckoff)
 	--开关值发生变化
 	if ledflg~=v then
 		ledflg = v
 		--开启
 		if v then
-			ledpin,ledvalid,ledcregon,ledcregoff = pin or ledpin,valid or ledvalid,cregon or ledcregon,cregoff or ledcregoff
+			ledpin,ledvalid,ledidleon,ledidleoff,ledcregon,ledcregoff = pin or ledpin,valid or ledvalid,idleon or ledidleon,idleoff or ledidleoff,cregon or ledcregon,cregoff or ledcregoff
 			ledcgatton,ledcgattoff,ledsckon,ledsckoff = cgatton or ledcgatton,cgattoff or ledcgattoff,sckon or ledsckon,sckoff or ledsckoff
 			pio.pin.setdir(pio.OUTPUT,ledpin)
 			procled()
@@ -641,7 +650,7 @@ function setled(v,pin,valid,cregon,cregoff,cgatton,cgattoff,sckon,sckoff)
 			sys.timer_stop(ledblinkoff)
 			pio.pin.setval(ledvalid==1 and 0 or 1,ledpin)
 			pio.pin.close(ledpin)
-			ledstate = "IDLE"
+			ledstate = "INIT"
 		end		
 	end
 end
