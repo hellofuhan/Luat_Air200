@@ -1,13 +1,26 @@
+--[[
+模块名称：gps应用管理模块
+模块功能：管理gps的开启，关闭
+模块最后修改时间：2017.02.13
+]]
 module(...,package.seeall)
 
+--nogpslockflg,lowvoltlockflg暂时未用
+--agpswrflg agps定位成功标记，true，agps已定位成功
 local nogpslockflg,lowvoltlockflg,agpswrflg
+--fstopn，true首次打开gps，nil或false非首次打开gps
 local fstopn=true
 
 local function print(...)
 	_G.print("gpsmng",...)
 end
 
-
+--[[
+函数名：opngps
+功能  ：开启gps
+参数  ：无
+返回值：true
+]]
 local function opngps()
 	print("opngps",nvm.get("workmod"),agpswrflg,chg.islow1(),chg.islow())
 	if nvm.get("workmod")=="GPS" then
@@ -16,6 +29,12 @@ local function opngps()
     return true
 end
 
+--[[
+函数名：fstopngps
+功能  ：首次开启gps
+参数  ：无
+返回值：true
+]]
 local function fstopngps()
     if fstopn then 
         fstopn=false
@@ -25,6 +44,12 @@ local function fstopngps()
     return true
 end
 
+--[[
+函数名：agpswrsuc
+功能  ：agps定位成功处理函数
+参数  ：无
+返回值：true
+]]
 local function agpswrsuc()
 	print("syy agpswrsuc",agpswrflg,fstopn)
 	if not agpswrflg and not fstopn then
@@ -44,6 +69,12 @@ local function clslongps()
 	gpsapp.close(gpsapp.DEFAULT,{cause="LONGPSMOD"})
 end]]
 
+--[[
+函数名：closegps
+功能  ：关闭gps
+参数  ：无
+返回值：无
+]]
 function closegps()
 	print("closegps")
 	gpsapp.close(gpsapp.TIMER,{cause="GPSMOD"})
@@ -83,14 +114,27 @@ local function init()
 	workmodind()
 end]]
 
+--[[
+函数名：gpstaind
+功能  ：gps事件处理函数
+参数  ：evt gps上报的事件
+返回值：true
+]]
 local function gpstaind(evt)
 	print("gpstaind",evt)
+    --gps定位成功，分发定位成功的消息
 	if evt == gps.GPS_LOCATION_SUC_EVT then
 		sys.dispatch("GPS_FIX_SUC")
 	end
 	return true
 end
 
+--[[
+函数名：shkind
+功能  ：震动处理函数
+参数  ：无
+返回值：true
+]]
 local function shkind()
 	if gpsapp.isactive(gpsapp.TIMER,{cause="GPSMOD"}) then
 		opngps()
@@ -98,6 +142,7 @@ local function shkind()
 	return true
 end
 
+--注册app消息处理函数
 local procer =
 {
 	GPSMOD_OPN_GPS_VALIDSHK_IND = opngps,

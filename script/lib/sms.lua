@@ -24,13 +24,23 @@ local req = ril.request
 local ready,isn,tlongsms = false,255,{}
 local ssub,slen,sformat,smatch = string.sub,string.len,string.format,string.match
 
+--[[
+函数名：send
+功能  ：发送短信
+参数  ：num,号码
+        data:短信内容
+返回值：true：发送成功，false发送失败
+]]
 function send(num,data)
 	local numlen,datalen,pducnt,pdu,pdulen,udhi = sformat("%02X",slen(num)),slen(data)/2,1,"","",""
 	if not ready then return false end
 	
+    --如果发送的数据大于140字节则为长短信
 	if datalen > 140 then
+        --计算出长短信拆分后的总条数，长短信的每包的数据实际只有134个实际要发送的短信内容，数据的前6字节为协议头
 		pducnt = sformat("%d",(datalen+133)/134)
 		pducnt = tonumber(pducnt)
+        --分配一个序列号，范围为0-255
 		isn = isn==255 and 0 or isn+1
 	end
 	
@@ -39,13 +49,16 @@ function send(num,data)
 	end
 	
 	for i=1, pducnt do
+        --如果是长短信
 		if pducnt > 1 then
 			local len_mul
 			len_mul = (i==pducnt and sformat("%02X",datalen-(pducnt-1)*134+6) or "8C")
+            --udhi：6位协议头格式
 			udhi = "050003" .. sformat("%02X",isn) .. sformat("%02X",pducnt) .. sformat("%02X",i)
 			print(datalen, udhi)
 			pdu = "005110" .. numlen .. common.numtobcdnum(num) .. "000800" .. len_mul .. udhi .. ssub(data, (i-1)*134*2+1,i*134*2)
-		else
+        --发送短短信    
+        else
 			datalen = sformat("%02X",datalen)
 			pdu = "001110" .. numlen .. common.numtobcdnum(num) .. "000800" .. datalen .. data
 		end
@@ -55,6 +68,12 @@ function send(num,data)
 	return true
 end
 
+--[[
+函数名：read
+功能  ：读短信
+参数  ：pos短信位置
+返回值：true：读成功，false读失败
+]]
 function read(pos)
 	if not ready or pos==ni or pos==0 then return false end
 	
@@ -62,6 +81,12 @@ function read(pos)
 	return true
 end
 
+--[[
+函数名：delete
+功能  ：删除短信
+参数  ：pos短信位置
+返回值：true：删除成功，false删除失败
+]]
 function delete(pos)
 	if not ready or pos==ni or pos==0 then return false end
 	req("AT+CMGD="..pos)
@@ -80,6 +105,13 @@ Charmap = {[0]=0x40,0xa3,0x24,0xa5,0xe8,0xE9,0xF9,0xEC,0xF2,0xC7,0x0A,0xD8,0xF8,
 Charmapctl = {[10]=0x0C,[20]=0x5E,[40]=0x7B,[41]=0x7D,[47]=0x5C,[60]=0x5B,[61]=0x7E
 			 ,[62]=0x5D,[64]=0x7C,[101]=0xA4}
 
+--[[
+函数名：gsm7bitdecode
+功能  ：7位编码, 在PDU模式中，当使用7位编码时，最多可发160个字符
+参数  ：data
+        longsms
+返回值：
+]]
 function gsm7bitdecode(data,longsms)
 	local ucsdata,lpcnt,tmpdata,resdata,nbyte,nleft,ucslen,olddat = "",slen(data)/2,0,0,0,0,0
   
@@ -157,6 +189,13 @@ function gsm7bitdecode(data,longsms)
 	return ucsdata,ucslen
 end
 
+--[[
+函数名：gsm8bitdecode
+功能  ：8位编码
+参数  ：data
+        longsms
+返回值：
+]]
 function gsm8bitdecode(data)
 	local ucsdata,lpcnt = "",slen(data)/2
    
@@ -167,10 +206,17 @@ function gsm8bitdecode(data)
 	return ucsdata,lpcnt
 end
 
+--[[
+函数名：rsp
+功能  ：AT应答
+参数  ：cmd,success,response,intermediate
+返回值：无
+]]
 local function rsp(cmd,success,response,intermediate)
 	local prefix = smatch(cmd,"AT(%+%u+)")
 	print("lib_sms rsp",prefix,cmd,success,response,intermediate)
 
+    --读短信成功
 	if prefix == "+CMGR" and success then
 		local convnum,t,stat,alpha,len,pdu,data,longsms,total,isn,idx = "",""
 		if intermediate then
@@ -178,6 +224,7 @@ local function rsp(cmd,success,response,intermediate)
 			len = tonumber(len)--PDU数据长度，不包括短信息中心号码
 		end
 	
+        --收到的PDU包不为空则解析PDU包
 		if pdu and pdu ~= "" then
 			local offset,addlen,addnum,flag,dcs,tz,txtlen,fo=5     
 			pdu = ssub(pdu,(slen(pdu)/2-len)*2+1,-1)--PDU数据，不包括短信息中心号码
@@ -217,7 +264,7 @@ local function rsp(cmd,success,response,intermediate)
 					data = ssub(data,1,txtlen*4)
 				end
 				print("7bit to ucs2 data: ",data,"txtlen",txtlen,"newlen",newlen)
-			elseif dcs == 0x04 then
+			elseif dcs == 0x04 then--8bit encode
 				data,txtlen = gsm8bitdecode(data)
 				print("8bit to ucs2 data: ",data,"txtlen",txtlen)
 			end
@@ -244,49 +291,86 @@ local function rsp(cmd,success,response,intermediate)
 	end
 end
 
+--[[
+函数名：urc
+功能  ：主动上报消息处理函数
+参数  ：data,prefix
+返回值：无
+]]
 local function urc(data,prefix)
+    --短信准备好
 	if data == "SMS READY" then
 		ready = true
 		--req("AT+CSMP=17,167,0,8")--设置短信TEXT 模式参数
+        --使用PDU模式发送
 		req("AT+CMGF=0")
+        --设置AT命令的字符编码是UCS2
 		req("AT+CSCS=\"UCS2\"")
+        --分发短信准备好消息
 		dispatch("SMS_READY")
 	elseif prefix == "+CMTI" then
+        --提取短信位置
 		local pos = smatch(data,"(%d+)",slen(prefix)+1)
+        --分发收到新短信消息
 		dispatch("SMS_NEW_MSG_IND",pos)
 	end
 end
 
+--[[
+函数名：getsmsstate
+功能  ：获取短消息是否准备好的状态
+参数  ：无
+返回值：true准备好，其他值：未准备好
+]]
 function getsmsstate()
 	return ready
 end
 
+--[[
+函数名：mergelongsms
+功能  ：合并长短信
+参数  ：无
+返回值：无
+]]
 local function mergelongsms()
 	local data,num,t,alpha=""
+    --按表中的顺序，一次拼接短消息内容
 	for i=1, #tlongsms do
 		if tlongsms[i] and tlongsms[i].dat and tlongsms[i].dat~="" then
 			data,num,t,alpha = data .. tlongsms[i].dat,tlongsms[i].num,tlongsms[i].t,tlongsms[i].nam 
 		end
 	end
+    --删除表中的短消息项，以确保下次长短信合并的正确
 	for i=1, #tlongsms do
 		table.remove(tlongsms)
 	end
+    --分发长短信合并确认消息
 	sys.dispatch("LONG_SMS_MERGR_CNF",true,num,data,t,alpha)
 	print("mergelongsms", "num:",num, "data", data)
 end
 
+--[[
+函数名：longsmsind
+功能  ：长短信被拆解后的消息包上报
+参数  ：id,num, data,datetime,name,total,idx,isn
+返回值：无
+]]
 local function longsmsind(id,num, data,datetime,name,total,idx,isn)
 	print("longsmsind", "total:",total, "idx:",idx,"data", data)
+    --如果是长短信的第一包，直接插入tlongsms表中
 	if #tlongsms==0 then
 		tlongsms[idx] = {dat=data,udhi=total .. isn,num=num,t=datetime,nam=name}
 	else
 		local oldudhi = ""
+        --获取之前收到的包中的udhi值，用于鉴别这次收到的短信是否跟表中收到的短信是来自同一条长短信
 		for i=1,#tlongsms do
 			if tlongsms[i] and tlongsms[i].udhi and tlongsms[i].udhi~="" then
 				oldudhi = tlongsms[i].udhi
 				break
 			end
 		end
+        --这次收到的短信是否跟表中收到的短信是来自同一条长短信，将本包插入表中
+        --否则先合并表中的长短信，再将本包短信插入tlongsms表中
 		if oldudhi==total .. isn then
 			tlongsms[idx] = {dat=data,udhi=total .. isn,num=num,t=datetime,nam=name}
 		else
@@ -296,14 +380,17 @@ local function longsmsind(id,num, data,datetime,name,total,idx,isn)
 		end
 	end
   
+    --长短信的总条数已收完毕，开始合并长短信
 	if total==#tlongsms then
 		sys.timer_stop(mergelongsms)
 		mergelongsms()
 	else
+        --如果2分钟后长短信还没收完整，2分钟后将自动合并已收到的长短信
 		sys.timer_start(mergelongsms,120000)
 	end
 end
 
+--注册长短信合并处理函数
 sys.regapp(longsmsind,"LONG_SMS_MERGE")
 
 ril.regurc("SMS READY",urc)
@@ -319,7 +406,9 @@ ril.regrsp("+CMGS",rsp)
 --使用PDU模式发送
 req("AT+CMGF=0")
 req("AT+CSMP=17,167,0,8")
+--设置AT命令的字符编码是UCS2
 req("AT+CSCS=\"UCS2\"")
+--设置存储区为SIM
 req("AT+CPMS=\"SM\"")
 req('AT+CNMI=2,1')
 

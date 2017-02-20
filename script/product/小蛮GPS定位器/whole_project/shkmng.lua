@@ -1,3 +1,9 @@
+--[[
+模块名称：震动管理模块
+模块功能：震动消息的管理
+模块最后修改时间：2017.02.09
+]]
+
 module(...,package.seeall)
 
 local function print(...)
@@ -6,6 +12,12 @@ end
 
 local tick = 0
 
+--[[
+函数名：timerfnc
+功能  ：定时计时函数，每秒tick加1
+参数  ：无
+返回值：无
+]]
 local function timerfnc()
 	tick = tick+1
 end
@@ -23,6 +35,12 @@ local tshkapp =
 	["STA_MOV"] = {flg={},idx=0,cnt=_G.STA_MOV_VALIDSHK_CNT,freq=_G.STA_MOV_VALIDSHK_FREQ},
 }
 
+--[[
+函数名：reset
+功能  ：重置shkapp参数
+参数  ：name
+返回值：无
+]]
 local function reset(name)
 	local i
 	for i=1,tshkapp[name].cnt do
@@ -39,6 +57,12 @@ local function shkprint(name,suffix)
 	print(name..suffix,str)
 end
 
+--[[
+函数名：fnc
+功能  ：shkapp对震动消息的处理，连续个指定的freq中都有震动，则分发对应的震动消息
+参数  ：无
+返回值：无
+]]
 local function fnc()
 	local k,v
 	for k,v in pairs(tshkapp) do
@@ -47,6 +71,7 @@ local function fnc()
 			v.flg[1] = tick
 			v.idx = 1
 		elseif v.idx<v.cnt then
+            --连续个指定的freq中都有震动，则分发对应的震动消息
 			if ((tick-v.flg[v.idx])>v.freq) and ((tick-v.flg[v.idx])<(v.freq*2)) then
 				v.idx = v.idx+1
 				if v.idx==v.cnt then
@@ -65,11 +90,23 @@ local function fnc()
 	end	
 end
 
+--[[
+函数名：shkind
+功能  ：震动消息处理函数
+参数  ：无
+返回值：true
+]]
 local function shkind()
 	fnc()
 	return true
 end
 
+--[[
+函数名：init
+功能  ：初始化震动管理app
+参数  ：无
+返回值：true
+]]
 local function init()
 	local k,v
 	for k,v in pairs(tshkapp) do

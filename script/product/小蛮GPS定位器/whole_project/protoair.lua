@@ -1,15 +1,75 @@
+--[[
+模块名称：协议模块
+模块功能：初始化，程序运行框架、消息分发处理、定时器接口
+模块最后修改时间：2017.02.09
+]]
+
+--定义模块,导入依赖库
 require"logger"
 local lpack = require"pack"
 module(...,package.seeall)
 
+--加载常用的全局函数至本地
 local slen,sbyte,ssub,sgsub,schar,srep,smatch,sgmatch = string.len,string.byte,string.sub,string.gsub,string.char,string.rep,string.match,string.gmatch
 
+--GPS GPS定位报文指令ID
+--LBS1 _LBS定位报文1指令ID
+--LBS2 _LBS定位报文2指令ID
+--HEART 心跳报文指令ID
+--LBS3 LBS定位报文3指令ID
+--GPSLBS GPS&多LBS定位报文指令ID
+--GPSLBS1 GPS&多LBS定位报文1指令ID
+--GPSLBSWIFIEXT GPS&LBS &WIFI扩展位置报文指令ID
+--GPSLBSWIFI GPS&LBS &WIFI定位报文指令ID
+--RPTPARA 参数变化报文指令ID
+--SETPARARSP 参数被动变化的应答报文指令ID
+--DEVEVENTRSP 被动处理事件的应答报文指令ID
+--GPSLBSWIFI1 GPS&LBS &WIFI定位报文1指令ID
+--INFO 终端信息报文指令ID
 GPS,LBS1,LBS2,HEART,LBS3,GPSLBS,GPSLBS1,GPSLBSWIFIEXT,GPSLBSWIFI,RPTPARA,SETPARARSP,DEVEVENTRSP,GPSLBSWIFI1,INFO = 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+--RPTFREQ 位置报文上报间隔
+--ALMFREQ 报警间隔
+--GUARDON 设防状态
+--GUARDOFF 撤防状态
+--RELNUM 亲情号码
+--CALLVOL 通话音量
+--CALLRINGVOL 亲情号码来电铃声音量
+--CALLRINGMUTEON 来电静音开启
+--CALLRINGMUTEOFF 来电静音关闭
 RPTFREQ,ALMFREQ,GUARDON,GUARDOFF,RELNUM,CALLVOL,CALLRINGVOL,CALLRINGMUTEON,CALLRINGMUTEOFF = 3,4,5,6,15,16,17,18,19
+--SILTIME 上课静默时间段
+--FIXTM 定时定位时间点
+--WHITENUM 呼入白名单
+--FIXMOD 定位模式
+--SMSFORBIDON 短信屏蔽开启
+--SMSFORBIDOFF 短信屏蔽关闭
+--CALLRINGID 亲情号码来电铃声类型
+--SOSIND SOS报警
+--ENTERTAIN 娱乐时间设置
+--ALARM 闹钟设置
 SILTIME,FIXTM,WHITENUM,FIXMOD,SMSFORBIDON,SMSFORBIDOFF,CALLRINGID,SOSIND,ENTERTAIN,ALARM = 20,21,22,23,24,25,26,27,28,29
+--SETPARA参数变化报文指令ID
+--SENDSMS发送短信报文指令ID
+--DIAL拨打电话报文指令ID
+--QRYLOC主动定位报文指令ID
+--RESET重启报文指令ID
+--MONIT监听报文指令ID
+--POWEROFF关机报文指令ID
+--RESTORE恢复出厂设置报文指令ID
+--PROMPT提示语报文指令ID
+--QRYPARA查询参数报文指令ID
+--QRYRCD拾音控制报文指令ID
 SETPARA,SENDSMS,DIAL,QRYLOC,RESET,MONIT,POWEROFF,RESTORE,PROMPT,QRYPARA,QRYRCD = 10,0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x50,0x51
+--QRYRCDREQ拾音报文指令ID
+--SMSRPT 短信报文指令ID
+--CCRPT 电话报文指令ID
 QRYRCDREQ,SMSRPT,CCRPT=0x17,0x18,0x19
+--版本号对应的参数ID
 VER = 0
+--FIXTIMEPOS,QRYPOS,KEYPOS为GPS&LBS &WIFI扩展位置报文中位置类型
+--FIXTIMEPOS设备定时定位上报
+--QRYPOS设备对后台主动定位请求的应答上报
+--KEYPOS设备按键上报
 FIXTIMEPOS,QRYPOS,KEYPOS = 0,1,6
 
 local PROTOVERSION = 0
@@ -22,6 +82,12 @@ local function print(...)
 	_G.print("protoair",...)
 end
 
+--[[
+函数名：bcd
+功能  ：将普通的字符串转成BCD码
+参数  ：d,n
+返回值：BCD码
+]]
 function bcd(d,n)
 	local l = slen(d or "")
 	local num
@@ -52,6 +118,12 @@ function bcd(d,n)
 	return s
 end
 
+--[[
+函数名：unbcd
+功能  ：将BCD码转成普通的字符串
+参数  ：d
+返回值：字符串
+]]
 local function unbcd(d)
 	local byte,v1,v2
 	local t = {}
@@ -70,6 +142,13 @@ local function unbcd(d)
 	return table.concat(t)
 end
 
+--[[
+函数名：enlnla
+功能  ：经纬度的封包处理
+参数  ：v,true定位成功，否则定位失败
+        s经度或者纬度值
+返回值：字符串
+]]
 local function enlnla(v,s)
 	if not v then return common.hexstobins("FFFFFFFFFF") end
 	
@@ -81,7 +160,12 @@ local function enlnla(v,s)
 	return bcd(v1..v2,5)
 end
 
--- 基本状态信息封包处理
+--[[
+函数名：enstat
+功能  ：基本状态信息封包处理
+参数  ：无
+返回值：基本状态信息封包字符串
+]]
 local function enstat()
 	local stat = get("STATUS")
 	local rssi = get("RSSI")
@@ -101,12 +185,14 @@ local function enstat()
 
 	local base = lpack.pack(">bbH",n1,n2,stat.volt)
 	local extend
+    --静止运行状态，0x00静止状态,0x01运行状态
 	if get("MOVSTA")=="SIL" then
 		extend = lpack.pack(">bHb",5,1,0)
 	else
 		extend = lpack.pack(">bHb",5,1,1)   
 	end
 
+    --充电状态，0x00未充电（未连接充电器）,0x01充电中（连接充电器），0x02充电完成（连接充电器）
 	if chgstat == 0 then
 		extend = extend..lpack.pack(">bHb",6,1,0)
 	elseif chgstat == 1 then
@@ -115,11 +201,13 @@ local function enstat()
 		extend = extend..lpack.pack(">bHb",6,1,2)	
 	end
 	
+    --关机原因，0x00按键关机,0x01低电关机
 	if pwoffcause and pwoffcause <= 1 then
         extend = extend..lpack.pack(">bHb",7,1,pwoffcause)
         linkair.delpwoffcause()
     end
 	
+    --按键，最高位[7:7]表示按键状态，0：短按，1长按；[6:0]表示按键值，0开机键，1状态键
 	if key_val_sta ~=nil then
 		extend = extend..lpack.pack(">bHb",8,1,key_val_sta)
 		linkair.delkeyvalsta()
@@ -128,6 +216,12 @@ local function enstat()
 	return base..extend
 end
 
+--[[
+函数名：encellinfo
+功能  ：基站定位信息封包处理
+参数  ：无
+返回值：基基站定位信息封包字符串
+]]
 local function encellinfo()
 	local info,ret,t,lac,ci,rssi,k,v,m,n,cntrssi = get("CELLINFO"),"",{}
 	print("encellinfo",info)
@@ -158,6 +252,12 @@ local function encellinfo()
 	return schar(#t)..ret
 end
 
+--[[
+函数名：encellinfoext
+功能  ：扩展基站定位信息封包处理
+参数  ：无
+返回值：扩展基基站定位信息封包字符串
+]]
 local function encellinfoext()
 	local info,ret,t,mcc,mnc,lac,ci,rssi,k,v,m,n,cntrssi = get("CELLINFOEXT"),"",{}
 	print("encellinfoext",info)
@@ -188,6 +288,12 @@ local function encellinfoext()
 	return schar(#t)..ret
 end
 
+--[[
+函数名：enwifi
+功能  ：wifi热点信息封包处理
+参数  ：p，WIFI热点信息
+返回值：wifi热点信息封包字符串
+]]
 local function enwifi(p)
 	local t,ret,i,mac,rssi = p or {},""
 	for i=1,#t do
@@ -199,11 +305,23 @@ local function enwifi(p)
 	return schar(#t)..ret
 end
 
+--[[
+函数名：pack
+功能  ：根据协议文档将命令封包处理
+参数  ：id，命令id
+返回值：报文字符串
+]]
 function pack(id,...)
 	if not imei then imei = bcd(get("IMEI"),8) end
 
 	local head = schar(id)
 
+    --[[
+    函数名：gps
+    功能  ：gps定位报文封包处理
+    参数  ：无
+    返回值：字符串
+    ]]
 	local function gps()
 		local t = get("GPS")
 		lng = enlnla(t.fix,t.lng)
@@ -212,19 +330,43 @@ function pack(id,...)
 		return lpack.pack(">AAHbA",lng,lat,t.cog,t.spd,enstat())
 	end
 
+    --[[
+    函数名：lbs1
+    功能  ：LBS定位报文1封包处理
+    参数  ：无
+    返回值：字符串
+    ]]
 	local function lbs1()
 		local ci,lac = get("CELLID"),get("LAC")
 		return lpack.pack(">HbIHA",get("MCC"),get("MNC"),ci,lac,enstat())
 	end
-
+    
+    --[[
+    函数名：lbs3
+    功能  ：LBS定位报文3封包处理
+    参数  ：无
+    返回值：字符串
+    ]]
 	local function lbs3()
 		return lpack.pack(">AbA",encellinfoext(),get("TA"),enstat())
 	end
 	
+    --[[
+    函数名：lbs2
+    功能  ：LBS定位报文2封包处理
+    参数  ：无
+    返回值：字符串
+    ]]
 	local function lbs2()
 		return lpack.pack(">HbAbA",get("MCC"),get("MNC"),encellinfo(),get("TA"),enstat())
 	end
 	
+    --[[
+    函数名：gpslbs
+    功能  ：GPS&多LBS定位报文封包处理
+    参数  ：无
+    返回值：字符串
+    ]]
 	local function gpslbs()
 		local t = get("GPS")
 		lng = enlnla(t.fix,t.lng)
@@ -232,27 +374,51 @@ function pack(id,...)
 		return lpack.pack(">AAHbHbAbA",lng,lat,t.cog,t.spd,get("MCC"),get("MNC"),encellinfo(),get("TA"),enstat())
 	end
 	
+    --[[
+    函数名：gpslbs1
+    功能  ：GPS&多LBS定位报文1封包处理
+    参数  ：无
+    返回值：字符串
+    ]]
 	local function gpslbs1()
 		local t = get("GPS")
 		lng = enlnla(t.fix,t.lng)
 		lat = enlnla(t.fix,t.lat)
 		return lpack.pack(">AAHbAbA",lng,lat,t.cog,t.spd,encellinfoext(),get("TA"),enstat())
 	end
-	
+
+	--[[
+    函数名：gpslbswifi
+    功能  ：GPS&LBS &WIFI定位报文封包处理
+    参数  ：无
+    返回值：字符串
+    ]]
 	local function gpslbswifi(p)
 		local t = get("GPS")
 		lng = enlnla(t.fix,t.lng)
 		lat = enlnla(t.fix,t.lat)
 		return lpack.pack(">AAHbHbAbAA",lng,lat,t.cog,t.spd,get("MCC"),get("MNC"),encellinfo(),get("TA"),enwifi(p),enstat())
 	end
-	
+
+	--[[
+    函数名：gpslbswifi1
+    功能  ：GPS&LBS &WIFI定位报文1封包处理
+    参数  ：无
+    返回值：字符串
+    ]]
 	local function gpslbswifi1(p)
 		local t = get("GPS")
 		lng = enlnla(t.fix,t.lng)
 		lat = enlnla(t.fix,t.lat)
 		return lpack.pack(">AAHbAbAA",lng,lat,t.cog,t.spd,encellinfoext(),get("TA"),enwifi(p),enstat())
 	end
-	
+
+	--[[
+    函数名：gpslbswifiext
+    功能  ：GPS&LBS &WIFI扩展位置报文封包处理
+    参数  ：无
+    返回值：字符串
+    ]]
 	local function gpslbswifiext(w,typ)
 		local t = get("GPS")
 		lng = enlnla(t.fix,t.lng)
@@ -260,26 +426,66 @@ function pack(id,...)
 		return lpack.pack(">bAAHbAbAA",typ,lng,lat,t.cog,t.spd,encellinfoext(),get("TA"),enwifi(w),enstat())
 	end
 
+    --[[
+    函数名：heart
+    功能  ：心跳报文封包处理
+    参数  ：无
+    返回值：字符串
+    ]]
 	local function heart()
 		return lpack.pack("A",enstat())
 	end	
 	
+    --[[
+    函数名：rptpara
+    功能  ：参数变化报文封包处理
+    参数  ：dat参数
+    返回值：字符串
+    ]]
 	local function rptpara(dat)
 		return dat or ""
 	end
 	
+    --[[
+    函数名：rsp
+    功能  ：被动处理事件的应答报文封包处理
+    参数  ：typ,应答事件类型
+            result，应答结果
+    返回值：字符串
+    ]]
 	local function rsp(typ,result)
 		return lpack.pack("bA",typ,result)
 	end
-	
+
+    --[[
+    函数名：info
+    功能  ：终端信息报文封包处理
+    参数  ：无
+    返回值：字符串
+    ]]
 	local function info()
 		return lpack.pack(">bHHbHHbHAbHAbHA",0,2,get("PROJECTID"),1,2,get("HEART"),2,2,bcd(sgsub(get("VERSION"),"%.",""),2),4,slen(get("ICCID")),get("ICCID"),0x0D,slen(get("IMSI")),get("IMSI"))
 	end
 	
+    --[[
+    函数名：qryrcdreq
+    功能  ：拾音报文封包处理
+    参数  ：s报文序列号,w发送方式,t报文总条数,
+            c当前报文索引,typ音频文件类型,tmlen音频时长,d当前报文内容
+    返回值：字符串
+    ]]
 	local function qryrcdreq(s,w,t,c,typ,tmlen,d)
 		return lpack.pack(">bbbbbb",s,w,t,c,typ,tmlen)..d
 	end
 	
+    --[[
+    函数名：smsrptreq
+    功能  ：短信报文封包处理
+    参数  ：t收到短信的时间,
+            num,号码
+            d，短信内容
+    返回值：字符串
+    ]]
 	local function smsrptreq(t,num,d)
 		local len,bcdnum,year,mon,day,h,m,s,gggg
 		local d1,d2 = string.find(num,"^([%+]*86)")
@@ -292,6 +498,16 @@ function pack(id,...)
 		return lpack.pack(">bbbbbbbAA",year,mon,day,h,m,s,len,bcdnum,common.hexstobins(d))
 	end
 	
+    --[[
+    函数名：ccrptreq
+    功能  ：电话报文封包处理
+    参数  ：cctyp电话类型,0：来电，1：去电
+            num,号码
+            starttm，来电或去电时间
+            ringtm,响铃时间
+            totaltm，通话总时间
+    返回值：字符串
+    ]]
 	local function ccrptreq(cctyp,num,starttm,ringtm,totaltm)
         local len,bcdnum,year,mon,day,h,m,s,gggg
         local d1,d2 = string.find(num,"^([%+]*86)")
@@ -329,9 +545,21 @@ function pack(id,...)
 	return s
 end
 
+--[[
+函数名：unpack
+功能  ：解包处理
+参数  ：s，收到的报文字符串
+返回值：字符串
+]]
 function unpack(s)
 	local packet = {}	
 	
+    --[[
+    函数名：setpara
+    功能  ：参数变化报文解包处理
+    参数  ：d，收到的报文字符串
+    返回值：字符串
+    ]]
 	local function setpara(d)
 		if slen(d) > 0 then			
 			
@@ -439,6 +667,12 @@ function unpack(s)
 		end
 	end
 	
+    --[[
+    函数名：sendsms
+    功能  ：发送短信报文解包处理
+    参数  ：d，收到的报文字符串
+    返回值：解包成功true，否则nil
+    ]]
 	local function sendsms(d)
 		if d == "" then return end
 
@@ -462,6 +696,12 @@ function unpack(s)
 		return true
 	end
 
+    --[[
+    函数名：dial
+    功能  ：拨打电话报文解包处理
+    参数  ：d，收到的报文字符串
+    返回值：解包成功true，否则nil
+    ]]
 	local function dial(d)
 		if d == "" then return end
 
@@ -477,22 +717,46 @@ function unpack(s)
 		return true
 	end
 	
+    --[[
+    函数名：empty
+    功能  ：报文内容为空的报文处理
+    参数  ：d，收到的报文字符串
+    返回值：解包成功true，否则nil
+    ]]
 	local function empty(d)
 		return d==""
 	end
 	
+    --[[
+    函数名：prompt
+    功能  ：提示语报文解包处理
+    参数  ：d，收到的报文字符串
+    返回值：解包成功true，否则nil
+    ]]
 	local function prompt(d)
 		if d == "" then return end
 		packet.data = d
 		return true
 	end
 	
+    --[[
+    函数名：qrypara
+    功能  ：查询参数报文解包处理
+    参数  ：d，收到的报文字符串
+    返回值：解包成功true，否则nil
+    ]]
 	local function qrypara(d)
 		if d == "" then return end
 		packet.val = sbyte(d)
 		return true
 	end
 	
+    --[[
+    函数名：qryrcd
+    功能  ：拾音控制报文解包处理
+    参数  ：d，收到的报文字符串
+    返回值：解包成功true，否则nil
+    ]]
 	local function qryrcd(d)
 		if slen(d) ~= 2 then return end
 		packet.val = sbyte(ssub(d,1,1))

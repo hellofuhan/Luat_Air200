@@ -1,8 +1,17 @@
+--[[
+模块名称：MQTT协议
+模块功能：MQTT封包，拆包
+模块最后修改时间：2017.02.13
+]]
+
+--定义模块,导入依赖库
 module(...,package.seeall)
 local lpack = require"pack"
 require"mqttdup"
 
+--加载常用的全局函数至本地
 local slen,sbyte,ssub,sgsub,schar,srep,smatch,sgmatch = string.len,string.byte,string.sub,string.gsub,string.char,string.rep,string.match,string.gmatch
+--命令消息
 CONNECT,CONNACK,PUBLISH,PUBACK,PUBREC,PUBREL,PUBCOMP,SUBSCRIBE,SUBACK,UNSUBSCRIBE,UNSUBACK,PINGREQ,PINGRSP,DISCONNECT = 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 
 local PRONAME,PROVER,CLEANSESS = "MQIsdp",3,1
@@ -13,11 +22,23 @@ local function print(...)
 	_G.print("mqtt",...)
 end
 
+--[[
+函数名：encutf8
+功能  ：将字符串转成UTF8编码
+参数  ：s
+返回值：UTF8编码
+]]
 local function encutf8(s)
 	if not s then return "" end
 	return lpack.pack(">HA",slen(s),s)
 end
 
+--[[
+函数名：enclen
+功能  ：长度编码
+参数  ：s
+返回值：
+]]
 local function enclen(s)
 	if not s or slen(s) == 0 then return schar(0) end
 	local ret,len,digit = "",slen(s)
@@ -32,6 +53,12 @@ local function enclen(s)
 	return ret
 end
 
+--[[
+函数名：declen
+功能  ：长度解码
+参数  ：s
+返回值：
+]]
 local function declen(s)
 	local i,value,multiplier,digit = 1,0,1 
 	repeat
@@ -44,6 +71,12 @@ local function declen(s)
 	return true,value,i-1
 end
 
+--[[
+函数名：getseq
+功能  ：获取序列号
+参数  ：无
+返回值：序列号（1-0xFFFE）
+]]
 local function getseq()
 	local s = seq
 	seq = (seq+1)%0xFFFF
@@ -66,12 +99,30 @@ function iscomplete(s)
 	end
 end
 
+--[[
+函数名：pack
+功能  ：MQTT报文封包
+参数  ：s
+返回值：解析成功：packet，解析失败：nil
+]]
 function pack(typ,...)
 	local para = {}
+    --[[
+    函数名：connect
+    功能：客户端请求连接服务器
+    参数  ：alive,id,user,pwd
+    返回值：MQTT报文
+    ]]
 	local function connect(alive,id,user,pwd)
 		return lpack.pack(">bAbbHAAA",CONNECT*16,encutf8(PRONAME),PROVER,(user and 1 or 0)*128+(pwd and 1 or 0)*64+CLEANSESS*2,alive,encutf8(id),encutf8(user),encutf8(pwd))
 	end
 	
+    --[[
+    函数名：subscribe
+    功能：客户端订阅主题
+    参数  ：p
+    返回值：MQTT报文
+    ]]
 	local function subscribe(p)
 		para.dup,para.topic = true,p.topic
 		para.seq = p.seq or getseq()
@@ -84,6 +135,12 @@ function pack(typ,...)
 		return s
 	end
 	
+    --[[
+    函数名：publish
+    功能：客户端发送PUBLISH 消息给服务器
+    参数  ：p
+    返回值：MQTT报文
+    ]]
 	local function publish(p)
 		para.dup,para.topic,para.payload,para.qos,para.retain = true,p.topic,p.payload,p.qos,p.retain
 		para.seq = p.seq or getseq()
@@ -92,14 +149,32 @@ function pack(typ,...)
 		return lpack.pack("bAAA",PUBLISH*16+(p.dup and 1 or 0)*8+(p.qos or 0)*2+(p.retain and 1 or 0)*1,encutf8(p.topic),((p.qos or 0)>0 and para.seq or ""),p.payload)
 	end
 	
+    --[[
+    函数名：puback
+    功能：发布确认
+    参数  ：seq
+    返回值：MQTT报文
+    ]]
 	local function puback(seq)
 		return schar(PUBACK*16)..seq
 	end
 	
+    --[[
+    函数名：pingreq
+    功能：询问服务器：“你还活着吗”？
+    参数  ：无
+    返回值：MQTT报文
+    ]]
 	local function pingreq()
 		return schar(PINGREQ*16)
 	end
 	
+    --[[
+    函数名：disconnect
+    功能：断开连接通知
+    参数  ：无
+    返回值：MQTT报文
+    ]]
 	local function disconnect()
 		return schar(DISCONNECT*16)
 	end
@@ -120,15 +195,33 @@ function pack(typ,...)
 	return s,para
 end
 
+--[[
+函数名：unpack
+功能  ：MQTT报文解析
+参数  ：s
+返回值：解析成功：packet，解析失败：nil
+]]
 function unpack(s)
 	local packet = {}
 
+    --[[
+    函数名：connack
+    功能  ：连接确认
+    参数  ：d
+    返回值：true
+    ]]
 	local function connack(d)
 		print("connack",common.binstohexs(d))
 		packet.suc = (sbyte(d,2)==0)
 		return true
 	end
 	
+    --[[
+    函数名：suback
+    功能  ：订阅确认
+    参数  ：d
+    返回值：true
+    ]]
 	local function suback(d)
 		print("suback",common.binstohexs(d))
 		if slen(d) < 2 then return end
@@ -136,6 +229,12 @@ function unpack(s)
 		return true
 	end
 	
+    --[[
+    函数名：suback
+    功能  ：发布确认
+    参数  ：d
+    返回值：true
+    ]]
 	local function puback(d)
 		print("puback",common.binstohexs(d))
 		if slen(d) < 2 then return end
@@ -143,6 +242,12 @@ function unpack(s)
 		return true
 	end
 	
+    --[[
+    函数名：publish
+    功能  ：发布消息
+    参数  ：d
+    返回值：true
+    ]]
 	local function publish(d)
 		print("publish",common.binstohexs(d))
 		if slen(d) < 6 then return end

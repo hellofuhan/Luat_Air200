@@ -1,3 +1,10 @@
+--[[
+模块名称：linkair
+模块功能：
+模块最后修改时间：2017.02.13
+]]
+
+--定义模块,导入依赖库
 module(...,package.seeall)
 
 require"protoair"
@@ -5,17 +12,32 @@ require"sms"
 require"dbg"
 require"ccair"
 
+--加载常用的全局函数至本地
 local ssub,schar,smatch = string.sub,string.char,string.match
 local SCK_IDX,KEEP_ALIVE_TIME = 1,720
+--rests存放收到的报文
+--shkcnt震动次数
 local rests,shkcnt = "",0
+--locshk位置是否发生移动，"SIL"未移动，"SHK"移动
 local locshk,firstloc,firstgps = "SIL"
+--chgalm 低电报警
+--shkalm 震动报警
 local chgalm,shkalm = true,true
-local verno,mqttconnfailcnt,mqttconn,monitnum = 1,0
+--verno协议版本号
+--mqttconnfailcnt mqttconn连接失败次数
+--mqttconn true mqtt连接
+local verno,mqttconnfailcnt,mqttconn = 1,0
 
 local function print(...)
 	_G.print("linkair",...)
 end
 
+--[[
+函数名：getstatus
+功能  ：获取设备状态
+参数  ：无
+返回值：设备状态表
+]]
 local function getstatus()
 	local t = {}
 
@@ -30,6 +52,12 @@ local function getstatus()
 	return t
 end
 
+--[[
+函数名：getgps
+功能  ：获取gps定位信息
+参数  ：无
+返回值：gps定位信息表
+]]
 local function getgps()
 	local t = {}
 	print("getgps:",gps.getgpslocation(),gps.getgpscog(),gps.getgpsspd())
@@ -46,6 +74,12 @@ local function getgps()
 	return t
 end
 
+--[[
+函数名：getgpstat
+功能  ：获取卫星数
+参数  ：无
+返回值：卫星数
+]]
 local function getgpstat()
 	local t = {}
 	t.satenum = gps.getgpssatenum()
@@ -59,10 +93,22 @@ local function getfncpara()
 	return pack.pack("bbbbbbbb",n1,n2,n3,n4,n5,n6,n7,n8)
 end
 
+--[[
+函数名：getcellinfo
+功能  ：获取小区信息
+参数  ：无
+返回值：小区信息
+]]
  function getcellinfo()
 	return smatch(net.getcellinfo(),"(%w+%.%w+%.%w+;)")
 end
 
+--[[
+函数名：getcellinfoext
+功能  ：获取小区扩展信息
+参数  ：无
+返回值：小区扩展信息
+]]
  function getcellinfoext()
 	return smatch(net.getcellinfoext(),"(%w+%.%w+%.%w+%.%w+%.%w+;)")
 end
@@ -98,6 +144,12 @@ protoair.reget(getf)
 
 local levt,lval,lerrevt,lerrval = "","","",""
 
+--[[
+函数名：datinactive
+功能  ：与后台断开连接后重启设备
+参数  ：无
+返回值：无
+]]
 local function datinactive()
     nvm.set("abnormal",true)
 	--if nvm.get("workmod") == "SMS" or nvm.get("sleep") or nvm.get("gpsleep") then return end
@@ -105,15 +157,33 @@ local function datinactive()
 	mqttconnfailcnt = 0
 end
 
+--[[
+函数名：checkdatactive
+功能  ：如果3倍KEEP_ALIVE_TIME+半分钟还没连上后台则重启设备
+参数  ：无
+返回值：无
+]]
 local function checkdatactive()
 	if nvm.get("workmod") == "SMS" then return end
 	sys.timer_start(datinactive,KEEP_ALIVE_TIME*1000*3+30000) --3倍心跳+半分钟
 end
 
+--[[
+函数名：snd
+功能  ：向后台发送报文
+参数  ：data,para,pos,ins
+返回值：true，发送成功，nil或false发送失败
+]]
 local function snd(data,para,pos,ins)
 	return linkapp.scksnd(SCK_IDX,data,para,pos,ins)
 end
 
+--[[
+函数名：chgalmrpt
+功能  ：低电报警上报，实质只发了心跳报文，是否推送低电报警由后台决定
+参数  ：无
+返回值：无
+]]
 local function chgalmrpt()
 	if nvm.get("guard") and not chg.getcharger() and chgalm then
 		chgalm = false
@@ -123,6 +193,12 @@ local function chgalmrpt()
 	end
 end
 
+--[[
+函数名：shkalmrpt
+功能  ：震动报警上报，实质只发了心跳报文，是否推送震动报警由后台决定
+参数  ：无
+返回值：无
+]]
 local function shkalmrpt()
 	print("shkalmrpt",nvm.get("guard"),shkalm)
 	if nvm.get("guard") and shkalm then
@@ -133,6 +209,12 @@ local function shkalmrpt()
 	end
 end
 
+--[[
+函数名：almtimerfnc
+功能  ：低电、震动报警定时器处理函数
+参数  ：tag区分是低电报警还是震动报警
+返回值：无
+]]
 function almtimerfnc(tag)
 	print("almtimerfnc",tag)
 	local val = nvm.get("guard")
@@ -144,6 +226,13 @@ function almtimerfnc(tag)
 	end
 end
 
+--[[
+函数名：startalmtimer
+功能  ：开启报警定时器
+参数  ：tag区分是低电报警还是震动报警
+        val ：true开启否则不开启
+返回值：无
+]]
 function startalmtimer(tag,val)
 	print("startalmtimer",tag,val,nvm.get("guard"))
 	if nvm.get("guard") then
@@ -153,11 +242,23 @@ function startalmtimer(tag,val)
 	end
 end
 
+--[[
+函数名：stopalmtimer
+功能  ：停掉报警定时器
+参数  ：tag区分是低电报警还是震动报警
+返回值：无
+]]
 local function stopalmtimer(tag)
 	print("stopalmtimer",tag)
 	sys.timer_stop(almtimerfnc,tag)
 end
 
+--[[
+函数名：alminit
+功能  ：报警初始化，初始化低电报警，震动报警开关
+参数  ：无
+返回值：无
+]]
 local function alminit()
 	print("alminit",nvm.get("guard"))
 	local val = nvm.get("guard")
@@ -166,10 +267,22 @@ local function alminit()
 	stopalmtimer("SHK")
 end
 
+--[[
+函数名：qrylocfnc
+功能  ：主动定位
+参数  ：无
+返回值：无
+]]
 local function qrylocfnc()
 	locrpt("QRYLOC")
 end
 
+--[[
+函数名：preloc
+功能  ：位置上报
+参数  ：无
+返回值：无
+]]
 local function preloc()
 	print("preloc",locshk)
 	loc()
@@ -183,26 +296,56 @@ local function preloc()
 	end]]
 end
 
+--[[
+函数名：loctimerfnc
+功能  ：位置定时上报
+参数  ：无
+返回值：无
+]]
 local function loctimerfnc()
 	print("loctimerfnc",locshk)
 	if locshk == "SIL" then	locshk = "TMOUT" end
 	preloc()
 end
 
+--[[
+函数名：startloctimer
+功能  ：开启位置定时上报定时器
+参数  ：无
+返回值：无
+]]
 function startloctimer()
 	print("startloctimer",nvm.get("rptfreq"))
 	sys.timer_start(loctimerfnc,nvm.get("rptfreq")*1000)
 end
 
+--[[
+函数名：entopic
+功能  ：topic封包
+参数  ：t，topic类型
+返回值：字符串
+]]
 local function entopic(t)
 	return "/v"..verno.."/device/"..tget["IMEI"]().."/"..t
 end
 
+--[[
+函数名：starthearttimer
+功能  ：开启心跳定时上报定时器
+参数  ：无
+返回值：无
+]]
 local function starthearttimer()
 	print("starthearttimer",nvm.get("heart"))
 	sys.timer_start(heart,nvm.get("heart")*1000)
 end
 
+--[[
+函数名：locrpt
+功能  ：位置上报
+参数  ：r定位类型,w wifi热点信息
+返回值：无
+]]
 function locrpt(r,w)
 	if not mqttconn then return end
 	local id,mod,extyp = protoair.LBS3,r or nvm.get("fixmod")
@@ -226,6 +369,12 @@ function locrpt(r,w)
 	return snd(mqtt.pack(mqtt.PUBLISH,{topic=entopic("devdata"),payload=protoair.pack(id,w,extyp)}),{typ="MQTTPUBLOC",val={typ=id,para=p}})
 end
 
+--[[
+函数名：loc
+功能  ：位置上报
+参数  ：r定位类型,p wifi热点信息
+返回值：无
+]]
 function loc(r,p)
 	print("loc",gps.isfix(),r,nvm.get("gpsleep"),manage.getmovsta())
 	startloctimer()
@@ -248,6 +397,12 @@ function loc(r,p)
 	end
 end
 
+--[[
+函数名：heart
+功能  ：心跳报文上报
+参数  ：v true强制上报心跳
+返回值：无
+]]
 function heart(v)
 	print("heart",nvm.get("gpsleep"),mqttconn,manage.getmovsta(),v)
 	starthearttimer()
@@ -257,10 +412,22 @@ function heart(v)
 	end
 end
 
+--[[
+函数名：disconnect
+功能  ：断开连接
+参数  ：无
+返回值：无
+]]
 local function disconnect()
 	snd(mqtt.pack(mqtt.DISCONNECT),"MQTTDISC")
 end
 
+--[[
+函数名：pingreq
+功能  ：检测mqtt是否断开连接
+参数  ：无
+返回值：无
+]]
 local function pingreq()
 	snd(mqtt.pack(mqtt.PINGREQ))
 	if not sys.timer_is_active(disconnect) then
@@ -268,6 +435,12 @@ local function pingreq()
 	end
 end
 
+--[[
+函数名：enrptpara
+功能  ：将需要上报的参数封包
+参数  ：无
+返回值：字符串
+]]
 local function enrptpara(typ)
 	local function enunsignshort(p)
 		return pack.pack(">H",nvm.get(p))
@@ -293,6 +466,12 @@ local tpara,tparapend =
 	"rptfreq","almfreq","guard","fixmod","workmod"
 },{}
 
+--[[
+函数名：rptpara
+功能  ：上报参数
+参数  ：无
+返回值：无
+]]
 local function rptpara(typ)
 	if nvm.get("workmod") == "SMS" and typ~="workmod" then return end
 	print("rptpara",typ,tget["IMEI"](),#tparapend)
@@ -331,12 +510,25 @@ local function rptpara(typ)
 	end
 end
 
+--[[
+函数名：connect
+功能  ：连接后台
+参数  ：cause
+返回值：无
+]]
 function connect(cause)
 	if nvm.get("workmod") == "SMS" then return end
 	linkapp.sckconn(SCK_IDX,cause,nvm.get("prot"),nvm.get("addr"),nvm.get("port"),ntfy,rcv)
 end
 
+--reconntimes重连次数
 local reconntimes = 0
+--[[
+函数名：reconn
+功能  ：重连后台
+参数  ：无
+返回值：无
+]]
 local function reconn()
 	if nvm.get("workmod") == "SMS" or nvm.get("gpsleep") then
 		reconntimes = 0
@@ -352,6 +544,12 @@ local function reconn()
 	end
 end
 
+--[[
+函数名：connack
+功能  ：连后台ack
+参数  ：packet，连接后台结果
+返回值：无
+]]
 local function connack(packet)
 	print("connack",packet.suc)
 	if packet.suc then
@@ -372,11 +570,23 @@ local function connack(packet)
 	end
 end
 
+--[[
+函数名：devinfo
+功能  ：发送终端信息报文
+参数  ：无
+返回值：无
+]]
 function devinfo()
 	if not mqttconn then return end
 	snd(mqtt.pack(mqtt.PUBLISH,{topic=entopic("devdata"),payload=protoair.pack(protoair.INFO)}),{typ="MQTTPUBINFO"})
 end
 
+--[[
+函数名：suback
+功能  ：订阅报文ack
+参数  ：packet订阅结果
+返回值：无
+]]
 local function suback(packet)
 	print("suback",common.binstohexs(packet.seq))
 	mqttdup.rmv("SUB",nil,packet.seq)
@@ -390,6 +600,12 @@ local function suback(packet)
 	end	
 end
 
+--[[
+函数名：puback
+功能  ：publish ack
+参数  ：packet
+返回值：无
+]]
 local function puback(packet)	
 	local typ = mqttdup.getyp(packet.seq) or ""
 	print("puback",common.binstohexs(packet.seq),typ)
@@ -407,10 +623,22 @@ local function puback(packet)
 	mqttdup.rmv(nil,nil,packet.seq)
 end
 
+--[[
+函数名：fixmodpara
+功能  ：工作模式参数的修改
+参数  ：p 工作模式值
+返回值：true
+]]
 local function fixmodpara(p)
 	return nvm.set("workmod",p.val==3 and "SMS" or (p.val==4 and "GPS" or (p.val==5 and "PWRGPS" or (p.val==6 and "LONGPS" or "PWOFF"))),"SVR")
 end
 
+--[[
+函数名：setpara
+功能  ：修改参数
+参数  ：packet 报文
+返回值：true
+]]
 local function setpara(packet)
 	local procer,result = {
 		[protoair.RPTFREQ] = "rptfreq",
@@ -439,6 +667,12 @@ local function setpara(packet)
 	if not snd(dat,{typ="MQTTPUBSETPARARSP",val=para}) then mqttpubsetpararspcb(para) end
 end
 
+--[[
+函数名：sendsms
+功能  ：发送短信
+参数  ：packet 报文
+返回值：无
+]]
 local function sendsms(packet)
 	if packet.coding == "UCS2" then
 		local num,i = ""
@@ -455,6 +689,12 @@ local function sendsms(packet)
 	end
 end
 
+--[[
+函数名：dial
+功能  ：拨打电话
+参数  ：packet 报文
+返回值：无
+]]
 local function dial(packet)
 	while #packet.num > 0 do
 		sys.dispatch("CCAPP_ADD_NUM",table.remove(packet.num,1))
@@ -462,6 +702,12 @@ local function dial(packet)
 	sys.dispatch("CCAPP_DIAL_NUM")
 end
 
+--[[
+函数名：deveventrsp
+功能  ：被动处理事件的应答
+参数  ：packet 报文
+返回值：无
+]]
 local function deveventrsp(packet)
 	mqttdup.rmv("PUBDEVEVENTRSP"..packet.id)
 	local dat,para = mqtt.pack(mqtt.PUBLISH,{qos=1,topic=entopic("deveventrsp/"..(smatch(packet.topic,"deveventreq/(.+)") or "")),payload=protoair.pack(protoair.DEVEVENTRSP,packet.id,schar(1))})
@@ -469,6 +715,12 @@ local function deveventrsp(packet)
 	if not snd(dat,{typ="MQTTPUBDEVEVENTRSP",val=para}) then mqttpubdeveventrspcb(para) end
 end
 
+--[[
+函数名：qryloc
+功能  ：主动定位
+参数  ：packet 报文
+返回值：无
+]]
 local function qryloc(packet)
 	--[[if not gpsapp.isactive(gpsapp.TIMERORSUC,{cause="QRYLOC"}) then
 		gpsapp.open(gpsapp.TIMERORSUC,{cause="QRYLOC",val=120,cb=qrylocfnc})
@@ -478,11 +730,23 @@ local function qryloc(packet)
 	sys.dispatch("SVR_QRY_LOC_IND")	
 end
 
+--[[
+函数名：restore
+功能  ：恢复出厂设置
+参数  ：packet 报文
+返回值：无
+]]
 local function restore(packet)
 	sys.dispatch("SVR_RESTORE_IND")
 	deveventrsp(packet)
 end
 
+--[[
+函数名：devqrypararsp
+功能  ：查询参数应答
+参数  ：packet 报文
+返回值：无
+]]
 local function devqrypararsp(packet,rsp)
 	mqttdup.rmv("PUBDEVEVENTRSP"..packet.id..packet.val)
 	local dat,para = mqtt.pack(mqtt.PUBLISH,{qos=1,topic=entopic("deveventrsp/"..smatch(packet.topic,"deveventreq/(.+)")),payload=protoair.pack(protoair.DEVEVENTRSP,packet.id,schar(packet.val)..rsp)})
@@ -490,6 +754,12 @@ local function devqrypararsp(packet,rsp)
 	if not snd(dat,{typ="MQTTPUBDEVEVENTRSP",val=para}) then mqttpubdeveventrspcb(para) end
 end
 
+--[[
+函数名：devqrypara
+功能  ：查询参数
+参数  ：packet 报文
+返回值：无
+]]
 local function qrypara(packet)
 	local procer,rsp = {
 		[protoair.VER] = function() return _G.PROJECT.."_".._G.VERSION end,
@@ -500,12 +770,29 @@ local function qrypara(packet)
 	if rsp then devqrypararsp(packet,rsp) end
 end
 
+--[[
+函数名：qryrcd
+功能  ：发送拾音请求
+参数  ：packet 报文
+返回值：无
+]]
 local function qryrcd(packet)
 	print("qryrcd",packet.val,packet.typ)
 	deveventrsp(packet)
 	sys.dispatch("QRY_RCD_IND",packet.val*1000,packet.typ)
 end
 
+--[[
+函数名：sndqryrcdreq
+功能  ：发送录音文件
+参数  ：s报文序列号,
+        w发送方式0：录完再发 1：边录边发,
+        t报文总条数,
+        c当前报文索引,
+        tm音频文件类型,
+        d当前报文内容
+返回值：无
+]]
 local function sndqryrcdreq(s,w,t,c,tm,d)
 	if not (s and w and t and c and tm and d) then sys.dispatch("SND_QRYRCD_CNF",false,s,c) return end
 	mqttdup.rmv("PUBQRYRCD&"..s.."!"..c)
@@ -516,6 +803,14 @@ local function sndqryrcdreq(s,w,t,c,tm,d)
     end
 end
 
+--[[
+函数名：smsrptreq
+功能  ：将收到的短信消息上报后台
+参数  ：num号码,
+        data短信内容
+        datetime收到短信的时间
+返回值：true
+]]
 local function smsrptreq(num,data,datetime)
     mqttdup.rmv("PUBSMSRPTREQ")
     local dat,para = mqtt.pack(mqtt.PUBLISH,{qos=1,topic=entopic("devdata"),payload=protoair.pack(protoair.SMSRPT,datetime,num,data)})
@@ -527,6 +822,16 @@ local function smsrptreq(num,data,datetime)
     return true
 end
 
+--[[
+函数名：ccrptreq
+功能  ：将来电或去电上报后台
+参数  ：cctyp 电话类型，0：来电，1：去电
+        num号码,
+        starttm 来电或去电的起始时间
+        ringtm响铃时间
+        totaltm通话总时长
+返回值：true
+]]
 local function ccrptreq(cctyp,ccnum,starttm,ringtm,totaltm)
     mqttdup.rmv("PUBCCRPTREQ")
     local dat,para = mqtt.pack(mqtt.PUBLISH,{qos=1,topic=entopic("devdata"),payload=protoair.pack(protoair.CCRPT,cctyp,ccnum,starttm,ringtm,totaltm)})
@@ -546,6 +851,12 @@ local cmds = {
 	[protoair.QRYRCD] = qryrcd,
 }
 
+--[[
+函数名：publish
+功能  ：解析mqtt发布的消息
+参数  ：mqttpacket PUBLISH报文
+返回值：无
+]]
 local function publish(mqttpacket)	
 	local packet = protoair.unpack(mqttpacket.payload)
 	if mqttpacket.qos == 1 then snd(mqtt.pack(mqtt.PUBACK,mqttpacket.seq)) end
@@ -556,6 +867,12 @@ local function publish(mqttpacket)
 	end
 end
 
+--[[
+函数名：pingrsp
+功能  ：PING应答，
+参数  ：mqttpacket PUBLISH报文
+返回值：无
+]]
 local function pingrsp()
 	sys.timer_stop(disconnect)
 end
@@ -568,23 +885,53 @@ local mqttcmds = {
 	[mqtt.PINGRSP] = pingrsp,
 }
 
+--[[
+函数名：mqttconncb
+功能  ：连接回调函数
+参数  ：v
+返回值：无
+]]
 local function mqttconncb(v)
 	--print("mqttconncb",common.binstohexs(v))
 	mqttdup.ins("CONN",v)
 end
 
+--[[
+函数名：mqttsubcb
+功能  ：订阅回调函数
+参数  ：v
+返回值：无
+]]
 function mqttsubcb(v)
 	mqttdup.ins("SUB",mqtt.pack(mqtt.SUBSCRIBE,v),v.seq)
 end
 
+--[[
+函数名：mqttdupcb
+功能  ：dup回调函数
+参数  ：v
+返回值：无
+]]
 local function mqttdupcb(v)
 	mqttdup.rsm(v)
 end
 
+--[[
+函数名：mqttdiscb
+功能  ：mqtt断开回调函数
+参数  ：无
+返回值：无
+]]
 local function mqttdiscb()
 	linkapp.sckdisc(SCK_IDX)
 end
 
+--[[
+函数名：mqttpublocb
+功能  ：上报位置回调函数
+参数  ：v，r
+返回值：无
+]]
 local function mqttpublocb(v,r)
 	startloctimer()
 	locshk = "SIL"
@@ -635,6 +982,12 @@ local function mqttpublocb(v,r)
 	end
 end
 
+--[[
+函数名：mqttpubheartcb
+功能  ：上报心跳回调函数
+参数  ：v，r
+返回值：无
+]]
 local function mqttpubheartcb(v,r)
 	--[[if nvm.get("sleep") then
 		sys.dispatch("ITV_SLEEP_REQ")
@@ -647,26 +1000,56 @@ local function mqttpubheartcb(v,r)
 	if r then sys.dispatch("ITV_WAKE_SNDSUC") end
 end
 
+--[[
+函数名：mqttpubrptparacb
+功能  ：上报参数回调函数
+参数  ：v
+返回值：无
+]]
 function mqttpubrptparacb(v)
 	print("mqttpubrptparacb",v.usr)
 	mqttdup.ins("PUBRPTPARA"..v.usr,mqtt.pack(mqtt.PUBLISH,v),v.seq)
 end
 
+--[[
+函数名：mqttpubsetpararspcb
+功能  ：设置参数回调函数
+参数  ：v
+返回值：无
+]]
 function mqttpubsetpararspcb(v)
 	print("mqttpubsetpararspcb",v.usr)
 	mqttdup.ins("PUBSETPARARSP"..v.usr,mqtt.pack(mqtt.PUBLISH,v),v.seq)
 end
 
+--[[
+函数名：mqttpubdeveventrspcb
+功能  ：事件应对回调函数
+参数  ：v
+返回值：无
+]]
 function mqttpubdeveventrspcb(v)
 	print("mqttpubdeveventrspcb",v.usr)
 	mqttdup.ins("PUBDEVEVENTRSP"..v.usr,mqtt.pack(mqtt.PUBLISH,v),v.seq)
 end
 
+--[[
+函数名：mqttpubqryrcb
+功能  ：拾音上报回调函数
+参数  ：v
+返回值：无
+]]
 function mqttpubqryrcb(v)
     print("mqttpubqryrcb",v.usr)
     mqttdup.ins("PUBQRYRCD&"..v.usr,mqtt.pack(mqtt.PUBLISH,v),v.seq)
 end
 
+--[[
+函数名：mqttpubsmsrptreqcb
+功能  ：短信上报回调函数
+参数  ：v
+返回值：无
+]]
 function mqttpubsmsrptreqcb(v)
     print("mqttpubsmsrptreqcb",v.usr)
     mqttdup.ins("PUBSMSRPTREQ",mqtt.pack(mqtt.PUBLISH,v),v.seq)
@@ -687,6 +1070,12 @@ local sndcbs =
 	MQTTPUBSMSRPTREQ=mqttpubsmsrptreqcb,
 }
 
+--[[
+函数名：enpwd
+功能  ：密码处理
+参数  ：s传入的密码
+返回值：处理后的密码
+]]
 local function enpwd(s)
 	local tmp,ret,i = 0,""
 	for i=1,string.len(s) do
@@ -699,6 +1088,12 @@ local function enpwd(s)
 	return common.binstohexs(ret)
 end
 
+--[[
+函数名：ntfy
+功能  ：对收到的CONNECT、STATE、DISCONNECT、SEND事件做相应处理
+参数  ：idx,evt,result,item
+返回值：无
+]]
 function ntfy(idx,evt,result,item)
 	print("ntfy",evt,result)
 	if evt == "CONNECT" then
@@ -741,6 +1136,12 @@ function ntfy(idx,evt,result,item)
 	end
 end
 
+--[[
+函数名：rcv
+功能  ：接收并解析接收到的报文
+参数  ：id,data
+返回值：无
+]]
 function rcv(id,data)
 	print("rcv",common.binstohexs(data))
 	sys.timer_start(pingreq,KEEP_ALIVE_TIME*1000/2)
@@ -762,10 +1163,22 @@ function rcv(id,data)
 	end
 end
 
+--[[
+函数名：mqttdupind
+功能  ：重发数据
+参数  ：s
+返回值：无
+]]
 local function mqttdupind(s)
 	if not snd(s,"MQTTDUP") then mqttdupcb(s) end
 end
 
+--[[
+函数名：mqttdupfail
+功能  ：消息重发失败
+参数  ：t,s
+返回值：无
+]]
 local function mqttdupfail(t,s)
     if smatch(t,"^PUBQRYRCD&") then
         local seq,cur = smatch(t,"PUBQRYRCD&(%d+)!(%d+)")
@@ -773,6 +1186,12 @@ local function mqttdupfail(t,s)
     end
 end
 
+--[[
+函数名：shkind
+功能  ：震动消息处理函数
+参数  ：无
+返回值：true
+]]
 local function shkind()
 	print("shkind",locshk)
 	local oldflg = locshk
@@ -785,6 +1204,12 @@ local function shkind()
 	return true
 end
 
+--[[
+函数名：chgind
+功能  ：DEV_CHG_IND消息处理函数
+参数  ：evt电池消息事件
+返回值：true
+]]
 local function chgind(evt)
 	if nvm.get("workmod") == "SMS" then return true end
 	if evt ~= "CHARGER" then return true end
@@ -798,11 +1223,23 @@ local function chgind(evt)
 	return true
 end
 
+--[[
+函数名：cconnect
+功能  ：电话接通后需关掉datinactive定时器
+参数  ：无
+返回值：无
+]]
 local function cconnect()
 	--if nvm.get("workmod") == "SMS" then return end
 	sys.timer_stop(datinactive)
 end
 
+--[[
+函数名：ccdisc
+功能  ：电话挂断后重连后台
+参数  ：无
+返回值：无
+]]
 local function ccdisc()
 	if nvm.get("workmod") == "SMS" then return end
 	checkdatactive()
@@ -810,12 +1247,24 @@ local function ccdisc()
 	connect(linkapp.NORMAL)
 end
 
+--[[
+函数名：delaysmsmod
+功能  ：延时短信工作模式的切换，工作模式中暂无短信工作模式，所以此函数暂时未用到
+参数  ：无
+返回值：无
+]]
 local function delaysmsmod()
 	linkapp.sckclrsnding(SCK_IDX)
 	link.shut()
 	cconnect()
 end
 
+--[[
+函数名：workmodind
+功能  ：工作模式切换处理函数
+参数  ：r,rpt
+返回值：无
+]]
 local function workmodind(r,rpt)
 	if nvm.get("workmod") == "SMS" then
 		sys.timer_start(delaysmsmod,10000)
@@ -834,6 +1283,12 @@ local function workmodind(r,rpt)
 	heart()
 end
 
+--[[
+函数名：gpstaind
+功能  ：gps事件处理函数
+参数  ：evt gps事件
+返回值：true
+]]
 local function gpstaind(evt)
 	if nvm.get("workmod") == "SMS" then return end
 	if evt == gps.GPS_LOCATION_SUC_EVT and manage.getlastyp() ~= "GPS" --[[and not firstgps]] then
@@ -842,17 +1297,35 @@ local function gpstaind(evt)
 	return true
 end
 
+--[[
+函数名：parachangeloc
+功能  ：位置上报频率改变或者定位模式改变，上报一次位置信息
+参数  ：无
+返回值：无
+]]
 local function parachangeloc()
 	locshk = "SHK"
 	preloc()
 end
 
+--[[
+函数名：rptgpsleep
+功能  ：gps关闭，上报心跳包
+参数  ：无
+返回值：无
+]]
 local function rptgpsleep()
 	if nvm.get("gpsleep") then
 		heart()
 	end
 end
 
+--[[
+函数名：stachange
+功能  ：设备由运动切换到静止状态，上报心跳包
+参数  ：无
+返回值：true
+]]
 local function stachange()
 	if manage.getmovsta()=="SIL" then
 		heart()
@@ -860,6 +1333,12 @@ local function stachange()
     return true
 end
 
+--[[
+函数名：tparachangeind
+功能  ：由非服务器方修改了参数，则将修改后的参数上报后台
+参数  ：k,kk,v,r
+返回值：true
+]]
 local function parachangeind(k,v,r)
 	print("parachangeind",k,r)
 	local rpt
@@ -875,12 +1354,17 @@ local function parachangeind(k,v,r)
 		fixmod = parachangeloc,
 		heart = devinfo,
 		--gpsleep = rptgpsleep,	
-        STA_CHANGE = stachange,
 	}
 	if procer[k] then procer[k](r,rpt) end
 	return true
 end
 
+--[[
+函数名：tparachangeind
+功能  ：由非服务器方修改了参数，则将修改后的参数上报后台
+参数  ：k,kk,v,r
+返回值：true
+]]
 local function tparachangeind(k,kk,v,r)
 	if r ~= "SVR" then
 		rptpara(k)
@@ -888,6 +1372,12 @@ local function tparachangeind(k,kk,v,r)
 	return true
 end
 
+--[[
+函数名：imeirdy
+功能  ：IMEI读取成功，则向后台上报tpara表中的参数值
+参数  ：无
+返回值：无
+]]
 local function imeirdy()	
 	rptpara()
 end
@@ -903,16 +1393,35 @@ end
 	return true
 end]]
 
+--关机原因值,0x00按键关机,0x01低电关机
 local pwoffcause
 
+--[[
+函数名：getpwoffcause
+功能  ：获取关机原因值
+参数  ：无
+返回值：关机原因值
+]]
 function getpwoffcause()
 	return pwoffcause
 end
 
+--[[
+函数名：delpwoffcause
+功能  ：删除关机原因值
+参数  ：无
+返回值：无
+]]
 function delpwoffcause()
     pwoffcause=nil
 end
 
+--[[
+函数名：rsp_pwoff
+功能  ：应答关机请求，1.如果主人号码不为空，给主人号码发送关机成功短信 2，发送心跳 3执行关机操作
+参数  ：tag 关机原因
+返回值：无
+]]
 local function rsp_pwoff(tag)
 	if nvm.get("adminum")~="" then
 		smsapp.send(nvm.get("adminum"),"关机成功！")
@@ -927,23 +1436,55 @@ local function rsp_pwoff(tag)
 	return true
 end
 
+--keyrptpos true表示按键按下的时候需要上报位置信息，false或nil则上报心跳
+--key_val_sta 标记按键的状态信息（最高位[7:7]表示按键状态，0：短按，1长按；[6:0]表示按键值，0开机键，1状态键）
 local keyrptpos,key_val_sta = true
+--[[
+函数名：resetkeyrptposflg
+功能  ：恢复按键按下是否需要上报位置信息的flag值
+参数  ：无
+返回值：无
+]]
 local function resetkeyrptposflg()
 	keyrptpos = true
 end
 
+--[[
+函数名：delkeyvalsta
+功能  ：获取按键状态值
+参数  ：无
+返回值：按键状态值
+]]
 function getkeyvalsta()
 	return key_val_sta
 end
 
+--[[
+函数名：delkeyvalsta
+功能  ：删除按键状态值
+参数  ：无
+返回值：无
+]]
 function delkeyvalsta()
 	key_val_sta=nil
 end
 
+--[[
+函数名：keyrpt
+功能  ：上报位置，位置类型为按键上报
+参数  ：无
+返回值：true
+]]
 local function keyrpt() 
 	locrpt("KEYRPT")
 end
 
+--[[
+函数名：keyind
+功能  ：不管是长按还是短按，一分钟内有N按键操作，上报一次位置信息，N-1次心跳
+参数  ：k按键值
+返回值：true
+]]
 local function keyind(k)
 	print("keyind",k,keyrptpos,key_val_sta)
 	if keyrptpos then
@@ -960,13 +1501,27 @@ local function keyind(k)
 	return true
 end
 
+--[[
+函数名：shortkey
+功能  ：短按按键消息处理函数
+参数  ：k按键值
+返回值：true
+]]
 local function shortkey(k)
+    --key_val_sta最高位[7:7]表示按键状态，0：短按，1长按；[6:0]表示按键值，0开机键，1状态键
 	key_val_sta=0x0
 	keyind(k)
 	return true
 end
 
+--[[
+函数名：longkey
+功能  ：长按按键消息处理函数
+参数  ：k按键值
+返回值：true
+]]
 local function longkey(k)
+    --key_val_sta最高位[7:7]表示按键状态，0：短按，1长按；[6:0]表示按键值，0开机键，1状态键
 	key_val_sta=0x80
 	keyind(k)
 	return true
@@ -991,10 +1546,14 @@ local procer =
 	SND_QRYRCD_REQ = sndqryrcdreq,
 	SMS_RPT_REQ = smsrptreq,
 	CCRPT_REQ = ccrptreq,
+    STA_CHANGE = stachange,
 }
 
+--注册app消息处理函数
 sys.regapp(procer)
+--如果3倍KEEP_ALIVE_TIME+半分钟还没连上后台则重启设备
 checkdatactive()
 net.startquerytimer()
+--连接后台
 connect(linkapp.NORMAL)
 

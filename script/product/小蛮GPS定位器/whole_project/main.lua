@@ -1,8 +1,20 @@
+--[[
+模块名称：主程序
+模块功能：程序入口
+模块最后修改时间：2017.02.13
+]]
+
+--项目名
 PROJECT = "A5315S"
+--项目id
 PRJID=21
+--版本号
 VERSION = "1.0.0"
+--远程升级模式 0，自动  1，收动
 UPDMODE = 0
+--修改时间
 MDFYTIME = "201608261317"
+--全接变量参数值
 LONGPSMOD_DFT_HEART = 1800
 LONGPSMOD_DFT_RPTFREQ = 60
 LONGPSMOD_SHK_HEART = 1800
@@ -53,9 +65,16 @@ STA_MOV_VALIDSHK_FREQ = 10
 STA_SIL_VALIDSHK_CNT = 5
 STA_SIL_VALIDSHK_FREQ = 60
 _G.collectgarbage("setpause",90)
+--[[
+函数名：appendprj
+功能  ：给工程名添加尾缀
+参数  ：suffix
+返回值：无
+]]
 function appendprj(suffix)
 	PROJECT = PROJECT .. suffix
 end
+--导入依赖库
 require"sys"
 require"nvm"
 require"pins"
@@ -92,14 +111,23 @@ local apntable =
 	["46006"] = "UNINET",
 }
 
+--[[
+函数名：proc
+功能  ：设置apn名
+参数  ：id，app消息id
+返回值：true
+]]
 local function proc(id)
 	link.setapn(apntable[sim.getmcc()..sim.getmnc()] or "CMNET")
 	return true
 end
 
+--注册IMSI_READY消息处理函数
 sys.regapp(proc,"IMSI_READY")
+--初始化程序
 sys.init(0,0)
 --ril.request("AT*TRACE=\"SXS\",1,0")
 --ril.request("AT*TRACE=\"DSS\",1,0")
 --ril.request("AT*TRACE=\"RDA\",1,0")
+--运行程序
 sys.run()
