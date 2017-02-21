@@ -1,6 +1,13 @@
--- 通用处理库
+--[[
+模块名称：通用库函数
+模块功能：编码格式转换、时区时间转换
+模块最后修改时间：2017.02.20
+]]
+
+--定义模块,导入依赖库
 module(...,package.seeall)
 
+--加载常用的全局函数至本地
 local tonumber = tonumber
 local tinsert = table.insert
 local ssub = string.sub
@@ -9,7 +16,13 @@ local schar = string.char
 local sformat = string.format
 local slen = string.len
 
--- "0031003200330034" -> "1234"
+--[[
+函数名：ucs2toascii
+功能  ：ascii字符串的unicode编码的16进制字符串 转化为 ascii字符串，例如"0031003200330034" -> "1234"
+参数  ：
+		inum：待转换字符串
+返回值：转换后的字符串
+]]
 function ucs2toascii(inum)
 	local tonum = {}
 	for i=1,string.len(inum),4 do
@@ -19,7 +32,13 @@ function ucs2toascii(inum)
 	return string.char(unpack(tonum))
 end
 
--- "+1234" -> "002B0031003200330034"
+--[[
+函数名：ucs2toascii
+功能  ：ascii字符串 转化为 ascii字符串的unicode编码的16进制字符串，仅支持数字和+，例如"+1234" -> "002B0031003200330034"
+参数  ：
+		inum：待转换字符串
+返回值：转换后的字符串
+]]
 function nstrToUcs2Hex(inum)
 	local hexs = ""
 	local elem = ""
@@ -36,7 +55,13 @@ function nstrToUcs2Hex(inum)
 	return hexs
 end
 
--- +8618126324567  ->91688121364265f7 
+--[[
+函数名：numtobcdnum
+功能  ：号码ASCII字符串 转化为 BCD编码格式字符串，仅支持数字和+，例如"+8618126324567" -> 91688121364265f7 （表示第1个字节是0x91，第2个字节为0x68，......）
+参数  ：
+		num：待转换字符串
+返回值：转换后的字符串
+]]
 function numtobcdnum(num)
   local len, numfix,convnum = slen(num),"81",""
   
@@ -60,7 +85,13 @@ function numtobcdnum(num)
   return numfix .. convnum
 end
 
---  91688121364265f7 -> +8618126324567
+--[[
+函数名：bcdnumtonum
+功能  ：BCD编码格式字符串 转化为 号码ASCII字符串，仅支持数字和+，例如91688121364265f7 （表示第1个字节是0x91，第2个字节为0x68，......） -> "+8618126324567"
+参数  ：
+		num：待转换字符串
+返回值：转换后的字符串
+]]
 function bcdnumtonum(num)
   local len, numfix,convnum = slen(num),"",""
   
@@ -86,8 +117,16 @@ function bcdnumtonum(num)
   return numfix .. convnum
 end
 
-function binstohexs(bins,s)   --把地址指向的字节的    八位二进制码，用两位十六进制   表示出来
-	local hexs = ""           --"00000000" --> "0x00"
+--[[
+函数名：binstohexs
+功能  ：二进制数据 转化为 16进制字符串格式，例如91688121364265f7 （表示第1个字节是0x91，第2个字节为0x68，......） -> "91688121364265f7"
+参数  ：
+		bins：二进制数据
+		s：转换后，每两个字节之间的分隔符，默认没有分隔符
+返回值：转换后的字符串
+]]
+function binstohexs(bins,s)
+	local hexs = "" 
 
 	if bins == nil or type(bins) ~= "string" then return nil,"nil input string" end
 
@@ -97,10 +136,14 @@ function binstohexs(bins,s)   --把地址指向的字节的    八位二进制码，用两位十六进
 	hexs = string.upper(hexs)
 	return hexs
 end
---"1234"  -->  "0x31 32 33 34"
---"1234"是字符串，四个字节。ASCII码的格式分别是：
---字符"1"的十进制形式：49；十六进制形式：31；二进制形式：00110001
 
+--[[
+函数名：hexstobins
+功能  ：16进制字符串 转化为 二进制数据格式，例如"91688121364265f7" -> 91688121364265f7 （表示第1个字节是0x91，第2个字节为0x68，......）
+参数  ：
+		hexs：16进制字符串
+返回值：转换后的数据
+]]
 function hexstobins(hexs)
 	local tbins = {}
 	local num
@@ -118,21 +161,49 @@ function hexstobins(hexs)
 	return schar(unpack(tbins))
 end
 
+--[[
+函数名：ucs2togb2312
+功能  ：unicode小端编码 转化为 gb2312编码
+参数  ：
+		ucs2s：unicode小端编码数据
+返回值：gb2312编码数据
+]]
 function ucs2togb2312(ucs2s)
 	local cd = iconv.open("gb2312","ucs2")
 	return cd:iconv(ucs2s)
 end
 
+--[[
+函数名：gb2312toucs2
+功能  ：gb2312编码 转化为 unicode小端编码
+参数  ：
+		ucs2s：gb2312编码数据
+返回值：unicode小端编码数据
+]]
 function gb2312toucs2(gb2312s)
 	local cd = iconv.open("ucs2","gb2312")
 	return cd:iconv(gb2312s)
 end
 
+--[[
+函数名：ucs2betogb2312
+功能  ：unicode大端编码 转化为 gb2312编码
+参数  ：
+		ucs2s：unicode大端编码数据
+返回值：gb2312编码数据
+]]
 function ucs2betogb2312(ucs2s)
 	local cd = iconv.open("gb2312","ucs2be")
 	return cd:iconv(ucs2s)
 end
 
+--[[
+函数名：gb2312toucs2be
+功能  ：gb2312编码 转化为 unicode大端编码
+参数  ：
+		ucs2s：gb2312编码数据
+返回值：unicode大端编码数据
+]]
 function gb2312toucs2be(gb2312s)
 	local cd = iconv.open("ucs2be","gb2312")
 	return cd:iconv(gb2312s)
@@ -224,6 +295,21 @@ local function timeRmozone(y,m,d,hh,mm,ss,zone)
 	t.year,t.month,t.day,t.hour,t.min,t.sec = y,m,d,hh,mm,ss
 	return t
 end
+
+--[[
+函数名：transftimezone
+功能  ：当前时区的时间转换为新时区的时间
+参数  ：
+		y：当前时区年份
+		m：当前时区月份
+		d：当前时区天
+		hh：当前时区小时
+		mm：当前时区分
+		ss：当前时区秒
+		pretimezone：当前时区
+		nowtimezone：新时区
+返回值：返回新时区对应的时间，table格式{year,month.day,hour,min,sec}
+]]
 function transftimezone(y,m,d,hh,mm,ss,pretimezone,nowtimezone)
 	local t = {}
 	local zone = nil
