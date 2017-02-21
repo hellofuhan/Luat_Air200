@@ -51,6 +51,12 @@ local function feed()
 	sys.timer_start(feedend,2000)
 end
 
+--[[
+函数名：open
+功能  ：打开Air200开发板上的硬件看门狗功能
+参数  ：无
+返回值：无
+]]
 function open()
 	sys.timer_start(feed,120000)
 	pio.pin.setdir(pio.OUTPUT,WATCHDOG_PIN)
