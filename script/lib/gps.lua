@@ -890,7 +890,7 @@ end
 函数名：getgpslocation
 功能  ：获取GPS经纬度信息
 参数  ：
-		format：经纬度格式
+		format：经纬度格式，默认为度格式GPS_DEGREES，支持GPS_DEGREES和GPS_DEGREES_MINUTES
 返回值：经纬度信息字符串，例如格式为："E,121.12345,N,31.23456"，如果没有经纬度格式为"E,,N,"
 ]]
 function getgpslocation(format)
