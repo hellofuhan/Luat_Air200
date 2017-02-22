@@ -57,7 +57,7 @@ if mAMWatchDll then
   package.cpath = string.format("%s/src/lib/?.so;%s/src/lib/?.lib",shellRoot,shellRoot)
   
   print("Lua Version: ",_G._VERSION)
-  print("AMWatchDll Version ",disp.getver())
+  print("LuaT Version ",LuaShell._VERSION)
   LuaShell.SetRoot(shellRoot)
 else
   print("Can't load AMWatchDll!")
