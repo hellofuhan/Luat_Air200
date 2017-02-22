@@ -531,7 +531,7 @@ static VOID lua_shell_main(PVOID pParameter)
     
     PUB_TRACE("[lua_shell_main]: lua exit status %d", luaExitStatus);
 
-    /*IVTBL(wait_semaphore)(luaShellSem, 3000); // 3秒后重启系统*/
+    IVTBL(wait_semaphore)(luaShellSem, 3000); // 3秒后重启系统*/
 
 /*+\NEW\liweiqiang\2013.9.20\lua异常退出后重启系统,避免文件未写入到flash中*/
     IVTBL(restart)();
