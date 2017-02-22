@@ -34,9 +34,10 @@ typedef off_t fpos_t;		/* stdio file position type */
 #ifdef AM_LUA_UNCOMPRESS_SCRIPT_TABLE_ACESS_SUPPORT
 typedef enum
 {
-    COMMON_FILE,
-    LUA_UNCOMPRESS_FILE,
-
+    COMMON_FILE = 0,
+    ENC_FILE = 1,
+    LUA_UNCOMPRESS_FILE = 2,
+    LUA_UNCOMPRESS_ENC_FILE = 3,
     MAX_EXT_FILE
 }E_EXT_FILE_TYPE;
 #endif
@@ -255,7 +256,7 @@ char* lualibc_tmpnam(char *);
 
 /*+\NEW\zhuth\2014.3.2\通过文件记录表访问luadb中未压缩的文件*/
 #ifdef AM_LUA_UNCOMPRESS_SCRIPT_TABLE_ACESS_SUPPORT
-#define __sfeof(p)      ((((p)->_type == COMMON_FILE) && (((p)->_flags & __SEOF) != 0)) || (((p)->_type == LUA_UNCOMPRESS_FILE) && feof_ext(p)))
+#define __sfeof(p)      ((((p)->_type == COMMON_FILE) && (((p)->_flags & __SEOF) != 0)) || (((p)->_type & LUA_UNCOMPRESS_FILE) && feof_ext(p)))
 #else
 #define __sfeof(p)      (((p)->_flags & __SEOF) != 0)
 #endif

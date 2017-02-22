@@ -86,6 +86,8 @@ typedef VOID (*PMINUTE_TICKFUNC)(VOID);
 
 
 int OPENAT_GetEnvUsage(void);
+void OPENAT_Decode(UINT32* v, INT32 n);
+
 
 #endif /* AM_OPENAT_SYSTEM_H */
 

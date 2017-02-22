@@ -34,3 +34,8 @@ int platform_sys_unlink(const char *path)
     return ret;
 }
 
+void platform_decode(unsigned int* data, int len)
+{
+    IVTBL(decode)((UINT32*)data, len);
+}
+

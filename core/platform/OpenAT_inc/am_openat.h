@@ -1022,6 +1022,8 @@ typedef struct T_AMOPENAT_INTERFACE_VTBL_TAG
 /*-\NEW\WZQ\2014.11.7\加入18030字库*/
 
     int (*get_env_usage)(void );
+
+    void (*decode)(UINT32* data, INT32 len);
 }T_AMOPENAT_INTERFACE_VTBL;
 
 /*+\BUG WM-656\lifei\2013.03.07\[OpenAT] 修改cust区域检查条件*/

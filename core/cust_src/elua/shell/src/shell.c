@@ -24,6 +24,9 @@
 #define LUA_ENTRY_FILE "/lua/" LUA_ENTRY_FILENAME
 /*-\NEW\liweqiang\2013.5.8\在文件系统存在main.lua文件时启动时自动加载文件系统文件*/
 
+#define LUA_ENTRY_ENC_FILENAME "main.luae"
+#define LUA_ENTRY_ENC_FILE "/lua/" LUA_ENTRY_ENC_FILENAME
+
 /*+\NEW\liulean\2015.8.5\解决产线概率性MP3播放无声音的问题*/
 #define LUA_CHECK_INTEGRITY_FILE "/integrity.bin"
 #define LUA_INTEGRITY_FLAG 0xABCD8765
@@ -31,6 +34,8 @@
 
 /*+\NEW\liweiqiang\2013.5.11\开机自解压luazip目录下文件支持,压缩算法lzma*/
 #define LUA_ENTRY_FILE_ZIP "/luazip/" LUA_ENTRY_FILENAME ".zip"
+#define LUA_ENTRY_ENC_FILE_ZIP "/luazip/" LUA_ENTRY_ENC_FILENAME ".zip"
+
 /*-\NEW\liweiqiang\2013.5.11\开机自解压luazip目录下文件支持,压缩算法lzma*/
 /*-\NEW\liweiqiang\2013.10.25\lua脚本统一放在lua目录下,预置的非lua文件统一放在ldata文件下 */
 
@@ -41,6 +46,7 @@ extern char _lua_script_section_start[LUA_SCRIPT_SIZE];
 void LuaDeleteMainFile(void)
 {
     remove(LUA_ENTRY_FILE);
+    remove(LUA_ENTRY_ENC_FILE);
 }
 /*-\NEW\rufei\2013.9.13\处理lua文件可能被破坏导致持续重启问题*/
 
@@ -214,7 +220,13 @@ int LuaAppTask(void)
         NULL
     };
 /*-\NEW\liweqiang\2013.5.8\在文件系统存在main.lua文件时启动时自动加载文件系统文件*/
-    
+    static const char *argv_enc_script_file[] =
+    {
+        "lua",
+        LUA_ENTRY_ENC_FILE,
+        NULL
+    };
+
     if((unsigned char)_lua_script_section_start[0] == 0xff || _lua_script_section_start[0] == '\0')
     {
         argc = sizeof(argv_null)/sizeof(argv_null[0]);
@@ -249,19 +261,34 @@ int LuaAppTask(void)
 /*+\NEW\liweqiang\2013.5.8\在文件系统存在main.lua文件时启动时自动加载文件系统文件*/
     if(existScript || existLuaDB)
     {
+        BOOL exitZipFile = FALSE;
+        char* zipFileName;
+        char* enterFile;
     /*+\NEW\liweiqiang\2013.5.11\开机自解压luazip目录下文件支持,压缩算法lzma*/
     #if defined(AM_LZMA_SUPPORT)
         // 保留旧的文件升级方式,以兼容旧版本
         if(file_exist(LUA_ENTRY_FILE_ZIP) == TRUE)
         {
+            exitZipFile = TRUE;
+            zipFileName = LUA_ENTRY_FILE_ZIP;
+            enterFile = LUA_ENTRY_FILE;
+        }
+        else if(file_exist(LUA_ENTRY_ENC_FILE_ZIP) == TRUE)
+        {
+            exitZipFile = TRUE;
+            zipFileName = LUA_ENTRY_ENC_FILE_ZIP;
+            enterFile = LUA_ENTRY_ENC_FILE;
+        }
+        if(exitZipFile)
+        {
             // 只有在存在升级包文件的情况下才处理解压
             int lzmaret = 0;    
-            if((lzmaret = LzmaUncompressFile(LUA_ENTRY_FILE_ZIP, LUA_ENTRY_FILE)) == 0)
+            if((lzmaret = LzmaUncompressFile(zipFileName, enterFile)) == 0)
             {
                 /*+\NEW\rufei\2013.9.13\处理lua文件可能被破坏导致持续重启问题*/
                 // 解压缩成功,删除压缩文件
                 /*+\NEW\zhuth\2014.8.11\升级包解压缩成功后，删除升级包，并且重启*/
-                remove(LUA_ENTRY_FILE_ZIP);
+                remove(zipFileName);
                 /*-\NEW\zhuth\2014.8.11\升级包解压缩成功后，删除升级包，并且重启*/
                 /*-\NEW\rufei\2013.9.13\处理lua文件可能被破坏导致持续重启问题*/
                 printf("uncompress zip file success!\n", lzmaret);
@@ -279,8 +306,15 @@ int LuaAppTask(void)
 
         if(file_exist(LUA_ENTRY_FILE) == TRUE)
         {
+            printf("\r\nRUN main.lua\r\n");
             argc = sizeof(argv_script_file)/sizeof(argv_script_file[0]);
             argv = (char **)argv_script_file;
+        }
+        else if(file_exist(LUA_ENTRY_ENC_FILE) == TRUE)
+        {
+            printf("\r\nRUN ENCRYPT main.lua\r\n");
+            argc = sizeof(argv_enc_script_file)/sizeof(argv_enc_script_file[0]);
+            argv = (char **)argv_enc_script_file;
         }
         else if(existLuaDB)
         {

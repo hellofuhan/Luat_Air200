@@ -103,7 +103,7 @@
 #define LUA_LDIR	LUA_ROOT "lual/"
 #define LUA_CDIR	LUA_ROOT "lualib/"
 #define LUA_PATH_DEFAULT  \
-		"/?.lua;"
+		"/?.lua; /?.luae"
 #define LUA_CPATH_DEFAULT \
 	"/?.so;"
 #else

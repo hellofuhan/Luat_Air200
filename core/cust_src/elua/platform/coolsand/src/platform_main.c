@@ -477,7 +477,7 @@ static VOID cust_task_main(PVOID pParameter)
 
 char *getLuaPath(void)
 {
-    return LUA_DIR "/?.lua";
+    return LUA_DIR "/?.lua;" LUA_DIR "/?.luae";
 }
 
 char *getLuaDir(void)

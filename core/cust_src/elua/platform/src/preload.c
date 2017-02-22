@@ -18,6 +18,7 @@
 #include "LzmaLib.h"
 #include "preload.h"
 
+
 #define ASSERT_LEN(len, defLen)     ((len) == (defLen) ? 0 : LUADB_ERR_TLV_LEN)
 
 #define DBMAKEU16(d, p)             ((u16)(d[p]|((d[p+1])<<8)))
@@ -258,6 +259,7 @@ FILE *fopen_ext(const char *file, const char *mode)
     FILE *fp = NULL;
     E_LUA_SCRIPT_TABLE_SECTION section = LUA_SCRIPT_TABLE_MAX_SECTION;
     T_UNCOMPRESS_FILE_TABLE_ITEM *pItem = NULL;
+    int fileNameLen = strlen(file);
     
     if((!file) || (strlen(file) == 0))
     {
@@ -274,6 +276,15 @@ FILE *fopen_ext(const char *file, const char *mode)
             fp->_cookie = pItem;
         }
         fp->_type = LUA_UNCOMPRESS_FILE;
+
+#ifdef AM_LUA_CRYPTO_SUPPORT
+        if(strncmp(&file[fileNameLen - 5],".luae", 5) == 0)
+        {
+            fp->_type |= ENC_FILE;
+        }
+#endif
+
+        printf("[fopen_ext]: %s %d!\n", file, fp->_type);
     }
 
     return fp;
@@ -307,6 +318,91 @@ int ungetc_ext(int c, FILE *fp)
     fseek_ext(fp, -1, SEEK_CUR);
 
     return 0;
+}
+
+//#define CRYPTO_DEBUG
+#define DEC_BUFF_SIZE 512
+extern char _lua_script_section_start[];
+
+static int decode_file(void *buf, size_t size, size_t count, FILE *fp)
+{
+
+    unsigned int act_low_boundary;  /*以512对齐的读取文件的起始位置*/
+    unsigned int read_count;        /*需要从文件中读取的长度*/
+    unsigned int act_up_boundary;   /*以512对齐的读取文件的结束位置*/
+    unsigned int act_count;         /*读取到的有效数据长度*/
+    unsigned char* temp;
+    unsigned int* data = NULL;
+    size_t resid;
+    int len;
+    T_UNCOMPRESS_FILE_TABLE_ITEM *pItem = NULL;
+    unsigned int offset  = ftell_ext(fp);
+
+    int decCount;
+    int i = 0;
+    int real_size;
+
+    resid = count * size;
+    
+    pItem = (T_UNCOMPRESS_FILE_TABLE_ITEM *)(fp->_cookie);
+
+    act_low_boundary = (offset & 0xFFFFFE00);
+    act_up_boundary = ((offset + resid + DEC_BUFF_SIZE - 1) & 0xFFFFFE00);
+    read_count = act_up_boundary - act_low_boundary; 
+
+    /*多申请8个字节的内存，以保证能4字节对齐*/
+    data = (unsigned int*)malloc(4 + read_count + 4);
+    
+    /*保证4字节对齐*/
+    temp = (unsigned char*)((((unsigned int)data + 3) >> 2) << 2);
+
+    /*把文件指针移到以512对齐的位置*/
+    fseek_ext(fp, act_low_boundary, SEEK_SET);
+
+    len = ((pItem->nLen - offset) >= read_count) ? read_count : (pItem->nLen - offset);
+    memcpy(temp, &_lua_script_section_start[pItem->nOffset + offset], len);
+    
+    
+    act_count = resid;
+    decCount = len / DEC_BUFF_SIZE;
+   
+    /*如果没有读到足够多的数据，意味着快到文件的末尾了*/
+    if(read_count > len)
+    {
+        real_size = pItem->nLen;
+
+        if(real_size - offset < resid)
+        {
+            act_count = real_size - offset;
+        }
+    }
+    
+    /*把文件指针移到真实的位置*/
+    fseek_ext(fp, offset + act_count, SEEK_SET);
+
+#ifdef CRYPTO_DEBUG
+    printf("liulean decode info  %d %d %d %d %d %d\r\n", 
+        act_low_boundary, 
+        act_up_boundary, 
+        offset + count,
+        offset - act_low_boundary,
+        count,
+        decCount);
+#endif
+
+    while(i < decCount)
+    {
+        platform_decode((unsigned int*)(temp + DEC_BUFF_SIZE * i), -((DEC_BUFF_SIZE) / 4));
+        i++;
+    }
+
+    platform_decode((unsigned int*)(temp + DEC_BUFF_SIZE * i), -((len % DEC_BUFF_SIZE) / 4));
+    
+    memcpy(buf, &temp[offset - act_low_boundary], act_count);
+    free(data);
+
+    return (act_count / size);
+
 }
 
 size_t fread_ext(void *buf, size_t size, size_t count, FILE *fp)
@@ -352,8 +448,19 @@ size_t fread_ext(void *buf, size_t size, size_t count, FILE *fp)
     }
     else if(fp->_flags == LUA_SCRIPT_TABLE_FLASH_SECTION)
     {
-        extern char _lua_script_section_start[LUA_SCRIPT_SIZE];
-        memcpy(buf, &_lua_script_section_start[pItem->nOffset + fp->_offset], len);
+        //extern char _lua_script_section_start[LUA_SCRIPT_SIZE];
+        //memcpy(buf, &_lua_script_section_start[pItem->nOffset + fp->_offset], len);
+
+#ifdef AM_LUA_CRYPTO_SUPPORT
+        if(fp->_type == LUA_UNCOMPRESS_ENC_FILE)
+        {
+            return decode_file(buf, size, count, fp);
+        }
+        else
+#endif
+        {
+            memcpy(buf, &_lua_script_section_start[pItem->nOffset + fp->_offset], len);
+        }
     }
     else
     {
@@ -664,6 +771,8 @@ int parse_luadb_data(const u8 *pData, u32 length, BOOL override, E_LUA_SCRIPT_TA
 
     memset(&headInfo, 0, sizeof(headInfo));
 
+    //根据头信息得到总文件个数
+
     err = decodeHeadInfo(pData, &headInfo, &offset);
 
     if(0 != err)
@@ -678,6 +787,7 @@ int parse_luadb_data(const u8 *pData, u32 length, BOOL override, E_LUA_SCRIPT_TA
 
     for(fileIndex = 0; fileIndex < headInfo.filecount && offset < length; fileIndex++)
     {
+        //解析每个文件，文件数据地址，文件大小
         if((err = decodeFile(&pData[offset], &pFileInfo[fileIndex], &offset)) != LUADB_ERR_NONE)
         {
             goto decode_exit;
@@ -708,7 +818,9 @@ int parse_luadb_data(const u8 *pData, u32 length, BOOL override, E_LUA_SCRIPT_TA
 
             if(strcmp(&pFileInfo[fileIndex].name[withoutZipLen], ".zip") == 0)
             {
-                if(strncmp(&pFileInfo[fileIndex].name[withoutLuaLen],".lua", 4) == 0)
+                if((strncmp(&pFileInfo[fileIndex].name[withoutLuaLen],".lua", 4) == 0)
+                    ||
+                    (strncmp(&pFileInfo[fileIndex].name[withoutLuaLen-1],".luae", 5) == 0))
                 {
                     strcpy(filename, getenv("LUA_DIR"));
                 }
@@ -749,7 +861,10 @@ int parse_luadb_data(const u8 *pData, u32 length, BOOL override, E_LUA_SCRIPT_TA
                 /*+\NEW\zhuth\2014.8.13\升级包解压缩成功后，删除升级包，并且重启*/
                 delupdpack = FALSE;
                 /*-\NEW\zhuth\2014.8.13\升级包解压缩成功后，删除升级包，并且重启*/
-                if(strncmp(&pFileInfo[fileIndex].name[pFileInfo[fileIndex].nameLen-4],".lua", 4) == 0)
+                if((strncmp(&pFileInfo[fileIndex].name[pFileInfo[fileIndex].nameLen-4],".lua", 4) == 0)
+                    ||
+                    (strncmp(&pFileInfo[fileIndex].name[pFileInfo[fileIndex].nameLen-5],".luae", 5) == 0)
+                    )
                 {                    
                     strcpy(filename, getenv("LUA_DIR"));
                 }
@@ -764,6 +879,7 @@ int parse_luadb_data(const u8 *pData, u32 length, BOOL override, E_LUA_SCRIPT_TA
                 #ifdef AM_LUA_UNCOMPRESS_SCRIPT_TABLE_ACESS_SUPPORT
                 {
                     char *p = &pFileInfo[fileIndex].name[pFileInfo[fileIndex].nameLen-4];
+                    char *luep = &pFileInfo[fileIndex].name[pFileInfo[fileIndex].nameLen-5];
                     if((strncmp(p,".lua", 4) == 0) || (strncmp(p,".bmp", 4) == 0) || (strncmp(p,".BMP", 4) == 0)
                         #ifdef AM_LPNG_SUPPORT
                         || (strncmp(p,".png", 4) == 0) || (strncmp(p,".PNG", 4) == 0)
@@ -774,8 +890,10 @@ int parse_luadb_data(const u8 *pData, u32 length, BOOL override, E_LUA_SCRIPT_TA
                         || (strncmp(p,".MP3", 4) == 0) || (strncmp(p,".mp3", 4) == 0)
                     #endif
 					/*-\liulean\2015.9.9\MP3和AMR文件不放在文件系统中*/
+					    ||(strncmp(luep, ".luae", 5) == 0)
                        )
                     {
+                        //将文件放入pFlashFileTable队列
                         if(FALSE == AddUncompressFileItem(section, filename, pFileInfo[fileIndex].offset, pFileInfo[fileIndex].length))
                         {
                             err = LUADB_ERR_ADD_TABLE_ITEM;
@@ -805,7 +923,7 @@ int parse_luadb_data(const u8 *pData, u32 length, BOOL override, E_LUA_SCRIPT_TA
                         err = LUADB_ERR_WRITE_FILE;
                         goto decode_exit;
                     }
-                    
+                    //将从flash区域取出的文件写入文件系统
                     if(fwrite(pFileInfo[fileIndex].data, 1, pFileInfo[fileIndex].length, fout) != pFileInfo[fileIndex].length)
                     {
                         printf("[parse_luadb_data]: write file(%s) error!\n", filename);

@@ -107,6 +107,9 @@ ifeq ($(strip $(AM_LUA_SUPPORT)), TRUE)
     LOCAL_EXPORT_FLAG += LUA_ZLIB_LIB  
 
     LOCAL_EXPORT_FLAG += DSS_CONFIG_EX_WATCH_DOG
+	
+
+    LOCAL_EXPORT_FLAG += AM_LUA_CRYPTO_SUPPORT
 endif
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

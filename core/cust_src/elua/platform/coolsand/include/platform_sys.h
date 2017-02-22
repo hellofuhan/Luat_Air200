@@ -14,6 +14,8 @@
 #define _PLATFORM_SYS_H_
 
 int platform_sys_unlink(const char *path);
+void platform_decode(unsigned int* data, int len);
+
 
 #endif/*_PLATFORM_SYS_H_*/
 

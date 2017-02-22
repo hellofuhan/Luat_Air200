@@ -70,7 +70,7 @@ char *lualibc_fgets(char *buf, int n, FILE *fp)
 
     /*+\NEW\zhuth\2014.3.2\通过文件记录表访问luadb中未压缩的文件*/
     #ifdef AM_LUA_UNCOMPRESS_SCRIPT_TABLE_ACESS_SUPPORT
-    if(LUA_UNCOMPRESS_FILE == fp->_type)
+    if(LUA_UNCOMPRESS_FILE & fp->_type)
     {
         return fgets_ext(buf,n,fp);
     }
@@ -165,6 +165,7 @@ FILE *lualibc_fopen(const char *file, const char *mode)
     int f;
     FILE *fp;
     int flags, oflags;
+    int fileNameLen = strlen(file);
     /*+\NEW\zhuth\2014.3.2\通过文件记录表访问luadb中未压缩的文件*/
     #ifdef AM_LUA_UNCOMPRESS_SCRIPT_TABLE_ACESS_SUPPORT
     FILE *pFile = fopen_ext(file, mode);
@@ -204,9 +205,22 @@ FILE *lualibc_fopen(const char *file, const char *mode)
     //if(oflags & O_APPEND)
     //    (void)__sseek((void *)fp, (fpos_t)0, SEEK_END);
 
+    printf("%s %s", __FUNCTION__, file);
+
     /*+\NEW\zhuth\2014.3.2\通过文件记录表访问luadb中未压缩的文件*/
     #ifdef AM_LUA_UNCOMPRESS_SCRIPT_TABLE_ACESS_SUPPORT
-    fp->_type = COMMON_FILE;
+	//强制用加密文件
+#ifdef AM_LUA_CRYPTO_SUPPORT
+    if(strncmp(&file[fileNameLen - 5],".luae", 5) == 0)
+    {
+        //走到这里 加密文件        
+        fp->_type = ENC_FILE;
+    }
+    else
+#endif
+    {
+        fp->_type = COMMON_FILE;
+    } 
     #endif
     /*-\NEW\zhuth\2014.3.2\通过文件记录表访问luadb中未压缩的文件*/
 
@@ -219,7 +233,7 @@ int lualibc_fclose(FILE *fp)
 
     /*+\NEW\zhuth\2014.3.2\通过文件记录表访问luadb中未压缩的文件*/
     #ifdef AM_LUA_UNCOMPRESS_SCRIPT_TABLE_ACESS_SUPPORT
-    if(LUA_UNCOMPRESS_FILE == fp->_type)
+    if(LUA_UNCOMPRESS_FILE & fp->_type)
     {
         return fclose_ext(fp);
     }
@@ -255,7 +269,7 @@ int lualibc_getc(FILE *fp)
 
     /*+\NEW\zhuth\2014.3.2\通过文件记录表访问luadb中未压缩的文件*/
     #ifdef AM_LUA_UNCOMPRESS_SCRIPT_TABLE_ACESS_SUPPORT
-    if(LUA_UNCOMPRESS_FILE == fp->_type)
+    if(LUA_UNCOMPRESS_FILE & fp->_type)
     {
         return getc_ext(fp);
     }
@@ -276,7 +290,7 @@ int lualibc_ungetc(int c, FILE *fp)
 
     /*+\NEW\zhuth\2014.3.2\通过文件记录表访问luadb中未压缩的文件*/
     #ifdef AM_LUA_UNCOMPRESS_SCRIPT_TABLE_ACESS_SUPPORT
-    if(LUA_UNCOMPRESS_FILE == fp->_type)
+    if(LUA_UNCOMPRESS_FILE & fp->_type)
     {
         return ungetc_ext(c,fp);
     }
@@ -288,14 +302,27 @@ int lualibc_ungetc(int c, FILE *fp)
     return 0;
 }
 
+
+#define DEC_BUFF_SIZE 512
+
+//#define CRYPTO_DEBUG
+
 size_t lualibc_fread(void *buf, size_t size, size_t count, FILE *fp)
 {
     size_t resid;
     int len;
+	
+    unsigned int* data = NULL;
+    unsigned char* temp = buf;
+    unsigned int offset  = ftell(fp);
+    unsigned int act_low_boundary = (offset & 0xFFFFFE00); /*以512对齐的读取文件的起始位置*/
+    unsigned int read_count;        /*需要从文件中读取的长度*/
+    unsigned int act_up_boundary;   /*以512对齐的读取文件的结束位置*/
+    unsigned int act_count;         /*读取到的有效数据长度*/
 
     /*+\NEW\zhuth\2014.3.2\通过文件记录表访问luadb中未压缩的文件*/
     #ifdef AM_LUA_UNCOMPRESS_SCRIPT_TABLE_ACESS_SUPPORT
-    if(LUA_UNCOMPRESS_FILE == fp->_type)
+    if(LUA_UNCOMPRESS_FILE & fp->_type)
     {
         return fread_ext(buf,size,count,fp);
     }
@@ -305,17 +332,103 @@ size_t lualibc_fread(void *buf, size_t size, size_t count, FILE *fp)
     if((resid = count * size) == 0)
         return (0);
 
-    len = (*fp->_read)(fp->_cookie, buf, resid);
+#ifdef AM_LUA_CRYPTO_SUPPORT
+    if(ENC_FILE == fp->_type)
+    {
+        act_up_boundary = ((offset + resid + DEC_BUFF_SIZE - 1) & 0xFFFFFE00);
+        //上下保持512B对其，读取的长度>=要求的长度
+        read_count = act_up_boundary - act_low_boundary; 
+
+        /*多申请8个字节的内存，以保证能4字节对齐*/
+        data = (unsigned int*)malloc(4 + read_count + 4);
+        
+        /*保证4字节对齐*/
+        temp = (unsigned char*)((((unsigned int)data + 3) >> 2) << 2);
+
+        /*把文件指针移到以512对齐的位置*/
+        lualibc_fseek(fp, act_low_boundary, SEEK_SET);
+        
+    }
+    else
+#endif
+
+    {
+        read_count = resid;
+    }
+
+    len = (*fp->_read)(fp->_cookie, temp, read_count);
 
     if(len <= 0){
         if(len == 0)
             fp->_flags |= __SEOF;
         else
             fp->_flags |= __SERR;
+
+#ifdef AM_LUA_CRYPTO_SUPPORT
+        if(ENC_FILE == fp->_type)
+        {
+            free(data);
+        }
+#endif
+
         return (0);
     }
+    else
+    {
+#ifdef AM_LUA_CRYPTO_SUPPORT
+        if(ENC_FILE == fp->_type)
+        {
+            int decCount = len / DEC_BUFF_SIZE;
+            int i = 0;
+            int real_size;
+            
+            act_count = resid;
+
+            /*如果没有读到足够多的数据，意味着快到文件的末尾了*/
+            if(read_count > len)
+            {
+                lualibc_fseek(fp, 0, SEEK_END);
+                real_size = lualibc_ftell(fp);
+
+                if(real_size - offset < resid)
+                {
+                    //文件还能读取的最大长度
+                    act_count = real_size - offset;
+                }
+            }
+            
+            /*把文件指针移到真实的位置*/
+            lualibc_fseek(fp, offset + act_count, SEEK_SET);
+
+#ifdef CRYPTO_DEBUG
+            printf("liulean info  %d %d %d %d %d %d\r\n", 
+                act_low_boundary, 
+                act_up_boundary, 
+                offset + count,
+                offset - act_low_boundary, //左边读取的多余长度
+                count,
+                decCount);
+#endif
+
+            while(i < decCount)
+            {
+                platform_decode((unsigned int*)(temp + DEC_BUFF_SIZE * i), -((DEC_BUFF_SIZE) / 4));
+                i++;
+            }
+
+            platform_decode((unsigned int*)(temp + DEC_BUFF_SIZE * i), -((len % DEC_BUFF_SIZE) / 4));
+            
+            memcpy(buf, &temp[offset - act_low_boundary], act_count);
+            free(data);
+        }
+        else
+#endif
+        {
+            act_count = len;
+        }
+    }
     
-    return (len/size);
+    return (act_count / size);
 }
 
 size_t lualibc_fwrite(const void *buf, size_t size, size_t count, FILE *fp)
@@ -344,7 +457,7 @@ int lualibc_fseek(FILE *fp, long offset, int whence)
 {
     /*+\NEW\zhuth\2014.3.2\通过文件记录表访问luadb中未压缩的文件*/
     #ifdef AM_LUA_UNCOMPRESS_SCRIPT_TABLE_ACESS_SUPPORT
-    if(LUA_UNCOMPRESS_FILE == fp->_type)
+    if(LUA_UNCOMPRESS_FILE & fp->_type)
     {
         return fseek_ext(fp,offset,whence);
     }
@@ -383,7 +496,7 @@ long lualibc_ftell(FILE *fp)
 
     /*+\NEW\zhuth\2014.3.2\通过文件记录表访问luadb中未压缩的文件*/
     #ifdef AM_LUA_UNCOMPRESS_SCRIPT_TABLE_ACESS_SUPPORT
-    if(LUA_UNCOMPRESS_FILE == fp->_type)
+    if(LUA_UNCOMPRESS_FILE & fp->_type)
     {
         return ftell_ext(fp);
     }
