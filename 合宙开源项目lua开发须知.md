@@ -1,10 +1,3 @@
-合宙OpenLuat开源技术支持  
-QQ讨论群：201848376  
-开源社区：www.openluat.com  
-GitHub：https://github.com/airm2m-open/luat  
-百度网盘：https://pan.baidu.com/s/1eSxFHrs  
-开发套件购买：https://shop436829391.taobao.com/
-
 ### 合宙开源项目lua开发一般步骤
 如果用户手上已经有合宙Air200模块开发板或小蛮GPS定位器，此时就具备实体开发调试的基本条件了
 

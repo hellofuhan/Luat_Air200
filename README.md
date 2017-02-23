@@ -2,12 +2,6 @@
 Luat = Lua +  AT  
 OpenLuat = 合宙AirM2M open source project
 
-合宙OpenLuat开源技术支持  
-QQ讨论群：201848376  
-开源社区：www.openluat.com  
-GitHub：https://github.com/airm2m-open/luat  
-百度网盘：https://pan.baidu.com/s/1eSxFHrs  
-开发套件：https://shop436829391.taobao.com/
 
 ## 合宙github开源项目Luat介绍
 
@@ -27,3 +21,5 @@ Air200 模块是合宙（AirM2M）推出的第一款开源模块，基于RDA平�
 一般用户只需修改我司提供的lua脚本，即可快速完成二次开发，而不会修改core基础软件。这部分用户，请参考：合宙开源项目lua开发须知.md
 
 还有一部分用户，不仅需要修改lua脚本，还要修改core基础软件，这部分用户，请参考：合宙开源项目core+lua开发须知.md
+
+注意：还有一部分用户，只需要MCU通过物理串口发送AT命令控制模块，对这部分用户，Air200出货软件已经直接满足，不需要再更新模块软件。
