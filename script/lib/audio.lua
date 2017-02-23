@@ -385,7 +385,7 @@ ril.regrsp("+QTTS",audiorsp,0)
 function setspeakervol(vol)
 	audio.setvol(vol)
 	speakervol = vol
-	dispatch("SPEAKER_VOLUME_SET_CNF",true)
+	--dispatch("SPEAKER_VOLUME_SET_CNF",true)
 end
 
 --[[
@@ -402,13 +402,13 @@ end
 函数名：setaudiochannel
 功能  ：设置音频通道
 参数  ：
-		channel：音频通道，跟硬件设计有关，用户程序需要根据硬件配置
+		channel：音频通道，跟硬件设计有关，用户程序需要根据硬件配置，Air200模块就固定用audiocore.HANDSET
 返回值：无
 ]]
 function setaudiochannel(channel)
 	audio.setchannel(channel)
 	audiochannel = channel
-	dispatch("AUDIO_CHANNEL_SET_CNF",true)
+	--dispatch("AUDIO_CHANNEL_SET_CNF",true)
 end
 
 --[[
@@ -445,7 +445,7 @@ end
 function setmicrophonegain(vol)
 	audio.setmicvol(vol)
 	microphonevol = vol
-	dispatch("MICROPHONE_GAIN_SET_CNF",true)
+	--dispatch("MICROPHONE_GAIN_SET_CNF",true)
 end
 
 --[[
@@ -478,3 +478,7 @@ end
 
 --注册底层上报的rtos.MSG_AUDIO外部消息的处理函数
 sys.regmsg(rtos.MSG_AUDIO,audiomsg)
+--默认音频通道设置为RECEIVER，因为Air200模块只支持RECEIVER通道
+setaudiochannel(audio.HANDSET)
+--默认音量等级设置为4级，4级是中间等级，最低为0级，最高为7级
+setspeakervol(audio.VOL4)
