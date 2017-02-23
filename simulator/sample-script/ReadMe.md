@@ -59,6 +59,8 @@ git clone git@github.com:airm2m-open/luat.git
 
 <p>Windows 64-bit，sample-script --> x64_lib --> 'VC_x64Runtime.exe'</p>
 
+<p>Win7/Win8系统已自带C运行时库，可不用安装C运行时库。</p>
+
 <a name="title50"></a>
 <h2 id="title50" name="title50">5. 导入样例工程</h2>
 <p>导入样例工程前，必须创建一个自己的工作空间(Workspace)，并选择此工作空间作为调试Lua脚本的目录。</p>
@@ -147,6 +149,8 @@ git clone git@github.com:airm2m-open/luat.git
 2.建议使用MarkdownPad来阅读，而且必须破解，否则无法查看ReadMe.md中的图片。</br>
 3.当前，用手机上的浏览器阅读本帖子无法查看图片。</br>
 </p>
+
+[Luat模拟器论坛](http://bbs.airm2m.com/forum.php?mod=forumdisplay&fid=81 "Luat模拟器论坛")
 
 <div style="height:130px;">&nbsp;</div>
 <div style="height:130px;">&nbsp;</div>
