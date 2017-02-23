@@ -48,8 +48,6 @@ local procer =
 sys.regapp(connected,"CALL_CONNECTED") --建立通话后，lib中的cc.lua会调用sys.dispatch接口抛出CALL_CONNECTED消息
 sys.regapp(procer)
 
---设置speaker音频通道，这个跟硬件有关
-audio.setaudiochannel(audiocore.AUX_HANDSET)
 --设置mic增益
 audio.setmicrophonegain(7)
 
