@@ -238,7 +238,7 @@ end
 ]]
 function reqcheck()
 	state = "CHECK"
-	send(lid,string.format("%s,%s,%s",misc.getimei(),base.PROJECT,base.VERSION))
+	send(lid,string.format("%s,%s,%s",misc.getimei(),base.PROJECT.."_"..sys.getcorever(),base.VERSION))
 	sys.timer_start(retry,CMD_GET_TIMEOUT)
 end
 

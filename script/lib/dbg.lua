@@ -66,7 +66,10 @@ end
 local function writerr(append,s)	
 	print("dbg_w",append,s)
 	if s then
-		writetxt(DBG_FILE,append and (readtxt(DBG_FILE)..s) or s)		
+		local str = (append and (readtxt(DBG_FILE)..s) or s)
+		if string.len(str)<900 then
+			writetxt(DBG_FILE,str)
+		end
 	end
 end
 
@@ -121,7 +124,7 @@ end
 local function snd()
 	local data = (luaerr or "") .. (inf or "")
 	if string.len(data) > 0 then
-		link.send(lid,_G.PROJECT .. "," .. (_G.VERSION and (_G.VERSION .. ",") or "") .. misc.getimei() .. "," .. data)
+		link.send(lid,_G.PROJECT .."_"..sys.getcorever() .. "," .. (_G.VERSION and (_G.VERSION .. ",") or "") .. misc.getimei() .. "," .. data)
 		sys.timer_start(snd,FREQ)
 		sys.timer_start(rcvtimeout,20000)
 	end
@@ -250,7 +253,7 @@ end
 ]]
 function saverr(s)
 	writerr(true,s)
-	init()
+	--init()不要立即上报，等待下次开机再上报，否则会影响CIPSHUT的顺利执行，导致用户程序应用调用异常
 end
 
 --[[
