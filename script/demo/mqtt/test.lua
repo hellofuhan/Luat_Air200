@@ -31,11 +31,23 @@ topic、client identifier、user、password只支持ascii字符串
 2、连接上后台后，终端每隔1分钟分别会发送一个qos为0和1的PUBLISH报文，参考loc0snd和loc1snd
 ]]
 
+--[[
+函数名：print
+功能  ：打印接口，此文件中的所有打印都会加上test前缀
+参数  ：无
+返回值：无
+]]
 local function print(...)
 	_G.print("test",...)
 end
 
---MQTT CONNECT报文中password字段用到的加密算法
+--[[
+函数名：enpwd
+功能  ：MQTT CONNECT报文中password字段用到的加密算法
+参数  ：
+		s：ascii字符串
+返回值：加密后的ascii字符串
+]]
 local function enpwd(s)
 	local tmp,ret,i = 0,""
 	for i=1,string.len(s) do
@@ -48,94 +60,194 @@ local function enpwd(s)
 	return common.binstohexs(ret)
 end
 
---终端发送MQTT CONNECT报文后，把数据保存起来，如果超时10秒中没有收到CONNACK或者CONNACK返回失败，则会重发CONNECT报文
---重发的触发开关在mqttdup.lua中
+--[[
+函数名：mqttconncb
+功能  ：发送MQTT CONNECT报文后的异步回调函数
+参数  ：		
+		result： bool类型，发送结果，true为成功，其他为失败
+		data：MQTT CONNECT报文数据
+返回值：无
+]]
 function mqttconncb(result,data)
+	--把MQTT CONNECT报文数据保存起来，如果超时DUP_TIME秒中没有收到CONNACK或者CONNACK返回失败，则会自动重发CONNECT报文
+	--重发的触发开关在mqttdup.lua中
 	mqttdup.ins(tmqttpack["MQTTCONN"].mqttduptyp,data)
 end
 
---封装MQTT CONNECT报文数据
+--[[
+函数名：mqttconndata
+功能  ：组包MQTT CONNECT报文数据
+参数  ：无		
+返回值：CONNECT报文数据和报文参数
+]]
 function mqttconndata()
 	return mqtt.pack(mqtt.CONNECT,KEEP_ALIVE_TIME,misc.getimei(),misc.getimei(),enpwd(misc.getimei()))
 end
 
---终端发送MQTT SUBSCRIBE报文后，把数据保存起来，如果超时10秒中没有收到SUBACK，则会重发SUBSCRIBE报文
---重发的触发开关在mqttdup.lua中
+--[[
+函数名：mqttsubcb
+功能  ：发送MQTT SUBSCRIBE报文后的异步回调函数
+参数  ：		
+		result： bool类型，发送结果，true为成功，其他为失败
+		v：SUBSCRIBE报文的参数，table类型{dup=true,topic=mqttsubdata中组包时的topic,seq=mqttsubdata中组包时生成的序列号}
+返回值：无
+]]
 function mqttsubcb(result,v)
+	--重新封装MQTT SUBSCRIBE报文，重复标志设为true，序列号和topic都是用原始值，数据保存起来，如果超时DUP_TIME秒中没有收到SUBACK，则会自动重发SUBSCRIBE报文
+	--重发的触发开关在mqttdup.lua中
 	mqttdup.ins(tmqttpack["MQTTSUB"].mqttduptyp,mqtt.pack(mqtt.SUBSCRIBE,v),v.seq)
 end
 
---封装MQTT SUBSCRIBE报文数据
+--[[
+函数名：mqttsubdata
+功能  ：组包MQTT SUBSCRIBE报文数据
+参数  ：无		
+返回值：SUBSCRIBE报文数据和报文参数
+]]
 function mqttsubdata()
 	return mqtt.pack(mqtt.SUBSCRIBE,{topic={"/v1/device/"..misc.getimei().."/devparareq/+", "/v1/device/"..misc.getimei().."/deveventreq/+"}})
 end
 
---终端发送MQTT DICONNECT报文后，关闭socket连接
+--[[
+函数名：mqttdiscb
+功能  ：发送MQTT DICONNECT报文后的异步回调函数
+参数  ：		
+		result： bool类型，发送结果，true为成功，其他为失败
+		v：DICONNECT报文的参数，目前固定为"MQTTDISC"，无意义
+返回值：无
+]]
 function mqttdiscb(result,v)
+	--关闭socket连接
 	linkapp.sckdisc(SCK_IDX)
 end
 
---封装MQTT DISCONNECT报文数据
+--[[
+函数名：mqttdiscdata
+功能  ：组包MQTT DISCONNECT报文数据
+参数  ：无		
+返回值：DISCONNECT报文数据和报文参数
+]]
 function mqttdiscdata()
 	return mqtt.pack(mqtt.DISCONNECT)
 end
 
---发送MQTT DISCONNECT报文
+--[[
+函数名：disconnect
+功能  ：发送MQTT DISCONNECT报文
+参数  ：无		
+返回值：无
+]]
 local function disconnect()
 	mqttsnd("MQTTDISC")
 end
 
---封装MQTT PINGREQ报文数据
+--[[
+函数名：mqttpingreqdata
+功能  ：组包MQTT PINGREQ报文数据
+参数  ：无		
+返回值：PINGREQ报文数据和报文参数
+]]
 function mqttpingreqdata()
 	return mqtt.pack(mqtt.PINGREQ)
 end
 
---发送MQTT PINGREQ报文
---然后启动定时器：如果保活时间+30秒内，没有收到pingrsp，则发送MQTT DISCONNECT报文
+--[[
+函数名：pingreq
+功能  ：发送MQTT PINGREQ报文
+参数  ：无		
+返回值：无
+]]
 local function pingreq()
 	mqttsnd("MQTTPINGREQ")
 	if not sys.timer_is_active(disconnect) then
+		--启动定时器：如果保活时间+30秒内，没有收到pingrsp，则发送MQTT DISCONNECT报文
 		sys.timer_start(disconnect,(KEEP_ALIVE_TIME+30)*1000)
 	end
 end
 
---启动定时器，60秒后再次发送qos为0的PULISH报文
+--[[
+函数名：mqttpubloc0cb
+功能  ：发送qos为0的MQTT PUBLISH报文后的异步回调函数
+参数  ：		
+		result： bool类型，发送结果，true为成功，其他为失败
+		v：PUBLISH报文的参数，目前固定为"MQTTPUBLOC0"，无意义
+返回值：无
+]]
 function mqttpubloc0cb(result,v)
+	--启动定时器，60秒后再次发送qos为0的PULISH报文
 	sys.timer_start(loc0snd,60000)
 end
 
---封装qos为0的MQTT PUBLISH报文数据
+--[[
+函数名：mqttpubloc0data
+功能  ：组包qos为0的MQTT PUBLISH报文数据
+参数  ：无		
+返回值：PUBLISH报文数据和报文参数
+]]
 function mqttpubloc0data()
 	return mqtt.pack(mqtt.PUBLISH,{qos=0,topic="/v1/device/"..misc.getimei().."/devdata",payload="loc data0"})
 end
 
---发送qos为0的MQTT PUBLISH报文
+--[[
+函数名：loc0snd
+功能  ：发送qos为0的MQTT PUBLISH报文
+参数  ：无		
+返回值：无
+]]
 function loc0snd()
 	mqttsnd("MQTTPUBLOC0")
 end
 
---启动定时器，60秒后再次发送qos为1的PULISH报文
---终端发送qos为1的MQTT PUBLISH报文后，把数据保存起来，如果超时10秒中没有收到PUBACK，则会重发该报文
---重发的触发开关在mqttdup.lua中
+
+--[[
+函数名：mqttpubloc1cb
+功能  ：发送qos为1的MQTT PUBLISH报文后的异步回调函数
+参数  ：		
+		result： bool类型，发送结果，true为成功，其他为失败
+		v：PUBLISH报文的参数，table类型{dup=true,topic=mqttpubloc1data中组包时的topic,seq=mqttpubloc1data中组包时生成的序列号,payload=mqttpubloc1data中组包时的payload}
+返回值：无
+]]
 function mqttpubloc1cb(result,v)
+	--启动定时器，60秒后再次发送qos为1的PULISH报文
 	sys.timer_start(loc1snd,60000)
+	--重新封装MQTT PUBLISH报文，重复标志设为true，序列号、topic、payload都是用原始值，数据保存起来，如果超时DUP_TIME秒中没有收到PUBACK，则会自动重发PUBLISH报文
+	--重发的触发开关在mqttdup.lua中
 	mqttdup.ins(tmqttpack["MQTTPUBLOC1"].mqttduptyp,mqtt.pack(mqtt.PUBLISH,v),v.seq)
 end
 
---封装qos为1的MQTT PUBLISH报文数据
+--[[
+函数名：mqttpubloc1data
+功能  ：组包qos为1的MQTT PUBLISH报文数据
+参数  ：无		
+返回值：PUBLISH报文数据和报文参数
+]]
 function mqttpubloc1data()
 	return mqtt.pack(mqtt.PUBLISH,{qos=1,topic="/v1/device/"..misc.getimei().."/devdata",payload="loc data1"})
 end
 
---发送qos为1的MQTT PUBLISH报文
+--[[
+函数名：loc1snd
+功能  ：发送qos为1的MQTT PUBLISH报文
+参数  ：无		
+返回值：无
+]]
 function loc1snd()
 	mqttsnd("MQTTPUBLOC1")
 end
 
-function snd(data,para,pos,ins)
-	return linkapp.scksnd(SCK_IDX,data,para,pos,ins)
+--[[
+函数名：snd
+功能  ：调用发送接口发送数据
+参数  ：
+        data：发送的数据，在发送结果事件处理函数ntfy中，会赋值到item.data中
+		para：发送的参数，在发送结果事件处理函数ntfy中，会赋值到item.para中 
+返回值：调用发送接口的结果（并不是数据发送是否成功的结果，数据发送是否成功的结果在ntfy中的SEND事件中通知），true为成功，其他为失败
+]]
+function snd(data,para)
+	return linkapp.scksnd(SCK_IDX,data,para)
 end
 
+--mqtt应用报文表
 tmqttpack =
 {
 	MQTTCONN = {sndpara="MQTTCONN",mqttyp=mqtt.CONNECT,mqttduptyp="CONN",mqttdatafnc=mqttconndata,sndcb=mqttconncb},
@@ -152,6 +264,13 @@ local function getidbysndpara(para)
 	end
 end
 
+--[[
+函数名：mqttsnd
+功能  ：MQTT报文发送总接口，根据报文类型，在mqtt应用报文表中找到组包函数，然后发送数据
+参数  ：
+        typ：报文类型
+返回值：无
+]]
 function mqttsnd(typ)
 	if not tmqttpack[typ] then print("mqttsnd typ error",typ) return end
 	local mqttyp = tmqttpack[typ].mqttyp
@@ -171,12 +290,12 @@ function mqttsnd(typ)
 		snd(dat,tmqttpack[typ].sndpara)
 	elseif mqttyp==mqtt.DISCONNECT then
 		if not snd(dat,tmqttpack[typ].sndpara) and tmqttpack[typ].sndcb then
-			tmqttpack[typ].sndcb(false,para)
+			tmqttpack[typ].sndcb(false,tmqttpack[typ].sndpara)
 		end
 	elseif mqttyp==mqtt.PUBLISH then
 		if typ=="MQTTPUBLOC0" then
 			if not snd(dat,tmqttpack[typ].sndpara) and tmqttpack[typ].sndcb then
-				tmqttpack[typ].sndcb(false,dat)
+				tmqttpack[typ].sndcb(false,tmqttpack[typ].sndpara)
 			end
 		elseif typ=="MQTTPUBLOC1" then
 			if not snd(dat,{typ=tmqttpack[typ].sndpara,val=para}) and tmqttpack[typ].sndcb then
@@ -187,13 +306,25 @@ function mqttsnd(typ)
 	end	
 end
 
+--[[
+函数名：reconn
+功能  ：重连后台处理
+        一个连接周期内的动作：如果连接后台失败，会尝试重连，重连间隔为RECONN_PERIOD秒，最多重连RECONN_MAX_CNT次
+        如果一个连接周期内都没有连接成功，则等待RECONN_CYCLE_PERIOD秒后，重新发起一个连接周期
+        如果连续RECONN_CYCLE_MAX_CNT次的连接周期都没有连接成功，则重启软件
+参数  ：无
+返回值：无
+]]
 local function reconn()
 	print("reconn",reconncnt,reconning,reconncyclecnt)
+	--conning表示正在尝试连接后台，一定要判断此变量，否则有可能发起不必要的重连，导致reconncnt增加，实际的重连次数减少
 	if reconning then return end
+	--一个连接周期内的重连
 	if reconncnt < RECONN_MAX_CNT then		
 		reconncnt = reconncnt+1
 		link.shut()
-		connect(linkapp.NORMAL)
+		connect()
+	--一个连接周期的重连都失败
 	else
 		reconncnt,reconncyclecnt = 0,reconncyclecnt+1
 		if reconncyclecnt >= RECONN_CYCLE_MAX_CNT then
@@ -203,7 +334,16 @@ local function reconn()
 	end
 end
 
---socket状态的处理函数
+--[[
+函数名：ntfy
+功能  ：socket状态的处理函数
+参数  ：
+        idx：number类型，linkapp中维护的socket idx，跟调用linkapp.sckconn时传入的第一个参数相同，程序可以忽略不处理
+        evt：string类型，消息事件类型
+		result： bool类型，消息事件结果，true为成功，其他为失败
+		item：table类型，{data=,para=}，消息回传的参数和数据，目前只是在SEND类型的事件中用到了此参数，例如调用linkapp.scksnd时传入的第2个和第3个参数分别为dat和par，则item={data=dat,para=par}
+返回值：无
+]]
 function ntfy(idx,evt,result,item,rspstr)
 	print("ntfy",evt,result,item)
 	--连接结果
@@ -252,6 +392,13 @@ function ntfy(idx,evt,result,item,rspstr)
 	end
 end
 
+--[[
+函数名：connack
+功能  ：处理服务器下发的MQTT CONNACK报文
+参数  ：
+        packet：解析后的报文格式，table类型{suc=是否连接成功}
+返回值：无
+]]
 local function connack(packet)
 	print("connack",packet.suc)
 	if packet.suc then
@@ -259,10 +406,17 @@ local function connack(packet)
 		mqttdup.rmv(tmqttpack["MQTTCONN"].mqttduptyp)
 		
 		--订阅主题
-		mqttsnd("MQTTSUB")		
+		mqttsnd("MQTTSUB")
 	end
 end
 
+--[[
+函数名：suback
+功能  ：处理服务器下发的MQTT SUBACK报文
+参数  ：
+        packet：解析后的报文格式，table类型{seq=对应的SUBSCRIBE报文序列号}
+返回值：无
+]]
 local function suback(packet)
 	print("suback",common.binstohexs(packet.seq))
 	mqttdup.rmv(tmqttpack["MQTTSUB"].mqttduptyp,nil,packet.seq)
@@ -270,21 +424,42 @@ local function suback(packet)
 	loc1snd()
 end
 
+--[[
+函数名：puback
+功能  ：处理服务器下发的MQTT PUBACK报文
+参数  ：
+        packet：解析后的报文格式，table类型{seq=对应的PUBLISH报文序列号}
+返回值：无
+]]
 local function puback(packet)	
 	local typ = mqttdup.getyp(packet.seq) or ""
 	print("puback",common.binstohexs(packet.seq),typ)
 	mqttdup.rmv(nil,nil,packet.seq)
 end
 
+--[[
+函数名：svrpublish
+功能  ：处理服务器下发的MQTT PUBLISH报文
+参数  ：
+        mqttpacket：解析后的报文格式，table类型{qos=,topic,seq,payload}
+返回值：无
+]]
 local function svrpublish(mqttpacket)
 	print("svrpublish",mqttpacket.topic,mqttpacket.seq,mqttpacket.payload)	
 	if mqttpacket.qos == 1 then snd(mqtt.pack(mqtt.PUBACK,mqttpacket.seq)) end	
 end
 
+--[[
+函数名：pingrsp
+功能  ：处理服务器下发的MQTT PINGRSP报文
+参数  ：无
+返回值：无
+]]
 local function pingrsp()
 	sys.timer_stop(disconnect)
 end
 
+--服务器下发报文处理表
 mqttcmds = {
 	[mqtt.CONNACK] = connack,
 	[mqtt.SUBACK] = suback,
@@ -293,15 +468,34 @@ mqttcmds = {
 	[mqtt.PINGRSP] = pingrsp,
 }
 
+--[[
+函数名：datinactive
+功能  ：数据通信异常处理
+参数  ：无
+返回值：无
+]]
 local function datinactive()
     dbg.restart("SVRNODATA")
 end
 
+--[[
+函数名：checkdatactive
+功能  ：重新开始检测“数据通信是否异常”
+参数  ：无
+返回值：无
+]]
 local function checkdatactive()
 	sys.timer_start(datinactive,KEEP_ALIVE_TIME*1000*3+30000) --3倍保活时间+半分钟
 end
 
---socket接收数据的处理函数
+--[[
+函数名：rcv
+功能  ：socket接收数据的处理函数
+参数  ：
+        id ：linkapp中维护的socket idx，跟调用linkapp.sckconn时传入的第一个参数相同，程序可以忽略不处理
+        data：接收到的数据
+返回值：无
+]]
 function rcv(id,data)
 	print("rcv",slen(data)>200 and slen(data) or common.binstohexs(data))
 	sys.timer_start(pingreq,KEEP_ALIVE_TIME*1000/2)
@@ -323,34 +517,63 @@ function rcv(id,data)
 	end
 end
 
---创建到后台服务器的连接
---如果数据网络还没有准备好，连接请求会被挂起，等数据网络准备就绪后，自动去连接后台
---ntfy：socket状态的处理函数
---rcv：socket接收数据的处理函数
-function connect(cause)	
-	linkapp.sckconn(SCK_IDX,cause,PROT,ADDR,PORT,ntfy,rcv)
+--[[
+函数名：connect
+功能  ：创建到后台服务器的连接；
+        如果数据网络已经准备好，会理解连接后台；否则，连接请求会被挂起，等数据网络准备就绪后，自动去连接后台
+		ntfy：socket状态的处理函数
+		rcv：socket接收数据的处理函数
+参数  ：无
+返回值：无
+]]
+function connect()	
+	linkapp.sckconn(SCK_IDX,linkapp.NORMAL,PROT,ADDR,PORT,ntfy,rcv)
 	reconning = true
 end
 
+--[[
+函数名：connect
+功能  ：mqttdup中触发的重发报文发送后的异步回调
+参数  ：
+		result： bool类型，发送结果，true为成功，其他为失败
+		v：报文数据
+返回值：无
+]]
 function mqttdupcb(result,v)
 	mqttdup.rsm(v)
 end
 
+--[[
+函数名：mqttdupind
+功能  ：mqttdup中触发的重发报文处理
+参数  ：
+		s：报文数据
+返回值：无
+]]
 local function mqttdupind(s)
-	if not snd(s,"MQTTDUP") then mqttdupcb(s) end
+	if not snd(s,"MQTTDUP") then mqttdupcb(false,s) end
 end
 
+--[[
+函数名：mqttdupfail
+功能  ：mqttdup中触发的重发报文，在最大重发次数内，都发送失败的通知消息处理
+参数  ：
+		t：报文的用户自定义类型
+		s：报文数据
+返回值：无
+]]
 local function mqttdupfail(t,s)
     
 end
 
+--mqttdup重发消息处理函数表
 local procer =
 {
 	MQTT_DUP_IND = mqttdupind,
 	MQTT_DUP_FAIL = mqttdupfail,
 }
-
+--注册消息的处理函数
 sys.regapp(procer)
 
-connect(linkapp.NORMAL)
+connect()
 checkdatactive()

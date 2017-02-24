@@ -61,9 +61,7 @@ end
 --[[
 函数名：locrpt
 功能  ：发送位置包数据到后台
-参数  ：  
-        result： bool类型，发送结果或者是否超时，true为成功或者超时，其他为失败
-		item：table类型，{data=,para=}，消息回传的参数和数据，例如调用linkapp.scksnd时传入的第2个和第3个参数分别为dat和par，则item={data=dat,para=par}
+参数  ：无 
 返回值：无
 ]]
 function locrpt()
@@ -79,7 +77,7 @@ function locrpt()
 end
 
 --[[
-函数名：sndcb
+函数名：locrptcb
 功能  ：位置包发送结果处理，发送成功或者超时，都会进入飞行模式，启动5分钟的“退出飞行模式，连接后台”定时器
 参数  ：  
         result： bool类型，发送结果或者是否超时，true为成功或者超时，其他为失败

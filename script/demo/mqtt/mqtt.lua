@@ -1,18 +1,26 @@
-module(...,package.seeall)
+--[[
+模块名称：mqtt协议管理
+模块功能：实现协议的组包和解包，请首先阅读http://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html了解mqtt协议
+模块最后修改时间：2017.02.24
+]]
 
 --[[
 目前只支持QoS=0和QoS=1，不支持QoS=2
 topic、client identifier、user、password只支持ascii字符串
 ]]
 
+module(...,package.seeall)
+
 local lpack = require"pack"
 require"mqttdup"
 
 local slen,sbyte,ssub,sgsub,schar,srep,smatch,sgmatch = string.len,string.byte,string.sub,string.gsub,string.char,string.rep,string.match,string.gmatch
+--报文类型
 CONNECT,CONNACK,PUBLISH,PUBACK,PUBREC,PUBREL,PUBCOMP,SUBSCRIBE,SUBACK,UNSUBSCRIBE,UNSUBACK,PINGREQ,PINGRSP,DISCONNECT = 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 
 local PRONAME,PROVER,CLEANSESS = "MQIsdp",3,1
 
+--报文序列号
 local seq = 1
 
 local function print(...)
@@ -74,6 +82,14 @@ function iscomplete(s)
 	end
 end
 
+--[[
+函数名：pack
+功能  ：MQTT组包
+参数  ：
+		typ：报文类型
+		...：可变参数
+返回值：第一个返回值是报文数据，第二个返回值是每种报文自定义的参数
+]]
 function pack(typ,...)
 	local para = {}
 	local function connect(alive,id,user,pwd)
@@ -145,6 +161,13 @@ end
 
 local rcvpacket = {}
 
+--[[
+函数名：unpack
+功能  ：MQTT解包
+参数  ：
+		s：一条完整的报文
+返回值：如果解包成功，返回一个table类型数据，数据元素由报文类型决定；如果解包失败，返回nil
+]]
 function unpack(s)
 	rcvpacket = {}
 

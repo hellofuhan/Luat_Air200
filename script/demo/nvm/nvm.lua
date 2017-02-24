@@ -115,6 +115,13 @@ local function load()
 	upd()
 end
 
+--[[
+函数名：save
+功能  ：保存参数文件
+参数  ：
+		s：是否真正保存，true保存，false或者nil不保存
+返回值：无
+]]
 local function save(s)
 	if not s then return end
 	local f = io.open(paraname,"wb")
@@ -132,11 +139,16 @@ local function save(s)
 	f:close()
 end
 
---设置某个参数的值
---k：参数名
---v：将要设置的新值
---r：设置原因，只有传入了有效参数，并且v的新值和旧值发生了改变，才会抛出TPARA_CHANGED_IND消息
---s：是否需要写入到文件系统中，false不写入，其余的都写入
+--[[
+函数名：set
+功能  ：设置某个参数的值
+参数  ：
+		k：参数名
+		v：将要设置的新值
+		r：设置原因，只有传入了有效参数，并且v的新值和旧值发生了改变，才会抛出PARA_CHANGED_IND消息
+		s：是否需要写入到文件系统中，false不写入，其余的都写入
+返回值：true
+]]
 function set(k,v,r,s)
 	local bchg
 	if type(v) == "table" then
@@ -155,12 +167,17 @@ function set(k,v,r,s)
 	return true
 end
 
---设置table类型的参数中的某一项的值
---k：table参数名
---kk：table参数中的键值
---v：将要设置的新值
---r：设置原因，只有传入了有效参数，并且v的新值和旧值发生了改变，才会抛出TPARA_CHANGED_IND消息
---s：是否需要写入到文件系统中，false不写入，其余的都写入
+--[[
+函数名：sett
+功能  ：设置table类型的参数中的某一项的值
+参数  ：
+		k：table参数名
+		kk：table参数中的键值
+		v：将要设置的新值
+		r：设置原因，只有传入了有效参数，并且v的新值和旧值发生了改变，才会抛出TPARA_CHANGED_IND消息
+		s：是否需要写入到文件系统中，false不写入，其余的都写入
+返回值：true
+]]
 function sett(k,kk,v,r,s)
 	if para[k][kk] ~= v then
 		para[k][kk] = v
@@ -170,13 +187,23 @@ function sett(k,kk,v,r,s)
 	return true
 end
 
---把参数从内存写到文件中
+--[[
+函数名：flush
+功能  ：把参数从内存写到文件中
+参数  ：无
+返回值：无
+]]
 function flush()
 	save(true)
 end
 
---读取参数值
---k：参数名
+--[[
+函数名：get
+功能  ：读取参数值
+参数  ：
+		k：参数名
+返回值：参数值
+]]
 function get(k)
 	if type(para[k]) == "table" then
 		local tmp = {}
@@ -189,9 +216,14 @@ function get(k)
 	end
 end
 
---读取table类型的参数中的某一项的值
---k：table参数名
---kk：table参数中的键值
+--[[
+函数名：gett
+功能  ：读取table类型的参数中的某一项的值
+参数  ：
+		k：table参数名
+		kk：table参数中的键值
+返回值：参数值
+]]
 function gett(k,kk)
 	return para[k][kk]
 end

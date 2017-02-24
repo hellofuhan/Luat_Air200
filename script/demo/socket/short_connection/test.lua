@@ -26,16 +26,34 @@ local RECONN_MAX_CNT,RECONN_PERIOD,RECONN_CYCLE_MAX_CNT,RECONN_CYCLE_PERIOD = 3,
 --reconning:是否在尝试连接
 local reconncnt,reconncyclecnt,reconning = 0,0
 
+--[[
+函数名：print
+功能  ：打印接口，此文件中的所有打印都会加上test前缀
+参数  ：无
+返回值：无
+]]
 local function print(...)
 	_G.print("test",...)
 end
 
-function snd(data,para,pos,ins)
-	return linkapp.scksnd(SCK_IDX,data,para,pos,ins)
+--[[
+函数名：snd
+功能  ：调用发送接口发送数据
+参数  ：
+        data：发送的数据，在发送结果事件处理函数ntfy中，会赋值到item.data中
+		para：发送的参数，在发送结果事件处理函数ntfy中，会赋值到item.para中 
+返回值：调用发送接口的结果（并不是数据发送是否成功的结果，数据发送是否成功的结果在ntfy中的SEND事件中通知），true为成功，其他为失败
+]]
+function snd(data,para)
+	return linkapp.scksnd(SCK_IDX,data,para)
 end
 
-
---发送位置包数据2到后台
+--[[
+函数名：locrpt2
+功能  ：发送位置包数据2到后台
+参数  ：无 
+返回值：无
+]]
 function locrpt2()
 	print("locrpt2",linksta)
 	--if linksta then
@@ -43,8 +61,14 @@ function locrpt2()
 	--end
 end
 
---位置包2发送回调
---启动定时器，20秒钟后再次发送位置包2
+--[[
+函数名：locrpt2cb
+功能  ：位置包2发送结果处理，启动定时器，20秒钟后再次发送位置包2
+参数  ：  
+        result： bool类型，发送结果或者是否超时，true为成功或者超时，其他为失败
+		item：table类型，{data=,para=}，消息回传的参数和数据，例如调用linkapp.scksnd时传入的第2个和第3个参数分别为dat和par，则item={data=dat,para=par}
+返回值：无
+]]
 function locrpt2cb(item,result)
 	print("locrpt2cb",linksta)
 	--if linksta then
@@ -54,7 +78,12 @@ function locrpt2cb(item,result)
 end
 
 
---发送位置包数据1到后台
+--[[
+函数名：locrpt1
+功能  ：发送位置包数据1到后台
+参数  ：无 
+返回值：无
+]]
 function locrpt1()
 	print("locrpt1",linksta)
 	--if linksta then
@@ -62,8 +91,14 @@ function locrpt1()
 	--end
 end
 
---位置包1发送回调
---启动定时器，10秒钟后再次发送位置包1
+--[[
+函数名：locrpt1cb
+功能  ：位置包1发送结果处理，启动定时器，10秒钟后再次发送位置包2
+参数  ：  
+        result： bool类型，发送结果或者是否超时，true为成功或者超时，其他为失败
+		item：table类型，{data=,para=}，消息回传的参数和数据，例如调用linkapp.scksnd时传入的第2个和第3个参数分别为dat和par，则item={data=dat,para=par}
+返回值：无
+]]
 function locrpt1cb(item,result)
 	print("locrpt1cb",linksta)
 	--if linksta then
@@ -72,6 +107,14 @@ function locrpt1cb(item,result)
 	--end
 end
 
+--[[
+函数名：sndcb
+功能  ：发送数据结果事件的处理
+参数  ：  
+        result： bool类型，消息事件结果，true为成功，其他为失败
+		item：table类型，{data=,para=}，消息回传的参数和数据，例如调用linkapp.scksnd时传入的第2个和第3个参数分别为dat和par，则item={data=dat,para=par}
+返回值：无
+]]
 local function sndcb(item,result)
 	print("sndcb",item.para,result)
 	if not item.para then return end
@@ -83,13 +126,25 @@ local function sndcb(item,result)
 	if not result then link.shut() end
 end
 
+--[[
+函数名：reconn
+功能  ：重连后台处理
+        一个连接周期内的动作：如果连接后台失败，会尝试重连，重连间隔为RECONN_PERIOD秒，最多重连RECONN_MAX_CNT次
+        如果一个连接周期内都没有连接成功，则等待RECONN_CYCLE_PERIOD秒后，重新发起一个连接周期
+        如果连续RECONN_CYCLE_MAX_CNT次的连接周期都没有连接成功，则重启软件
+参数  ：无
+返回值：无
+]]
 local function reconn()
 	print("reconn",reconncnt,reconning,reconncyclecnt)
+	--conning表示正在尝试连接后台，一定要判断此变量，否则有可能发起不必要的重连，导致reconncnt增加，实际的重连次数减少
 	if reconning then return end
+	--一个连接周期内的重连
 	if reconncnt < RECONN_MAX_CNT then		
 		reconncnt = reconncnt+1
 		link.shut()
-		connect(linkapp.NORMAL)
+		connect()
+	--一个连接周期的重连都失败
 	else
 		reconncnt,reconncyclecnt = 0,reconncyclecnt+1
 		if reconncyclecnt >= RECONN_CYCLE_MAX_CNT then
@@ -99,7 +154,16 @@ local function reconn()
 	end
 end
 
---socket状态的处理函数
+--[[
+函数名：ntfy
+功能  ：socket状态的处理函数
+参数  ：
+        idx：number类型，linkapp中维护的socket idx，跟调用linkapp.sckconn时传入的第一个参数相同，程序可以忽略不处理
+        evt：string类型，消息事件类型
+		result： bool类型，消息事件结果，true为成功，其他为失败
+		item：table类型，{data=,para=}，消息回传的参数和数据，目前只是在SEND类型的事件中用到了此参数，例如调用linkapp.scksnd时传入的第2个和第3个参数分别为dat和par，则item={data=dat,para=par}
+返回值：无
+]]
 function ntfy(idx,evt,result,item)
 	print("ntfy",evt,result,item,hasconnected)
 	--连接结果
@@ -147,18 +211,30 @@ function ntfy(idx,evt,result,item)
 	end
 end
 
---socket接收数据的处理函数
+--[[
+函数名：rcv
+功能  ：socket接收数据的处理函数
+参数  ：
+        idx ：linkapp中维护的socket idx，跟调用linkapp.sckconn时传入的第一个参数相同，程序可以忽略不处理
+        data：接收到的数据
+返回值：无
+]]
 function rcv(id,data)
 	print("rcv",data)
 end
 
---创建到后台服务器的连接
---如果数据网络还没有准备好，连接请求会被挂起，等数据网络准备就绪后，自动去连接后台
---ntfy：socket状态的处理函数
---rcv：socket接收数据的处理函数
-function connect(cause)	
-	linkapp.sckconn(SCK_IDX,cause,PROT,ADDR,PORT,ntfy,rcv)
+--[[
+函数名：connect
+功能  ：创建到后台服务器的连接；
+        如果数据网络已经准备好，会理解连接后台；否则，连接请求会被挂起，等数据网络准备就绪后，自动去连接后台
+		ntfy：socket状态的处理函数
+		rcv：socket接收数据的处理函数
+参数  ：无
+返回值：无
+]]
+function connect()	
+	linkapp.sckconn(SCK_IDX,linkapp.NORMAL,PROT,ADDR,PORT,ntfy,rcv)
 	reconning = true
 end
 
-connect(linkapp.NORMAL)
+connect()
