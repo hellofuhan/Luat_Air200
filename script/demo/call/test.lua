@@ -1,33 +1,64 @@
-module(...,package.seeall)
-
 --[[
-功能需求：
-1、第奇数次来电呼入，自动拒接
-2、第偶数次来电呼入，自动接听，接听后10秒钟，如果通话仍然存在，则主动挂断
-3、开机1分钟后主动呼叫10086，接通后10秒钟，如果通话仍然存在，则主动挂断
+模块名称：通话测试
+模块功能：测试呼入呼出
+模块最后修改时间：2017.02.23
 ]]
 
+module(...,package.seeall)
 
-local incomingIdx = 1
 
+--[[
+函数名：print
+功能  ：打印接口，此文件中的所有打印都会加上test前缀
+参数  ：无
+返回值：无
+]]
 local function print(...)
 	_G.print("test",...)
 end
 
+--[[
+函数名：connected
+功能  ：通话已建立的消息处理函数
+参数  ：
+		id：通话id
+返回值：无
+]]
 local function connected(id)
 	print("connected:"..(id or "nil"))
+	--设置mic增益
+	audio.setmicrophonegain(7)
+	--10秒中之后主动结束通话
 	sys.timer_start(cc.hangup,10000,"AUTO_DISCONNECT")
 end
 
+--[[
+函数名：disconnected
+功能  ：通话已结束的消息处理函数
+参数  ：
+		id：通话id
+返回值：无
+]]
 local function disconnected(id)
 	print("disconnected:"..(id or "nil"))
 	sys.timer_stop(cc.hangup,"AUTO_DISCONNECT")
 end
 
+--表示第几次来电
+local incomingIdx = 1
+--[[
+函数名：incoming
+功能  ：来电消息处理函数
+参数  ：
+		id：通话id
+返回值：无
+]]
 local function incoming(id)
 	print("incoming:"..(id or "nil"))
+	--第偶数次来电，自动接听
 	if incomingIdx%2==0 then
 		cc.accept()
+	--第奇数次来电，自动挂断
 	else
 		cc.hangup()
 	end	
@@ -48,9 +79,6 @@ local procer =
 sys.regapp(connected,"CALL_CONNECTED") --建立通话后，lib中的cc.lua会调用sys.dispatch接口抛出CALL_CONNECTED消息
 sys.regapp(procer)
 
---设置mic增益
-audio.setmicrophonegain(7)
-
---1分钟后呼叫10086
+--开机后1分钟后呼叫10086
 sys.timer_start(cc.dial,60000,"10086")
 

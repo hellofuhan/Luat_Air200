@@ -31,6 +31,7 @@ local function read()
 	while true do
 		data = uart.read(UART_ID,"*l",0)
 		if not data or string.len(data) == 0 then break end
+		--打开下面的打印会耗时
 		print("read",data)
 		ril.sendtransparentdata(data)
 	end

@@ -1,18 +1,35 @@
+--[[
+模块名称：参数管理
+模块功能：参数初始化、读写以及恢复出厂设置
+模块最后修改时间：2017.02.23
+]]
+
 module(...,package.seeall)
 require"config"
 
 package.path = "/?.lua;"..package.path
 
---默认参数配置存储在config.lua中
---实时参数配置存储在para.lua中
+--默认参数配置存储在configname文件中
+--实时参数配置存储在paraname文件中
+--para：实时参数表
 local configname,paraname,para = "/lua/config.lua","/para.lua"
 
+--[[
+函数名：print
+功能  ：打印接口，此文件中的所有打印都会加上nvm前缀
+参数  ：无
+返回值：无
+]]
 local function print(...)
 	_G.print("nvm",...)
 end
 
---恢复出厂设置
---把config.lua文件内容复制到para.lua中
+--[[
+函数名：restore
+功能  ：参数恢复出厂设置，把configname文件中内容复制到paraname文件中
+参数  ：无
+返回值：无
+]]
 function restore()
 	local fpara,fconfig = io.open(paraname,"wb"),io.open(configname,"rb")
 	fpara:write(fconfig:read("*a"))
@@ -21,14 +38,26 @@ function restore()
 	para = config
 end
 
+--[[
+函数名：serialize
+功能  ：根据不同的数据类型，按照不同的格式，写格式化后的数据到文件中
+参数  ：
+		pout：文件句柄
+		o：数据
+返回值：无
+]]
 local function serialize(pout,o)
 	if type(o) == "number" then
-		pout:write(o)
+		--number类型，直接写原始数据
+		pout:write(o)	
 	elseif type(o) == "string" then
+		--string类型，原始数据左右各加上双引号写入
 		pout:write(string.format("%q", o))
 	elseif type(o) == "boolean" then
+		--boolean类型，转化为string写入
 		pout:write(tostring(o))
 	elseif type(o) == "table" then
+		--table类型，加换行，大括号，中括号，双引号写入
 		pout:write("{\n")
 		for k,v in pairs(o) do
 			if type(k) == "number" then
@@ -47,6 +76,12 @@ local function serialize(pout,o)
 	end
 end
 
+--[[
+函数名：upd
+功能  ：更新实时参数表
+参数  ：无
+返回值：无
+]]
 local function upd()
 	for k,v in pairs(config) do
 		if k ~= "_M" and k ~= "_NAME" and k ~= "_PACKAGE" then
@@ -57,6 +92,12 @@ local function upd()
 	end
 end
 
+--[[
+函数名：load
+功能  ：初始化参数
+参数  ：无
+返回值：无
+]]
 local function load()
 	local f = io.open(paraname,"rb")
 	if not f or f:read("*a") == "" then

@@ -16,15 +16,31 @@ uart按照帧结构接收外围设备的输入，收到正确的指令后，回复ASCII字符串
 ]]
 
 
-
+--串口ID,1对应uart1
+--如果要修改为uart2，把UART_ID赋值为2即可
 local UART_ID = 1
+--帧头类型以及帧尾
 local CMD_SCANNER,CMD_GPIO,CMD_PORT,FRM_TAIL = 1,2,3,string.char(0xC0)
+--串口读到的数据缓冲区
 local rdbuf = ""
 
+--[[
+函数名：print
+功能  ：打印接口，此文件中的所有打印都会加上test前缀
+参数  ：无
+返回值：无
+]]
 local function print(...)
 	_G.print("test",...)
 end
 
+--[[
+函数名：parse
+功能  ：按照帧结构解析处理一条完整的帧数据
+参数  ：
+		data：所有未处理的数据
+返回值：第一个返回值是一条完整帧报文的处理结果，第二个返回值是未处理的数据
+]]
 local function parse(data)
 	if not data then return end	
 	
@@ -48,13 +64,21 @@ local function parse(data)
 	return true,string.sub(data,tail+1,-1)	
 end
 
---请参考功能需求，分析此函数
+--[[
+函数名：proc
+功能  ：处理从串口读到的数据
+参数  ：
+		data：当前一次从串口读到的数据
+返回值：无
+]]
 local function proc(data)
 	if not data or string.len(data) == 0 then return end
+	--追加到缓冲区
 	rdbuf = rdbuf..data	
 	
 	local result,unproc
 	unproc = rdbuf
+	--根据帧结构循环解析未处理过的数据
 	while true do
 		result,unproc = parse(unproc)
 		if not unproc or unproc == "" or not result then
@@ -65,24 +89,37 @@ local function proc(data)
 	rdbuf = unproc or ""
 end
 
---底层core中，串口收到数据时：
---如果接收缓冲区为空，则会以中断方式通知Lua脚本收到了新数据；
---如果接收缓冲器不为空，则不会通知Lua脚本
---所以Lua脚本中收到中断读串口数据时，每次都要把接收缓冲区中的数据全部读出，这样才能保证底层core中的新数据中断上来，此read函数中的while语句中就保证了这一点
+--[[
+函数名：read
+功能  ：读取串口接收到的数据
+参数  ：无
+返回值：无
+]]
 local function read()
 	local data = ""
+	--底层core中，串口收到数据时：
+	--如果接收缓冲区为空，则会以中断方式通知Lua脚本收到了新数据；
+	--如果接收缓冲器不为空，则不会通知Lua脚本
+	--所以Lua脚本中收到中断读串口数据时，每次都要把接收缓冲区中的数据全部读出，这样才能保证底层core中的新数据中断上来，此read函数中的while语句中就保证了这一点
 	while true do		
 		data = uart.read(UART_ID,"*l",0)
 		if not data or string.len(data) == 0 then break end
-		print("read",data,common.binstohexs(data))
+		--打开下面的打印会耗时
+		--print("read",data,common.binstohexs(data))
 		proc(data)
 	end
 end
 
---通过串口发送数据到外围设备
+--[[
+函数名：write
+功能  ：通过串口发送数据
+参数  ：
+		s：要发送的数据
+返回值：无
+]]
 function write(s)
 	print("write",s)
-	uart.write(UART_ID,s.."\r\n")	
+	uart.write(UART_ID,s.."\r\n")
 end
 
 --保持系统处于唤醒状态，此处只是为了测试需要，所以此模块没有地方调用pm.sleep("test")休眠，不会进入低功耗休眠状态
