@@ -18,6 +18,12 @@ local function getscm()
 		sys.timer_start(getscm,100)
 	else
 		get_scm_cnt = 20
+		if not scm_active then
+			pio.pin.setval(0,RST_SCMWD_PIN)
+			sys.timer_start(pio.pin.setval,100,1,RST_SCMWD_PIN)
+			print("wdt reset 153b")
+			scm_active = true
+		end
 	end
 
 	if pio.pin.getval(WATCHDOG_PIN) == 0 then
@@ -36,10 +42,10 @@ end
 local function feed()
 	if scm_active then
 		scm_active = false
-	else
+	--[[else
 		pio.pin.setval(0,RST_SCMWD_PIN)
 		sys.timer_start(pio.pin.setval,100,1,RST_SCMWD_PIN)
-		print("wdt reset 153b")
+		print("wdt reset 153b")]]
 	end
 
 	pio.pin.close(WATCHDOG_PIN)
@@ -63,5 +69,5 @@ function open()
 	pio.pin.setval(1,WATCHDOG_PIN)
 end
 
-pio.pin.setdir(pio.OUTPUT,RST_SCMWD_PIN)
+pio.pin.setdir(pio.OUTPUT1,RST_SCMWD_PIN)
 pio.pin.setval(1,RST_SCMWD_PIN)
