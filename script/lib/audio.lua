@@ -91,13 +91,14 @@ end
 参数  ：
 		text：字符串
 		path："net"表示网络播放，其余值表示本地播放
-返回值：无
+返回值：true
 ]]
 function playtts(text,path)
 	local action = path == "net" and 4 or 2
 
 	req("AT+QTTS=1")
 	req(string.format("AT+QTTS=%d,\"%s\"",action,text))
+	return true
 end
 
 --[[

@@ -10,7 +10,8 @@ module(...,package.seeall)
 --PWRON：开机铃声
 --CALL：来电铃声
 --SMS：新短信铃声
-PWRON,CALL,SMS = 0,1,2
+--TTS：TTS播放
+PWRON,CALL,SMS,TTS = 0,1,2,3
 
 --styp：当前播放的音频类型
 --spath：当前播放的音频文件路径
@@ -74,7 +75,7 @@ function play(typ,path,vol,cb,dup,duprd)
     end
 	
 	--调用播放接口成功
-	if audio.play(path) then
+	if (typ==TTS and audio.playtts(path)) or (typ~=TTS and audio.play(path)) then
 		return true
 	--调用播放接口失败
 	else
@@ -93,6 +94,7 @@ function stop()
 	sys.timer_stop_all(play)
 	--停止音频播放
 	audio.stop()
+	if styp==TTS then audio.stoptts() end
 	styp,spath,svol,scb,sdup,sduprd = nil
 end
 
@@ -104,6 +106,7 @@ end
 ]]
 local function playend()
 	print("playend",sdup,sduprd)
+	if styp==TTS then audio.stoptts() end
 	--需要重复播放
 	if sdup then
 		--存在重复播放间隔
@@ -129,6 +132,7 @@ end
 ]]
 local function playerr()
 	print("playerr")
+	if styp==TTS then audio.stoptts() end
 	--如果正在播放的音频有回调函数，则执行回调，传入参数1
 	if scb then scb(1) end
 	styp,spath,svol,scb,sdup,sduprd = nil
