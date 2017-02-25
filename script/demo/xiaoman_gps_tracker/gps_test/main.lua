@@ -3,7 +3,7 @@ VERSION = "1.0.0"
 require"chg"
 require"pins"
 require"gpsapp"
-require"wdt"
+require"wdt153b"
 require"testgps"
 
 sys.init(0,0)

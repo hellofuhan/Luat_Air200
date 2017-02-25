@@ -162,7 +162,7 @@ local function proc(s)
 		rtos.restart()
 	elseif smatch(s,"WDTEST") then
 		rsp("\r\nAT+WDTEST\r\nOK\r\n")
-		wdt.test()
+		wdt153b.test()
 	elseif smatch(s,"AT%+FT5315") then
 		sys.dispatch("FAC_IND")
 		gpsapp.open(gpsapp.OPEN_DEFAULT,{cause="FAC"})
