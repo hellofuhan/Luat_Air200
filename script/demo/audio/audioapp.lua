@@ -75,7 +75,7 @@ function play(typ,path,vol,cb,dup,duprd)
     end
 	
 	--调用播放接口成功
-	if (typ==TTS and audio.playtts(path)) or (typ~=TTS and audio.play(path)) then
+	if (typ==TTS and audio.playtts(path)) or (typ~=TTS and audio.play(path,dup and (not duprd or duprd==0))) then
 		return true
 	--调用播放接口失败
 	else
@@ -114,7 +114,7 @@ local function playend()
 			sys.timer_start(play,sduprd,styp,spath,svol,scb,sdup,sduprd)
 		--不存在重复播放间隔
 		else
-			play(styp,spath,svol,scb,sdup,sduprd)
+			--play(styp,spath,svol,scb,sdup,sduprd)
 		end
 	--不需要重复播放
 	else

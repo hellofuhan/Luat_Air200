@@ -27,6 +27,7 @@ nvm：参数存储读写demo项目
 pm：休眠控制demo项目
 sms：短信demo项目
 socket\long_connection：基于TCP的socket长连接通信demo项目（UDP使用方式和TCP完全相同）
+socket\long_connection_transparent：基于TCP的socket透传demo项目，uart1透传数据到指定服务器
 socket\short_connection：基于TCP的socket短连接通信demo项目（UDP使用方式和TCP完全相同）
 socket\short_connection_flymode：基于TCP的socket短连接通信demo项目，会进入飞行模式并且定时退出飞行模式（UDP使用方式和TCP完全相同）
 timer：定时器demo项目
