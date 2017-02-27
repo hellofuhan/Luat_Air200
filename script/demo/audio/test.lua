@@ -38,6 +38,7 @@ end
 
 --播放冲突测试接口，每次打开一个if语句进行测试
 local function testplayconflict()	
+
 	if true then
 		--循环播放来电铃声
 		audioapp.play(audioapp.CALL,"/ldata/call.mp3",audiocore.VOL7,nil,true)
@@ -45,6 +46,7 @@ local function testplayconflict()
 		sys.timer_start(audioapp.play,5000,audioapp.PWRON,"/ldata/pwron.mp3",audiocore.VOL7,nil,true)
 		
 	end
+
 	
 	--[[
 	if true then
@@ -52,6 +54,16 @@ local function testplayconflict()
 		audioapp.play(audioapp.CALL,"/ldata/call.mp3",audiocore.VOL7,nil,true)
 		--5秒钟后，尝试循环播放新短信铃声，但是优先级不够，不会播放
 		sys.timer_start(audioapp.play,5000,audioapp.SMS,"/ldata/sms.mp3",audiocore.VOL7,nil,true)
+		
+	end
+	]]
+	
+	--[[
+	if true then
+		--循环播放TTS
+		audioapp.play(audioapp.TTS,common.binstohexs(common.gb2312toucs2(ttstr)),audiocore.VOL7,nil,true)
+		--10秒钟后，循环播放开机铃声
+		sys.timer_start(audioapp.play,10000,audioapp.PWRON,"/ldata/pwron.mp3",audiocore.VOL7,nil,true)
 		
 	end
 	]]

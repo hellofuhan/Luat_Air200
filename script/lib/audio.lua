@@ -364,6 +364,9 @@ local function audiorsp(cmd,success,response,intermediate)
 				dispatch("TTS_CLOSE_IND",ttscause)
 			end
 		end
+		if action=="3" then
+			dispatch("TTS_STOP_IND")
+		end
 	end
 end
 
