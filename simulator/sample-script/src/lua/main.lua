@@ -1,1 +1,0 @@
-print("AirM2M sample-script")
