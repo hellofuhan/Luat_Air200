@@ -9,8 +9,8 @@
       /Air200模块相关文档/EVB_S1_Air200_pcb_bottom_V1.0.pdf
       /Air200模块相关文档/EVB_S1_Air200_pcb_top_V1.0.pdf
 
-20170226：
+20170227：
 添加：Air200模块开发板使用说明V1.0.pdf
       DTU参考设计pcb图：Luat_DTU_Air200_20170224.pcb
       DTU参考设计原理图：Luat_DTU_Air200_20170224.sch
-更名：定位器(Air200+GPS)硬件设计原理图.pdf 改成 小蛮GPS定位器(Air200+GPS)硬件设计原理图.pdf
+更名：定位器(Air200+GPS)硬件设计原理图.pdf 改成 车卫士定位器(Air200+GPS)硬件设计原理图.pdf
