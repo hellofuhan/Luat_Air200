@@ -30,8 +30,9 @@ local tonumber,tostring,print,req,smatch = base.tonumber,base.tostring,base.prin
 local sn,snrdy,imeirdy,--[[ver,]]imei,clkswitch,updating,dbging,flypending
 
 --calib：校准标志，true为已校准，其余未校准
---cbfunc：执行AT命令，处理完应答后的用户自定义回调函数
-local calib,cbfunc
+--setclkcb：执行AT+CCLK命令，应答后的用户自定义回调函数
+--wimeicb：执行AT+WIMEI命令，应答后的用户自定义回调函数
+local calib,setclkcb,wimeicb
 
 --[[
 函数名：rsp
@@ -60,12 +61,17 @@ local function rsp(cmd,success,response,intermediate)
 		if not imeirdy then sys.dispatch("IMEI_READY") imeirdy = true end
 	--写IMEI
 	elseif smatch(cmd,"AT%+WIMEI=") then
+		if wimeicb then wimeicb(success) end
 	--写序列号
 	elseif smatch(cmd,"AT%+WISN=") then
 		req("AT+WISN?")
 	--设置系统时间
 	elseif prefix == "+CCLK" then
 		startclktimer()
+		--AT命令应答处理结束，如果有回调函数
+		if setclkcb then
+			setclkcb(cmd,success,response,intermediate)
+		end
 	--查询是否校准
 	elseif cmd == "AT+ATWMFT=99" then
 		print('ATWMFT',intermediate)
@@ -79,13 +85,7 @@ local function rsp(cmd,success,response,intermediate)
 		--产生一个内部消息FLYMODE_IND，表示飞行模式状态发生变化
 		sys.dispatch("FLYMODE_IND",smatch(cmd,"AT%+CFUN=(%d)")=="0")
 	end
-	--AT命令应答处理结束，如果有回调函数
-	if cbfunc then
-		local tmp = cbfunc
-		cbfunc = nil
-		--调用回调
-		tmp(cmd,success,response,intermediate)
-	end
+	
 end
 
 --[[
@@ -98,7 +98,7 @@ end
 ]]
 function setclock(t,rspfunc)
 	if t.year - 2000 > 38 then return end
-	cbfunc = rspfunc
+	setclkcb = rspfunc
 	req(string.format("AT+CCLK=\"%02d/%02d/%02d,%02d:%02d:%02d+32\"",string.sub(t.year,3,4),t.month,t.day,t.hour,t.min,t.sec),nil,rsp)
 end
 
@@ -182,6 +182,26 @@ end
 ]]
 function getimei()
 	return imei or ""
+end
+
+--[[
+函数名：setimei
+功能  ：设置IMEI
+		如果传入了cb，则设置IMEI后不会自动重启，用户必须自己保证设置成功后，调用sys.restart或者dbg.restart接口进行软重启;
+		如果没有传入cb，则设置成功后软件会自动重启
+参数  ：
+		s：新IMEI
+		cb：设置后的回调函数，调用时会将设置结果传出去，true表示设置成功，false或者nil表示失败；
+返回值：无
+]]
+function setimei(s,cb)
+	if s==imei then
+		if cb then cb(true) end
+	else
+		req("AT+AMFAC="..(cb and "0" or "1"))
+		req("AT+WIMEI=\""..s.."\"")
+		wimeicb = cb
+	end
 end
 
 

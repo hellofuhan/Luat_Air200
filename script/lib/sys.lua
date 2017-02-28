@@ -25,9 +25,9 @@ local assert = base.assert
 local tonumber = base.tonumber
 
 --lib脚本版本号，只要lib中的任何一个脚本做了修改，都需要更新此版本号
-SCRIPT_LIB_VER = "1.0.4"
+SCRIPT_LIB_VER = "1.0.5"
 --支持lib脚本的最小core软件版本号
-CORE_MIN_VER = "Luat_V0002_Air200"
+CORE_MIN_VER = "Luat_V0003_Air200"
 
 --“是否需要刷新界面”的标志，有GUI的项目才会用到此标志
 local refreshflag = false
@@ -445,8 +445,6 @@ function getworkmode()
 	return workmode
 end
 
---lua的原始打印接口
-local baseprint = base.print
 --[[
 函数名：opntrace
 功能  ：开启或者关闭print的打印输出功能
@@ -455,7 +453,7 @@ local baseprint = base.print
 返回值：无
 ]]
 function opntrace(v)
-	base.print = v and baseprint or function () end
+	rtos.set_trace(v and 1 or 0)
 end
 
 --app存储表
