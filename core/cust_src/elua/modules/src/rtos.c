@@ -20,6 +20,9 @@
 #include "auxmods.h"
 #include "lrotable.h"
 #include "platform.h"
+/*begin\NEW\zhutianhua\2017.2.28 14:38\新增rtos.set_trace接口，可控制是否输出Lua的trace*/
+#include "platform_conf.h"
+/*end\NEW\zhutianhua\2017.2.28 14:38\新增rtos.set_trace接口，可控制是否输出Lua的trace*/
 #include "platform_rtos.h"
 #include "platform_malloc.h"
 
@@ -271,6 +274,16 @@ static int l_rtos_tick(lua_State *L)
 }
 /*-\NEW\liweiqiang\2013.4.5\增加rtos.tick接口*/
 
+/*begin\NEW\zhutianhua\2017.2.28 14:12\新增rtos.set_trace接口，可控制是否输出Lua的trace*/
+static int l_set_trace(lua_State *L)
+{
+    //u32 flag = luaL_optinteger(L, 1, 0);
+    platform_set_console_port(luaL_optinteger(L, 1, 0)==1 ? PLATFORM_PORT_ID_DEBUG : NUM_UART);
+    lua_pushboolean(L,1);
+    return 1;
+}
+/*end\NEW\zhutianhua\2017.2.28 14:12\新增rtos.set_trace接口，可控制是否输出Lua的trace*/
+
 #define MIN_OPT_LEVEL 2
 #include "lrodefs.h"
 const LUA_REG_TYPE rtos_map[] =
@@ -296,6 +309,9 @@ const LUA_REG_TYPE rtos_map[] =
 /*-\NEW\zhuwangbin\2017.2.12\添加版本查询接口 */
     { LSTRKEY( "get_version" ), LFUNCVAL( l_get_version ) },
 /*-\NEW\zhuwangbin\2017.2.12\添加版本查询接口 */
+    /*begin\NEW\zhutianhua\2017.2.28 14:4\新增rtos.set_trace接口，可控制是否输出Lua的trace*/
+    { LSTRKEY( "set_trace" ), LFUNCVAL( l_set_trace ) },
+    /*end\NEW\zhutianhua\2017.2.28 14:4\新增rtos.set_trace接口，可控制是否输出Lua的trace*/
 
 	{ LNILKEY, LNILVAL }
 };

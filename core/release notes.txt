@@ -1,3 +1,12 @@
+版本号：Luat_V0003_Air200.lod、Luat_V0003_Air200_TTS1.lod、Luat_V0003_Air200_TTS2.lod、Luat_V0003_Air200_TTS3.lod
+发布时间：2017/2/28 15:10
+修改记录：
+	1, 新增接口控制Lua的trace输出
+	2, 发布3个支持TTS功能的版本，文件系统和LuaDB使用的Flash分区大小不同，详情参考http://www.openluat.com/forum.php?mod=viewthread&tid=2393&page=1&extra=#pid6355
+
+
+
+==============================
 版本号：Luat_V0002_Air200_TTS.lod
 发布时间：2017/2/27 13:57
 修改记录：

@@ -433,6 +433,12 @@ static u32 uart_phy_close(unsigned id)
 
 static u32 uart_phy_write(u8 id, uint8 *data_p, uint16 length)
 {
+    /*begin\NEW\zhutianhua\2017.2.28 13:53\新增rtos.set_trace接口，可控制是否输出Lua的trace*/
+    if (id>=NUM_UART)
+    {
+        return 0;
+    }
+    /*end\NEW\zhutianhua\2017.2.28 13:53\新增rtos.set_trace接口，可控制是否输出Lua的trace*/
     if(!uartContext[id].opened)
         return 0;
 
