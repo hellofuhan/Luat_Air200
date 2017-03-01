@@ -132,14 +132,14 @@ end
 
 --[[
 函数名：open
-功能  ：打开Air200开发板上的硬件看门狗功能
+功能  ：打开Air200开发板上的硬件看门狗功能，并立即喂狗
 参数  ：无
 返回值：无
 ]]
 function open()
-	sys.timer_start(feed,120000,"normal")
 	pio.pin.setdir(pio.OUTPUT,WATCHDOG_PIN)
 	pio.pin.setval(1,WATCHDOG_PIN)
+	feed("normal")
 end
 
 --[[
