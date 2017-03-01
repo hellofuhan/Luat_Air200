@@ -6,9 +6,9 @@
 module(...,package.seeall)
 require"config"
 
-package.path = "/?.lua;"..package.path
+package.path = "/?.lua;".."/?.luae;"..package.path
 
-local configname,paraname,para = "/lua/config.lua","/para.lua"
+local configname,econfigname,paraname,para = "/lua/config.lua","/lua/config.luae","/para.lua"
 
 --[[
 º¯ÊýÃû£ºrestore
@@ -18,6 +18,7 @@ local configname,paraname,para = "/lua/config.lua","/para.lua"
 ]]
 function restore()
 	local fpara,fconfig = io.open(paraname,"wb"),io.open(configname,"rb")
+	if not fconfig then fconfig = io.open(econfigname,"rb") end
 	fpara:write(fconfig:read("*a"))
 	fpara:close()
 	fconfig:close()
