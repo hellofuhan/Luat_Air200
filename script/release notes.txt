@@ -6,6 +6,8 @@
         (1)wdt.lua：修正“加载此功能模块后一直重启”的问题；代码添加注释
     二、demo脚本修改
         (1)wdt项目：简化lib中wdt功能模块的使用方式，直接require就能正常使用
+        (2)nvm项目：修正“LuaDB加密下载后，模块开机一直重启”的问题
+        (3)product\小蛮GPS定位器\whole_project项目：修正“LuaDB加密下载后，模块开机一直重启”的问题
 
 
 
