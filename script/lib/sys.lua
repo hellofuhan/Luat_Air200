@@ -13,7 +13,7 @@ local uart = require"uart"
 local io = require"io"
 local os = require"os"
 local string = require"string"
-module("sys")
+module(...,package.seeall)
 
 --加载常用的全局函数至本地
 local print = base.print
@@ -25,7 +25,7 @@ local assert = base.assert
 local tonumber = base.tonumber
 
 --lib脚本版本号，只要lib中的任何一个脚本做了修改，都需要更新此版本号
-SCRIPT_LIB_VER = "1.0.6"
+SCRIPT_LIB_VER = "1.0.7"
 --支持lib脚本的最小core软件版本号
 CORE_MIN_VER = "Luat_V0003_Air200"
 
@@ -387,6 +387,7 @@ end
 function init(mode,lprfnc)
 	--用户应用脚本中必须定义PROJECT和VERSION两个全局变量，否则会死机重启，如何定义请参考各个demo中的main.lua
 	assert(base.PROJECT and base.PROJECT ~= "" and base.VERSION and base.VERSION ~= "","Undefine PROJECT or VERSION")
+	require"net"
 	--设置AT命令的虚拟串口
 	uart.setup(uart.ATC,0,0,uart.PAR_NONE,uart.STOP_1)
 	print("poweron reason:",rtos.poweron_reason(),base.PROJECT,base.VERSION,SCRIPT_LIB_VER,CORE_MIN_VER,getcorever())

@@ -24,6 +24,8 @@ local tonumber,tostring,print = base.tonumber,base.tostring,base.print
 --REGISTERED：注册上GSM网络
 --UNREGISTER：未注册上GSM网络
 local state = "INIT"
+--SIM卡状态：true为异常，false或者nil为正常
+local simerrsta
 
 --lac：位置区ID
 --ci：小区ID
@@ -40,8 +42,10 @@ local csqqrypriod,cengqrypriod = 60*1000
 --cengswitch：定时查询当前和临近小区信息开关
 local cellinfo,flymode,csqswitch,cengswitch = {}
 
---ledstate：网络指示灯状态INIT,IDLE,CREG,CGATT,SCK
+--ledstate：网络指示灯状态INIT,FLYMODE,SIMERR,IDLE,CREG,CGATT,SCK
 --INIT：功能关闭状态
+--FLYMODE：飞行模式
+--SIMERR：未检测到SIM卡或者SIM卡锁pin码等异常
 --IDLE：未注册GSM网络
 --CREG：已注册GSM网络
 --CGATT：已附着GPRS数据网络
@@ -54,7 +58,7 @@ local ledstate,ledontime,ledofftime,usersckconnect = "INIT",0,0
 --ledpin：网络指示灯控制引脚
 --ledvalid：引脚输出何种电平会点亮指示灯，1为高，0为低
 --ledidleon,ledidleoff,ledcregon,ledcregoff,ledcgatton,ledcgattoff,ledsckon,ledsckoff：IDLE,CREG,CGATT,SCK状态下指示灯的点亮和熄灭时长(毫秒)
-local ledflg,ledpin,ledvalid,ledidleon,ledidleoff,ledcregon,ledcregoff,ledcgatton,ledcgattoff,ledsckon,ledsckoff = false,pio.P0_15,1,0,0xFFFF,300,700,300,1700,100,100
+local ledflg,ledpin,ledvalid,ledflymodeon,ledflymodeoff,ledsimerron,ledsimerroff,ledidleon,ledidleoff,ledcregon,ledcregoff,ledcgatton,ledcgattoff,ledsckon,ledsckoff = false,pio.P0_15,1,0,0xFFFF,300,5700,300,3700,300,700,300,1700,100,100
 
 --[[
 函数名：creg
@@ -327,6 +331,10 @@ function startquerytimer() end
 返回值：无
 ]]
 local function simind(para)
+	if simerrsta ~= (para~="RDY") then
+		simerrsta = (para~="RDY")
+		procled()
+	end
 	--sim卡工作不正常
 	if para ~= "RDY" then
 		--更新GSM网络状态
@@ -576,6 +584,7 @@ function procled()
 		local newstate,newontime,newofftime = "IDLE",ledidleon,ledidleoff
 		--飞行模式
 		if flymode then
+			newstate,newontime,newofftime = "FLYMODE",ledflymodeon,ledflymodeoff
 		--用户socket连接到了后台
 		elseif usersckconnect then
 			newstate,newontime,newofftime = "SCK",ledsckon,ledsckoff
@@ -585,6 +594,8 @@ function procled()
 		--注册上GSM网络
 		elseif state=="REGISTERED" then
 			newstate,newontime,newofftime = "CREG",ledcregon,ledcregoff
+		elseif simerrsta then
+			newstate,newontime,newofftime = "SIMERR",ledsimerron,ledsimerroff
 		end
 		--指示灯状态发生变化
 		if newstate~=ledstate then
@@ -631,25 +642,33 @@ end
 		v：指示灯开关，true为开启，其余为关闭
 		pin：指示灯控制引脚，可选
 		valid：引脚输出何种电平会点亮指示灯，1为高，0为低，可选
-		idleon,idleoff,cregon,cregoff,cgatton,cgattoff,sckon,sckoff：IDLE,CREG,CGATT,SCK状态下指示灯的点亮和熄灭时长(毫秒)，可选
+		flymodeon,flymodeoff,simerron,simerroff,idleon,idleoff,cregon,cregoff,cgatton,cgattoff,sckon,sckoff：FLYMODE,SIMERR,IDLE,CREG,CGATT,SCK状态下指示灯的点亮和熄灭时长(毫秒)，可选
 返回值：无
 ]]
-function setled(v,pin,valid,idleon,idleoff,cregon,cregoff,cgatton,cgattoff,sckon,sckoff)
-	--开关值发生变化
-	if ledflg~=v then
+function setled(v,pin,valid,flymodeon,flymodeoff,simerron,simerroff,idleon,idleoff,cregon,cregoff,cgatton,cgattoff,sckon,sckoff)
+	local c1 = (ledflg~=v or ledpin~=(pin or ledpin) or ledvalid~=(valid or ledvalid))
+	local c2 = (ledidleon~=(idleon or ledidleon) or ledidleoff~=(idleoff or ledidleoff) or flymodeon~=(flymodeon or ledflymodeon) or flymodeoff~=(flymodeoff or ledflymodeoff))
+	local c3 = (ledcregon~=(cregon or ledcregon) or ledcregoff~=(cregoff or ledcregoff) or ledcgatton~=(cgatton or ledcgatton) or simerron~=(simerron or ledsimerron))
+	local c4 = (ledcgattoff~=(cgattoff or ledcgattoff) or ledsckon~=(sckon or ledsckon) or ledsckoff~=(sckoff or ledsckoff) or simerroff~=(simerroff or ledsimerroff))
+	--开关值发生变化 或者其他参数发生变化
+	if c1 or c2 or c3 or c4 then
+		local oldledflg = ledflg
 		ledflg = v
 		--开启
 		if v then
 			ledpin,ledvalid,ledidleon,ledidleoff,ledcregon,ledcregoff = pin or ledpin,valid or ledvalid,idleon or ledidleon,idleoff or ledidleoff,cregon or ledcregon,cregoff or ledcregoff
 			ledcgatton,ledcgattoff,ledsckon,ledsckoff = cgatton or ledcgatton,cgattoff or ledcgattoff,sckon or ledsckon,sckoff or ledsckoff
-			pio.pin.setdir(pio.OUTPUT,ledpin)
+			ledflymodeon,ledflymodeoff,ledsimerron,ledsimerroff = flymodeon or ledflymodeon,flymodeoff or ledflymodeoff,simerron or ledsimerron,simerroff or ledsimerroff
+			if not oldledflg then pio.pin.setdir(pio.OUTPUT,ledpin) end
 			procled()
 		--关闭
 		else
 			sys.timer_stop(ledblinkon)
 			sys.timer_stop(ledblinkoff)
-			pio.pin.setval(ledvalid==1 and 0 or 1,ledpin)
-			pio.pin.close(ledpin)
+			if oldledflg then
+				pio.pin.setval(ledvalid==1 and 0 or 1,ledpin)
+				pio.pin.close(ledpin)
+			end
 			ledstate = "INIT"
 		end		
 	end
@@ -679,3 +698,4 @@ req("AT+CENG=1,1")
 --8秒后查询第一次csq
 sys.timer_start(startcsqtimer,8*1000)
 resetcellinfo()
+setled(true)
