@@ -260,7 +260,7 @@ function timer_is_active(val,...)
 end
 
 --[[
-函数名：writetxt
+函数名：readtxt
 功能  ：读取文本文件中的全部内容
 参数  ：
 		f：文件路径
