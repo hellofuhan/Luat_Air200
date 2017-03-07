@@ -39,7 +39,7 @@ PIN27 = {pin=pio.P0_1}
 PIN5 = {name="PIN5",pin=pio.P0_6,dir=pio.INT,valid=1}
 
 --和PIN22相似
-PIN6 = {pin=pio.P0_15}
+--PIN6 = {pin=pio.P0_15}
 
 --第20个引脚：GPIO13；配置为输入；valid=0
 --调用get(PIN20)时，如果为高电平，则返回false；如果为低电平，则返回true
@@ -52,7 +52,7 @@ PIN17 = {pin=pio.P0_25}
 
 
 
-local allpin = {PIN22,PIN23,PIN25,PIN26,PIN27,PIN5,PIN6,PIN20,PIN21,PIN16,PIN17}
+local allpin = {PIN22,PIN23,PIN25,PIN26,PIN27,PIN5,--[[PIN6,]]PIN20,PIN21,PIN16,PIN17}
 
 --[[
 函数名：get
