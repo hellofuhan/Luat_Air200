@@ -1,3 +1,7 @@
+注：对Luat_Air200相关文档的描述，请点开：
+http://www.luam2m.com/forum.php?mod=post&action=edit&fid=84&tid=2479&pid=6502&page=1
+
+
 20170221：
 添加：Luat看门狗电路参考设计V1.0.pdf
 
@@ -23,3 +27,8 @@
 
 20170306：
 添加：Air200开发板新手入门指导.pdf
+
+20170307：
+更新：Air200模块AT命令手册V2.6 升级成 V2.7
+添加：EVB_S2_Air200_V1.1_20170206_1330.pcb ：Air200简易开发板S2 pcb图
+      EVB_S2_Air200_V1.1_20170206_1330.sch ：Air200简易开发板S2 原理图
