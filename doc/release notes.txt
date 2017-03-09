@@ -45,3 +45,4 @@ http://www.luam2m.com/forum.php?mod=post&action=edit&fid=84&tid=2479&pid=6502&pa
 
 20170309：
 添加：Luat专用看门狗芯片设计手册V1.0.pdf
+      Luat模块阻抗线及天线设计建议_V1.0.pdf	
