@@ -137,7 +137,7 @@ local function imeirdy()
 	--创建一个mqtt client
 	mqttclient = mqtt.create(PROT,ADDR,PORT)
 	--连接mqtt服务器
-	mqttclient:connect(misc.getimei(),KEEP_ALIVE_TIME,"user","password",connectedcb,connecterrcb)
+	mqttclient:connect(misc.getimei(),600,"user","password",connectedcb,connecterrcb)
 end
 
 local procer =

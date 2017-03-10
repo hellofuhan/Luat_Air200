@@ -1,3 +1,11 @@
+发布时间：2017/3/10 11:55:21
+修改记录：
+    一、demo脚本修改
+        (1)新增uart_at_transparent_wdt项目
+        (2)mqtt项目：调用mqttclient:connect时显示传入mqtt的保活时间
+
+
+
 发布时间：2017/3/9 17:55:21
 修改记录：
     一、lib脚本修改
