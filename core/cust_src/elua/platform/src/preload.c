@@ -94,7 +94,9 @@ static BOOL AddUncompressFileItem(E_LUA_SCRIPT_TABLE_SECTION nSection, const cha
 {
     T_UNCOMPRESS_FILE_TABLE_ITEM *pItem = NULL;
     
-    if((nSection >= LUA_SCRIPT_TABLE_MAX_SECTION) || (NULL == pFile) || (strlen(pFile) == 0) || (nLen == 0))
+    /*begin\NEW\zhutianhua\2017.3.10 16:14\修正下载空文件后，开机一直重启的问题*/
+    if((nSection >= LUA_SCRIPT_TABLE_MAX_SECTION) || (NULL == pFile) || (strlen(pFile) == 0) /*|| (nLen == 0)*/)
+    /*end\NEW\zhutianhua\2017.3.10 16:14\修正下载空文件后，开机一直重启的问题*/
     {
         printf("[AddUncompressFileItem]: para error!\n");
         return FALSE;
