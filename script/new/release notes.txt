@@ -1,8 +1,13 @@
-发布时间：2017/3/10 11:55:21
+发布时间：2017/3/13 11:55:21
 修改记录：
-    一、demo脚本修改
+    一、lib脚本修改
+        lib脚本版本号：2.0.1
+        支持lib脚本的最小core软件版本号：Luat_V0003_Air200
+        (1)nvm.lua：修正“参数存储后，重启失效”的问题
+    二、demo脚本修改
         (1)新增uart_at_transparent_wdt项目
         (2)mqtt项目：调用mqttclient:connect时显示传入mqtt的保活时间
+        (3)xiaoman_gps_tracker/gps_test项目：增加gps定位接口和经纬度接口的使用例子
 
 
 

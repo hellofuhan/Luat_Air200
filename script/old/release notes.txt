@@ -1,7 +1,8 @@
-发布时间：2017/3/10 11:55:21
+发布时间：2017/3/13 11:55:21
 修改记录：
     一、demo脚本修改
         (1)新增uart_at_transparent_wdt项目
+        (2)xiaoman_gps_tracker/gps_test项目：增加gps定位接口和经纬度接口的使用例子
 
 
 

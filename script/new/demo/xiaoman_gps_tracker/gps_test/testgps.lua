@@ -18,15 +18,21 @@ local function print(...)
 end
 
 local function test1cb(cause)
-	print("test1cb",cause,gps.isfix())
+	--gps.isfix()：是否定位成功
+	--gps.getgpslocation()：经纬度信息
+	print("test1cb",cause,gps.isfix(),gps.getgpslocation())
 end
 
 local function test2cb(cause)
-	print("test2cb",cause,gps.isfix())
+	--gps.isfix()：是否定位成功
+	--gps.getgpslocation()：经纬度信息
+	print("test2cb",cause,gps.isfix(),gps.getgpslocation())
 end
 
 local function test3cb(cause)
-	print("test3cb",cause,gps.isfix())
+	--gps.isfix()：是否定位成功
+	--gps.getgpslocation()：经纬度信息
+	print("test3cb",cause,gps.isfix(),gps.getgpslocation())
 end
 
 --UART2外接UBLOX GPS模块
