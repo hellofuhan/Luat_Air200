@@ -1,3 +1,12 @@
+版本号：Luat_V0004_Air200.lod、Luat_V0004_Air200_TTS1.lod、Luat_V0004_Air200_TTS2.lod、Luat_V0004_Air200_TTS3.lod
+发布时间：2017/3/13 23:10
+修改记录：
+	1, 支持uart1全pin脚功能，uart1全pin脚功能开启后，用户通过DTR脚控制模块的休眠和唤醒
+	2, 支持PPP功能用到的AT命令
+
+
+
+==============================
 版本号：Luat_V0003_Air200.lod、Luat_V0003_Air200_TTS1.lod、Luat_V0003_Air200_TTS2.lod、Luat_V0003_Air200_TTS3.lod
 发布时间：2017/2/28 15:10
 修改记录：

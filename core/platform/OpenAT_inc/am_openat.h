@@ -435,7 +435,11 @@ typedef struct T_AMOPENAT_INTERFACE_VTBL_TAG
                             BOOL enable                         /* 是否使能 */
                                 );
 /*-\NEW\liweiqiang\2014.4.12\增加串口接收中断使能接口 */
-    
+
+		/*+\NEW\zhuwangbin\2017.3.10\AIR200 项目添加uart1全pin脚功能*/
+		void (*uart1_all_pin_set)(void);
+		/*+\NEW\zhuwangbin\2017.3.10\AIR200 项目添加uart1全pin脚功能*/
+
 /*+\NEW\liweiqiang\2013.12.25\添加host uart发送数据功能 */
     /****************************** HOST ******************************/
     BOOL (*host_init)(PHOST_MESSAGE hostCallback);

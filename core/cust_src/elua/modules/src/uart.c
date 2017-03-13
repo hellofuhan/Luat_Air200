@@ -23,6 +23,14 @@ enum
 };
 
 // Lua: actualbaud = setup( id, baud, databits, parity, stopbits,[mode] )
+/*+\NEW\zhuwangbin\2017.3.10\AIR200 项目添加uart1全pin脚功能*/
+static int uart1_all_pin_set( lua_State* L )
+{
+	platform_uart1_all_pin_set();
+	return 0;
+}
+/*+\NEW\zhuwangbin\2017.3.10\AIR200 项目添加uart1全pin脚功能*/
+
 static int uart_setup( lua_State* L )
 {
   unsigned id, databits, parity, stopbits;
@@ -278,6 +286,10 @@ static int uart_mt_index( lua_State* L )
 #include "lrodefs.h"
 const LUA_REG_TYPE uart_map[] = 
 {
+/*+\NEW\zhuwangbin\2017.3.10\AIR200 项目添加uart1全pin脚功能*/
+	{ LSTRKEY( "uart1_all_pin_set" ),  LFUNCVAL( uart1_all_pin_set ) },
+/*+\NEW\zhuwangbin\2017.3.10\AIR200 项目添加uart1全pin脚功能*/
+
   { LSTRKEY( "setup" ),  LFUNCVAL( uart_setup ) },
 /*+\NEW\liweiqiang\2013.4.20\增加uart.close接口 */
   { LSTRKEY( "close" ),  LFUNCVAL( uart_close ) },
