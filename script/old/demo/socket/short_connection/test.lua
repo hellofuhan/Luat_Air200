@@ -11,8 +11,9 @@ module(...,package.seeall)
 
 local ssub,schar,smatch,sbyte = string.sub,string.char,string.match,string.byte
 --测试时请搭建自己的服务器
-local SCK_IDX,PROT,ADDR,PORT = 1,"TCP","www.test.com",6500
-local linksta 
+local SCK_IDX,PROT,ADDR,PORT = 1,"TCP","120.26.196.195",9999
+--linksta:与后台的socket连接状态
+local linksta
 --是否成功连接过服务器
 local hasconnected
 --开机后如果一次也没有连接上后台，会有如下异常处理

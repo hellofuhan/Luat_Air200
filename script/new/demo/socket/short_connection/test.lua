@@ -109,7 +109,7 @@ local function reconn()
 	--conning表示正在尝试连接后台，一定要判断此变量，否则有可能发起不必要的重连，导致reconncnt增加，实际的重连次数减少
 	if conning then return end
 	--一个连接周期内的重连
-	if reconncnt < RECONN_MAX_CNT then		
+	if reconncnt < RECONN_MAX_CNT then
 		reconncnt = reconncnt+1
 		link.shut()
 		connect()

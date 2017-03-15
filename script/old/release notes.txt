@@ -1,3 +1,18 @@
+发布时间：2017/3/16 00:13:21
+修改记录：
+    一、lib脚本修改
+        lib脚本版本号：1.0.8
+        支持lib脚本的最小core软件版本号：Luat_V0005_Air200
+        (1)audio.lua：mic增益默认设置为1级，用户如果需要监听功能调大mic增益，直接调用接口audio.setmicrophonegain(audio.MIC_VOL15)即可
+    二、demo脚本修改
+        (1)uart_at_transparent项目：UART1打开全PIN脚功能
+        (2)uart_at_transparent_wdt项目：UART1打开全PIN脚功能
+        (3)socket/long_connection项目：修改默认的后台地址；修正“发送失败后没有自动重连”的问题
+        (4)socket/long_connection_transparent项目：修改默认的后台地址
+        (5)socket/short_connection项目：修改默认的后台地址
+
+
+
 发布时间：2017/3/13 11:55:21
 修改记录：
     一、demo脚本修改

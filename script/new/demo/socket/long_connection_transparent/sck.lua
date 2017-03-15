@@ -81,9 +81,6 @@ local function sndcb(item,result)
 			sndingdata = ""
 			--sys.dispatch("SND_TO_SVR_CNF",true)
 			sndmcuartdata()
-		--发送失败，RECONN_PERIOD秒后重连后台
-		else
-			sys.timer_start(reconn,RECONN_PERIOD*1000)
 		end
 	end
 end
@@ -148,6 +145,8 @@ function ntfy(idx,evt,result,item)
 		if item then
 			sndcb(item,result)
 		end
+		--发送失败，RECONN_PERIOD秒后重连后台
+		if not result then sys.timer_start(reconn,RECONN_PERIOD*1000) end
 	--连接被动断开
 	elseif evt == "STATE" and result == "CLOSED" then
 		linksta = false

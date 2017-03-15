@@ -15,7 +15,7 @@
 # 版本生成规则 Luat_V$(BUILD_VER)_$(HW_VER)[_$(FUNCTION)]
 
 #BUILD号
-BUILD_VER =0004
+BUILD_VER =0005
 #硬件版本号
 HW_VER = Air200
 #可选功能，例如TTS等，表明该版本具有特定功能

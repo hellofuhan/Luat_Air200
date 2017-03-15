@@ -14,7 +14,7 @@ module(...,package.seeall)
 
 local ssub,schar,smatch,sbyte = string.sub,string.char,string.match,string.byte
 --测试时请搭建自己的服务器
-local SCK_IDX,PROT,ADDR,PORT = 1,"TCP","www.test.com",6500
+local SCK_IDX,PROT,ADDR,PORT = 1,"TCP","120.26.196.195",9999
 --linksta:与后台的socket连接状态
 local linksta
 --一个连接周期内的动作：如果连接后台失败，会尝试重连，重连间隔为RECONN_PERIOD秒，最多重连RECONN_MAX_CNT次
@@ -190,6 +190,8 @@ function ntfy(idx,evt,result,item)
 		if item then
 			sndcb(item,result)
 		end
+		--发送失败，RECONN_PERIOD秒后重连后台
+		if not result then sys.timer_start(reconn,RECONN_PERIOD*1000) end
 	--连接被动断开
 	elseif evt == "STATE" and result == "CLOSED" then
 		linksta = false

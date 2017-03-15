@@ -1,3 +1,12 @@
+版本号：Luat_V0005_Air200.lod、Luat_V0005_Air200_TTS1.lod、Luat_V0005_Air200_TTS2.lod、Luat_V0005_Air200_TTS3.lod
+发布时间：2017/3/16 00:10
+修改记录：
+	1, 支持音频参数固化在代码中的功能，调大receiver播放增益以及mic增益
+	2, 修正0004版本引入的“Lua应用未使用UART1功能时，UART1可复用为GPIO的引脚电平状态不可控”的问题
+
+
+
+==============================
 版本号：Luat_V0004_Air200.lod、Luat_V0004_Air200_TTS1.lod、Luat_V0004_Air200_TTS2.lod、Luat_V0004_Air200_TTS3.lod
 发布时间：2017/3/13 23:10
 修改记录：

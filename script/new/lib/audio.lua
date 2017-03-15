@@ -355,6 +355,8 @@ sys.regmsg(rtos.MSG_AUDIO,audiomsg)
 setaudiochannel(audio.HANDSET)
 --默认音量等级设置为4级，4级是中间等级，最低为0级，最高为7级
 setspeakervol(audio.VOL4)
+--默认MIC音量等级设置为1级，最低为0级，最高为15级
+setmicrophonegain(audio.MIC_VOL1)
 
 
 --spriority：当前播放的音频优先级

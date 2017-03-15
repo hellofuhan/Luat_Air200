@@ -2,8 +2,9 @@ module(...,package.seeall)
 
 require"pm"
 
---串口ID,2对应uart2
---如果要修改为uart1，把UART_ID赋值为1即可
+--串口ID,1对应uart1
+--如果要修改为uart2，把UART_ID赋值为2即可
+--uart1支持全串口功能，uart2不支持全串口（只有RX、TX、GND）
 local UART_ID = 1
 
 --[[
@@ -48,8 +49,16 @@ function write(s)
 	uart.write(UART_ID,s)	
 end
 
---保持系统处于唤醒状态，不会休眠
-pm.wake("uartat")
+--如果是UART1，打开全串口功能，用户需要通过uart1的DTR脚控制模块的休眠和唤醒
+--我们的开发板硬件，默认DTR一直拉低，模块不会休眠
+--如果用户使用我们的模块布自己的大板，请参考硬件设计手册，注意对DTR脚的控制
+if UART_ID==1 then
+	--打开uart1的全串口功能
+	uart.uart1_all_pin_set()
+else
+	--保持系统处于唤醒状态，不会休眠
+	pm.wake("uartat")
+end
 --注册串口的数据接收函数，串口收到数据后，会以中断方式，调用read接口读取数据
 sys.reguart(UART_ID,read)
 --配置并且打开串口
