@@ -579,13 +579,6 @@ void platform_setup_vat_queue(void)
     QueueClean(&vatcRx_Q);
     hAtcReadSem = IVTBL(create_semaphore)(1);
 }
-/*+\NEW\zhuwangbin\2017.3.10\AIR200 项目添加uart1全pin脚功能*/
-void platform_uart1_all_pin_set(void)
-{
-	IVTBL(uart1_all_pin_set)();
-}
-/*+\NEW\zhuwangbin\2017.3.10\AIR200 项目添加uart1全pin脚功能*/
-
 
 u32 platform_uart_setup( unsigned id, u32 baud, int databits, int parity, int stopbits, u32 mode )
 {      

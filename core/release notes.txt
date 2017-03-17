@@ -1,3 +1,11 @@
+版本号：Luat_V0006_Air200.lod、Luat_V0006_Air200_TTS1.lod、Luat_V0006_Air200_TTS2.lod、Luat_V0006_Air200_TTS3.lod
+发布时间：2017/3/17 13:18
+修改记录：
+	1, 删除PPP功能和uart1的全pin脚功能；注意：0004和0005版本会引起部分功能不稳定，请开发者不再使用这两个版本
+
+
+
+==============================
 版本号：Luat_V0005_Air200.lod、Luat_V0005_Air200_TTS1.lod、Luat_V0005_Air200_TTS2.lod、Luat_V0005_Air200_TTS3.lod
 发布时间：2017/3/16 00:10
 修改记录：
