@@ -1,3 +1,15 @@
+发布时间：2017/3/17 13:47:21
+修改记录：
+    一、lib脚本修改
+        lib脚本版本号：2.0.3
+        支持lib脚本的最小core软件版本号：Luat_V0006_Air200
+        (1)sys.lua：支持lib脚本的最小core软件版本号：Luat_V0006_Air200
+    二、demo脚本修改
+        (1)uart_at_transparent项目：关闭UART1全PIN脚功能
+        (2)uart_at_transparent_wdt项目：关闭UART1全PIN脚功能
+
+
+
 发布时间：2017/3/16 00:13:21
 修改记录：
     一、lib脚本修改
