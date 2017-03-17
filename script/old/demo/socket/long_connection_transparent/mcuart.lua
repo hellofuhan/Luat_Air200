@@ -2,39 +2,39 @@ module(...,package.seeall)
 
 require"pm"
 
---ä¸²å£ID,1å¯¹åº”uart1
+--´®¿ÚID,1¶ÔÓ¦uart1
 local UART_ID = 1
 
---SND_UNIT_MAXï¼šæ¯æ¬¡å‘é€æœ€å¤§çš„å­—èŠ‚æ•°ï¼Œåªè¦ç´¯ç§¯æ”¶åˆ°çš„æ•°æ®å¤§äºŽç­‰äºŽè¿™ä¸ªæœ€å¤§å­—èŠ‚æ•°ï¼Œå¹¶ä¸”æ²¡æœ‰æ­£åœ¨å‘é€æ•°æ®åˆ°åŽå°ï¼Œåˆ™ç«‹å³å‘é€å‰SND_UNIT_MAXå­—èŠ‚æ•°æ®ç»™åŽå°
---SND_DELAYï¼šæ¯æ¬¡ä¸²å£æ”¶åˆ°æ•°æ®æ—¶ï¼Œé‡æ–°å»¶è¿ŸSND_DELAYæ¯«ç§’åŽï¼Œæ²¡æœ‰æ”¶åˆ°æ–°çš„æ•°æ®ï¼Œå¹¶ä¸”æ²¡æœ‰æ­£åœ¨å‘é€æ•°æ®åˆ°åŽå°ï¼Œåˆ™ç«‹å³å‘é€æœ€å¤šå‰SND_UNIT_MAXå­—èŠ‚æ•°æ®ç»™åŽå°
---è¿™ä¸¤ä¸ªå˜é‡é…åˆä½¿ç”¨ï¼Œåªè¦ä»»ä½•ä¸€ä¸ªæ¡ä»¶æ»¡è¶³ï¼Œéƒ½ä¼šè§¦å‘å‘é€åŠ¨ä½œ
---ä¾‹å¦‚ï¼šSND_UNIT_MAX,SND_DELAY = 1024,1000ï¼Œæœ‰å¦‚ä¸‹å‡ ç§æƒ…å†µ
---ä¸²å£æ”¶åˆ°äº†500å­—èŠ‚æ•°æ®ï¼ŒæŽ¥ä¸‹æ¥çš„1000æ¯«ç§’æ²¡æœ‰æ”¶åˆ°æ•°æ®ï¼Œå¹¶ä¸”æ²¡æœ‰æ­£åœ¨å‘é€æ•°æ®åˆ°åŽå°ï¼Œåˆ™ç«‹å³å‘é€è¿™500å­—èŠ‚æ•°æ®ç»™åŽå°
---ä¸²å£æ”¶åˆ°äº†500å­—èŠ‚æ•°æ®ï¼Œ800æ¯«ç§’åŽï¼Œåˆæ”¶åˆ°äº†524å­—èŠ‚æ•°æ®ï¼Œæ­¤æ—¶æ²¡æœ‰æ­£åœ¨å‘é€æ•°æ®åˆ°åŽå°ï¼Œåˆ™ç«‹å³å‘é€è¿™1024å­—èŠ‚æ•°æ®ç»™åŽå°
+--SND_UNIT_MAX£ºÃ¿´Î·¢ËÍ×î´óµÄ×Ö½ÚÊý£¬Ö»ÒªÀÛ»ýÊÕµ½µÄÊý¾Ý´óÓÚµÈÓÚÕâ¸ö×î´ó×Ö½ÚÊý£¬²¢ÇÒÃ»ÓÐÕýÔÚ·¢ËÍÊý¾Ýµ½ºóÌ¨£¬ÔòÁ¢¼´·¢ËÍÇ°SND_UNIT_MAX×Ö½ÚÊý¾Ý¸øºóÌ¨
+--SND_DELAY£ºÃ¿´Î´®¿ÚÊÕµ½Êý¾ÝÊ±£¬ÖØÐÂÑÓ³ÙSND_DELAYºÁÃëºó£¬Ã»ÓÐÊÕµ½ÐÂµÄÊý¾Ý£¬²¢ÇÒÃ»ÓÐÕýÔÚ·¢ËÍÊý¾Ýµ½ºóÌ¨£¬ÔòÁ¢¼´·¢ËÍ×î¶àÇ°SND_UNIT_MAX×Ö½ÚÊý¾Ý¸øºóÌ¨
+--ÕâÁ½¸ö±äÁ¿ÅäºÏÊ¹ÓÃ£¬Ö»ÒªÈÎºÎÒ»¸öÌõ¼þÂú×ã£¬¶¼»á´¥·¢·¢ËÍ¶¯×÷
+--ÀýÈç£ºSND_UNIT_MAX,SND_DELAY = 1024,1000£¬ÓÐÈçÏÂ¼¸ÖÖÇé¿ö
+--´®¿ÚÊÕµ½ÁË500×Ö½ÚÊý¾Ý£¬½ÓÏÂÀ´µÄ1000ºÁÃëÃ»ÓÐÊÕµ½Êý¾Ý£¬²¢ÇÒÃ»ÓÐÕýÔÚ·¢ËÍÊý¾Ýµ½ºóÌ¨£¬ÔòÁ¢¼´·¢ËÍÕâ500×Ö½ÚÊý¾Ý¸øºóÌ¨
+--´®¿ÚÊÕµ½ÁË500×Ö½ÚÊý¾Ý£¬800ºÁÃëºó£¬ÓÖÊÕµ½ÁË524×Ö½ÚÊý¾Ý£¬´ËÊ±Ã»ÓÐÕýÔÚ·¢ËÍÊý¾Ýµ½ºóÌ¨£¬ÔòÁ¢¼´·¢ËÍÕâ1024×Ö½ÚÊý¾Ý¸øºóÌ¨
 local SND_UNIT_MAX,SND_DELAY = 1024,1000
 
---sndingtosvrï¼šæ˜¯å¦æ­£åœ¨å‘é€æ•°æ®åˆ°åŽå°
+--sndingtosvr£ºÊÇ·ñÕýÔÚ·¢ËÍÊý¾Ýµ½ºóÌ¨
 local sndingtosvr
 
---unsndbufï¼šè¿˜æ²¡æœ‰å‘é€çš„æ•°æ®
---sndingbufï¼šæ­£åœ¨å‘é€çš„æ•°æ®
+--unsndbuf£º»¹Ã»ÓÐ·¢ËÍµÄÊý¾Ý
+--sndingbuf£ºÕýÔÚ·¢ËÍµÄÊý¾Ý
 local readbuf--[[,sndingbuf]] = ""--[[,""]]
 
 --[[
-å‡½æ•°åï¼šprint
-åŠŸèƒ½  ï¼šæ‰“å°æŽ¥å£ï¼Œæ­¤æ–‡ä»¶ä¸­çš„æ‰€æœ‰æ‰“å°éƒ½ä¼šåŠ ä¸Šmcuartå‰ç¼€
-å‚æ•°  ï¼šæ— 
-è¿”å›žå€¼ï¼šæ— 
+º¯ÊýÃû£ºprint
+¹¦ÄÜ  £º´òÓ¡½Ó¿Ú£¬´ËÎÄ¼þÖÐµÄËùÓÐ´òÓ¡¶¼»á¼ÓÉÏmcuartÇ°×º
+²ÎÊý  £ºÎÞ
+·µ»ØÖµ£ºÎÞ
 ]]
 local function print(...)
 	_G.print("mcuart",...)
 end
 
 --[[
-å‡½æ•°åï¼šsndtosvr
-åŠŸèƒ½  ï¼šé€šçŸ¥æ•°æ®å‘é€åŠŸèƒ½æ¨¡å—ï¼Œä¸²å£æ•°æ®å·²å‡†å¤‡å¥½ï¼Œå¯ä»¥å‘é€
-å‚æ•°  ï¼šæ— 
-è¿”å›žå€¼ï¼šæ— 
+º¯ÊýÃû£ºsndtosvr
+¹¦ÄÜ  £ºÍ¨ÖªÊý¾Ý·¢ËÍ¹¦ÄÜÄ£¿é£¬´®¿ÚÊý¾ÝÒÑ×¼±¸ºÃ£¬¿ÉÒÔ·¢ËÍ
+²ÎÊý  £ºÎÞ
+·µ»ØÖµ£ºÎÞ
 ]]
 local function sndtosvr()
 	--print("sndtosvr",sndingtosvr)
@@ -44,10 +44,10 @@ local function sndtosvr()
 end
 
 --[[
-å‡½æ•°åï¼šgetsndingbuf
-åŠŸèƒ½  ï¼šèŽ·å–å°†è¦å‘é€çš„æ•°æ®
-å‚æ•°  ï¼šæ— 
-è¿”å›žå€¼ï¼šstringç±»åž‹ï¼Œå°†è¦å‘é€çš„æ•°æ®
+º¯ÊýÃû£ºgetsndingbuf
+¹¦ÄÜ  £º»ñÈ¡½«Òª·¢ËÍµÄÊý¾Ý
+²ÎÊý  £ºÎÞ
+·µ»ØÖµ£ºstringÀàÐÍ£¬½«Òª·¢ËÍµÄÊý¾Ý
 ]]
 local function getsndingbuf()
 	print("getsndingbuf",string.len(readbuf),sndingtosvr,sys.timer_is_active(sndtosvr))
@@ -64,10 +64,10 @@ local function getsndingbuf()
 end
 
 --[[
-å‡½æ•°åï¼šresumesndtosvr
-åŠŸèƒ½  ï¼šå¤ä½å‘é€ä¸­æ ‡å¿—ï¼ŒèŽ·å–å°†è¦å‘é€çš„æ•°æ®
-å‚æ•°  ï¼šæ— 
-è¿”å›žå€¼ï¼šstringç±»åž‹ï¼Œå°†è¦å‘é€çš„æ•°æ®
+º¯ÊýÃû£ºresumesndtosvr
+¹¦ÄÜ  £º¸´Î»·¢ËÍÖÐ±êÖ¾£¬»ñÈ¡½«Òª·¢ËÍµÄÊý¾Ý
+²ÎÊý  £ºÎÞ
+·µ»ØÖµ£ºstringÀàÐÍ£¬½«Òª·¢ËÍµÄÊý¾Ý
 ]]
 function resumesndtosvr()
 	sndingtosvr = false
@@ -75,11 +75,11 @@ function resumesndtosvr()
 end
 
 --[[
-å‡½æ•°åï¼šsndcnf
-åŠŸèƒ½  ï¼šå‘é€ç»“æžœå¤„ç†å‡½æ•°
-å‚æ•°  ï¼š
-		resultï¼šå‘é€ç»“æžœï¼ŒtrueæˆåŠŸï¼Œå…¶ä½™å€¼å¤±è´¥
-è¿”å›žå€¼ï¼šæ— 
+º¯ÊýÃû£ºsndcnf
+¹¦ÄÜ  £º·¢ËÍ½á¹û´¦Àíº¯Êý
+²ÎÊý  £º
+		result£º·¢ËÍ½á¹û£¬true³É¹¦£¬ÆäÓàÖµÊ§°Ü
+·µ»ØÖµ£ºÎÞ
 ]]
 --[[local function sndcnf(result)
 	print("sndcnf",result)
@@ -88,15 +88,15 @@ end
 end]]
 
 --[[
-å‡½æ•°åï¼šproc
-åŠŸèƒ½  ï¼šå¤„ç†ä¸²å£æŽ¥æ”¶åˆ°çš„æ•°æ®
-å‚æ•°  ï¼š
-		dataï¼šå½“å‰ä¸€æ¬¡è¯»å–åˆ°çš„ä¸²å£æ•°æ®
-è¿”å›žå€¼ï¼šæ— 
+º¯ÊýÃû£ºproc
+¹¦ÄÜ  £º´¦Àí´®¿Ú½ÓÊÕµ½µÄÊý¾Ý
+²ÎÊý  £º
+		data£ºµ±Ç°Ò»´Î¶ÁÈ¡µ½µÄ´®¿ÚÊý¾Ý
+·µ»ØÖµ£ºÎÞ
 ]]
 local function proc(data)
 	if not data or string.len(data) == 0 then return end
-	--è¿½åŠ åˆ°æœªå‘é€æ•°æ®ç¼“å†²åŒºæœ«å°¾
+	--×·¼Óµ½Î´·¢ËÍÊý¾Ý»º³åÇøÄ©Î²
 	readbuf = readbuf..data
 	if string.len(readbuf)>=SND_UNIT_MAX then sndtosvr() end
 	sys.timer_start(sndtosvr,SND_DELAY)
@@ -104,17 +104,17 @@ end
 
 
 --[[
-å‡½æ•°åï¼šsnd
-åŠŸèƒ½  ï¼šè¯»å–ä¸²å£æŽ¥æ”¶åˆ°çš„æ•°æ®
-å‚æ•°  ï¼šæ— 
-è¿”å›žå€¼ï¼šæ— 
+º¯ÊýÃû£ºsnd
+¹¦ÄÜ  £º¶ÁÈ¡´®¿Ú½ÓÊÕµ½µÄÊý¾Ý
+²ÎÊý  £ºÎÞ
+·µ»ØÖµ£ºÎÞ
 ]]
 local function read()
 	local data = ""
-	--åº•å±‚coreä¸­ï¼Œä¸²å£æ”¶åˆ°æ•°æ®æ—¶ï¼š
-	--å¦‚æžœæŽ¥æ”¶ç¼“å†²åŒºä¸ºç©ºï¼Œåˆ™ä¼šä»¥ä¸­æ–­æ–¹å¼é€šçŸ¥Luaè„šæœ¬æ”¶åˆ°äº†æ–°æ•°æ®ï¼›
-	--å¦‚æžœæŽ¥æ”¶ç¼“å†²å™¨ä¸ä¸ºç©ºï¼Œåˆ™ä¸ä¼šé€šçŸ¥Luaè„šæœ¬
-	--æ‰€ä»¥Luaè„šæœ¬ä¸­æ”¶åˆ°ä¸­æ–­è¯»ä¸²å£æ•°æ®æ—¶ï¼Œæ¯æ¬¡éƒ½è¦æŠŠæŽ¥æ”¶ç¼“å†²åŒºä¸­çš„æ•°æ®å…¨éƒ¨è¯»å‡ºï¼Œè¿™æ ·æ‰èƒ½ä¿è¯åº•å±‚coreä¸­çš„æ–°æ•°æ®ä¸­æ–­ä¸Šæ¥ï¼Œæ­¤readå‡½æ•°ä¸­çš„whileè¯­å¥ä¸­å°±ä¿è¯äº†è¿™ä¸€ç‚¹
+	--µ×²ãcoreÖÐ£¬´®¿ÚÊÕµ½Êý¾ÝÊ±£º
+	--Èç¹û½ÓÊÕ»º³åÇøÎª¿Õ£¬Ôò»áÒÔÖÐ¶Ï·½Ê½Í¨ÖªLua½Å±¾ÊÕµ½ÁËÐÂÊý¾Ý£»
+	--Èç¹û½ÓÊÕ»º³åÆ÷²»Îª¿Õ£¬Ôò²»»áÍ¨ÖªLua½Å±¾
+	--ËùÒÔLua½Å±¾ÖÐÊÕµ½ÖÐ¶Ï¶Á´®¿ÚÊý¾ÝÊ±£¬Ã¿´Î¶¼Òª°Ñ½ÓÊÕ»º³åÇøÖÐµÄÊý¾ÝÈ«²¿¶Á³ö£¬ÕâÑù²ÅÄÜ±£Ö¤µ×²ãcoreÖÐµÄÐÂÊý¾ÝÖÐ¶ÏÉÏÀ´£¬´Ëreadº¯ÊýÖÐµÄwhileÓï¾äÖÐ¾Í±£Ö¤ÁËÕâÒ»µã
 	while true do
 		data = uart.read(UART_ID,"*l",0)
 		if not data or string.len(data) == 0 then break end
@@ -124,31 +124,31 @@ local function read()
 end
 
 --[[
-å‡½æ•°åï¼šwrite
-åŠŸèƒ½  ï¼šé€šè¿‡ä¸²å£å‘é€æ•°æ®
-å‚æ•°  ï¼š
-		sï¼šè¦å‘é€çš„æ•°æ®
-è¿”å›žå€¼ï¼šæ— 
+º¯ÊýÃû£ºwrite
+¹¦ÄÜ  £ºÍ¨¹ý´®¿Ú·¢ËÍÊý¾Ý
+²ÎÊý  £º
+		s£ºÒª·¢ËÍµÄÊý¾Ý
+·µ»ØÖµ£ºÎÞ
 ]]
 function write(s)
 	print("write",s)
 	uart.write(UART_ID,s)	
 end
 
---æ¶ˆæ¯å¤„ç†å‡½æ•°åˆ—è¡¨
+--ÏûÏ¢´¦Àíº¯ÊýÁÐ±í
 local procer =
 {
 	SVR_TRANSPARENT_TO_MCU = write,
 	--SND_TO_SVR_CNF = sndcnf,
 }
 
---æ³¨å†Œæ¶ˆæ¯å¤„ç†å‡½æ•°åˆ—è¡¨
+--×¢²áÏûÏ¢´¦Àíº¯ÊýÁÐ±í
 sys.regapp(procer)
---ä¿æŒç³»ç»Ÿå¤„äºŽå”¤é†’çŠ¶æ€ï¼Œä¸ä¼šä¼‘çœ 
+--±£³ÖÏµÍ³´¦ÓÚ»½ÐÑ×´Ì¬£¬²»»áÐÝÃß
 pm.wake("mcuart")
---æ³¨å†Œä¸²å£çš„æ•°æ®æŽ¥æ”¶å‡½æ•°ï¼Œä¸²å£æ”¶åˆ°æ•°æ®åŽï¼Œä¼šä»¥ä¸­æ–­æ–¹å¼ï¼Œè°ƒç”¨readæŽ¥å£è¯»å–æ•°æ®
+--×¢²á´®¿ÚµÄÊý¾Ý½ÓÊÕº¯Êý£¬´®¿ÚÊÕµ½Êý¾Ýºó£¬»áÒÔÖÐ¶Ï·½Ê½£¬µ÷ÓÃread½Ó¿Ú¶ÁÈ¡Êý¾Ý
 sys.reguart(UART_ID,read)
---é…ç½®å¹¶ä¸”æ‰“å¼€ä¸²å£
+--ÅäÖÃ²¢ÇÒ´ò¿ª´®¿Ú
 uart.setup(UART_ID,9600,8,uart.PAR_NONE,uart.STOP_1,2)
 
 

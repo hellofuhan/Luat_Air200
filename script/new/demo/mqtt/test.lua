@@ -3,16 +3,16 @@ require"mqtt"
 module(...,package.seeall)
 
 local ssub,schar,smatch,sbyte,slen = string.sub,string.char,string.match,string.byte,string.len
---æµ‹è¯•æ—¶è¯·æ­å»ºè‡ªå·±çš„æœåŠ¡å™¨
+--²âÊÔÊ±Çë´î½¨×Ô¼ºµÄ·şÎñÆ÷
 local PROT,ADDR,PORT = "TCP","lbsmqtt.airm2m.com",1884
 local mqttclient
 
 
 --[[
-å‡½æ•°åï¼šprint
-åŠŸèƒ½  ï¼šæ‰“å°æ¥å£ï¼Œæ­¤æ–‡ä»¶ä¸­çš„æ‰€æœ‰æ‰“å°éƒ½ä¼šåŠ ä¸Štestå‰ç¼€
-å‚æ•°  ï¼šæ— 
-è¿”å›å€¼ï¼šæ— 
+º¯ÊıÃû£ºprint
+¹¦ÄÜ  £º´òÓ¡½Ó¿Ú£¬´ËÎÄ¼şÖĞµÄËùÓĞ´òÓ¡¶¼»á¼ÓÉÏtestÇ°×º
+²ÎÊı  £ºÎŞ
+·µ»ØÖµ£ºÎŞ
 ]]
 local function print(...)
 	_G.print("test",...)
@@ -21,12 +21,12 @@ end
 local qos0cnt,qos1cnt = 1,1
 
 --[[
-å‡½æ•°åï¼špubqos0testsndcb
-åŠŸèƒ½  ï¼šâ€œå‘å¸ƒ1æ¡qosä¸º0çš„æ¶ˆæ¯â€å‘é€ç»“æœçš„å›è°ƒå‡½æ•°
-å‚æ•°  ï¼š
-		usertagï¼šè°ƒç”¨mqttclient:publishæ—¶ä¼ å…¥çš„usertag
-		resultï¼štrueè¡¨ç¤ºå‘é€æˆåŠŸï¼Œfalseæˆ–è€…nilå‘é€å¤±è´¥
-è¿”å›å€¼ï¼šæ— 
+º¯ÊıÃû£ºpubqos0testsndcb
+¹¦ÄÜ  £º¡°·¢²¼1ÌõqosÎª0µÄÏûÏ¢¡±·¢ËÍ½á¹ûµÄ»Øµ÷º¯Êı
+²ÎÊı  £º
+		usertag£ºµ÷ÓÃmqttclient:publishÊ±´«ÈëµÄusertag
+		result£ºtrue±íÊ¾·¢ËÍ³É¹¦£¬false»òÕßnil·¢ËÍÊ§°Ü
+·µ»ØÖµ£ºÎŞ
 ]]
 local function pubqos0testsndcb(usertag,result)
 	print("pubqos0testsndcb",usertag,result)
@@ -35,22 +35,22 @@ local function pubqos0testsndcb(usertag,result)
 end
 
 --[[
-å‡½æ•°åï¼špubqos0test
-åŠŸèƒ½  ï¼šå‘å¸ƒ1æ¡qosä¸º0çš„æ¶ˆæ¯
-å‚æ•°  ï¼šæ— 
-è¿”å›å€¼ï¼šæ— 
+º¯ÊıÃû£ºpubqos0test
+¹¦ÄÜ  £º·¢²¼1ÌõqosÎª0µÄÏûÏ¢
+²ÎÊı  £ºÎŞ
+·µ»ØÖµ£ºÎŞ
 ]]
 function pubqos0test()
 	mqttclient:publish("/qos0topic","qos0data",0,pubqos0testsndcb,"publish0test_"..qos0cnt)
 end
 
 --[[
-å‡½æ•°åï¼špubqos1testackcb
-åŠŸèƒ½  ï¼šå‘å¸ƒ1æ¡qosä¸º1çš„æ¶ˆæ¯åæ”¶åˆ°PUBACKçš„å›è°ƒå‡½æ•°
-å‚æ•°  ï¼š
-		usertagï¼šè°ƒç”¨mqttclient:publishæ—¶ä¼ å…¥çš„usertag
-		resultï¼štrueè¡¨ç¤ºå‘å¸ƒæˆåŠŸï¼Œfalseæˆ–è€…nilè¡¨ç¤ºå¤±è´¥
-è¿”å›å€¼ï¼šæ— 
+º¯ÊıÃû£ºpubqos1testackcb
+¹¦ÄÜ  £º·¢²¼1ÌõqosÎª1µÄÏûÏ¢ºóÊÕµ½PUBACKµÄ»Øµ÷º¯Êı
+²ÎÊı  £º
+		usertag£ºµ÷ÓÃmqttclient:publishÊ±´«ÈëµÄusertag
+		result£ºtrue±íÊ¾·¢²¼³É¹¦£¬false»òÕßnil±íÊ¾Ê§°Ü
+·µ»ØÖµ£ºÎŞ
 ]]
 local function pubqos1testackcb(usertag,result)
 	print("pubqos1testackcb",usertag,result)
@@ -59,84 +59,84 @@ local function pubqos1testackcb(usertag,result)
 end
 
 --[[
-å‡½æ•°åï¼špubqos1test
-åŠŸèƒ½  ï¼šå‘å¸ƒ1æ¡qosä¸º1çš„æ¶ˆæ¯
-å‚æ•°  ï¼šæ— 
-è¿”å›å€¼ï¼šæ— 
+º¯ÊıÃû£ºpubqos1test
+¹¦ÄÜ  £º·¢²¼1ÌõqosÎª1µÄÏûÏ¢
+²ÎÊı  £ºÎŞ
+·µ»ØÖµ£ºÎŞ
 ]]
 function pubqos1test()
 	mqttclient:publish("/qos1topic","qos1data",1,pubqos1testackcb,"publish1test_"..qos1cnt)
 end
 
 --[[
-å‡½æ•°åï¼šsubackcb
-åŠŸèƒ½  ï¼šMQTT SUBSCRIBEä¹‹åæ”¶åˆ°SUBACKçš„å›è°ƒå‡½æ•°
-å‚æ•°  ï¼š
-		usertagï¼šè°ƒç”¨mqttclient:subscribeæ—¶ä¼ å…¥çš„usertag
-		resultï¼štrueè¡¨ç¤ºè®¢é˜…æˆåŠŸï¼Œfalseæˆ–è€…nilè¡¨ç¤ºå¤±è´¥
-è¿”å›å€¼ï¼šæ— 
+º¯ÊıÃû£ºsubackcb
+¹¦ÄÜ  £ºMQTT SUBSCRIBEÖ®ºóÊÕµ½SUBACKµÄ»Øµ÷º¯Êı
+²ÎÊı  £º
+		usertag£ºµ÷ÓÃmqttclient:subscribeÊ±´«ÈëµÄusertag
+		result£ºtrue±íÊ¾¶©ÔÄ³É¹¦£¬false»òÕßnil±íÊ¾Ê§°Ü
+·µ»ØÖµ£ºÎŞ
 ]]
 local function subackcb(usertag,result)
 	print("subackcb",usertag,result)
 end
 
 --[[
-å‡½æ•°åï¼šrcvmessage
-åŠŸèƒ½  ï¼šæ”¶åˆ°PUBLISHæ¶ˆæ¯æ—¶çš„å›è°ƒå‡½æ•°
-å‚æ•°  ï¼š
-		topicï¼šæ¶ˆæ¯ä¸»é¢˜
-		payloadï¼šæ¶ˆæ¯è´Ÿè½½
-		qosï¼šæ¶ˆæ¯è´¨é‡ç­‰çº§
-è¿”å›å€¼ï¼šæ— 
+º¯ÊıÃû£ºrcvmessage
+¹¦ÄÜ  £ºÊÕµ½PUBLISHÏûÏ¢Ê±µÄ»Øµ÷º¯Êı
+²ÎÊı  £º
+		topic£ºÏûÏ¢Ö÷Ìâ
+		payload£ºÏûÏ¢¸ºÔØ
+		qos£ºÏûÏ¢ÖÊÁ¿µÈ¼¶
+·µ»ØÖµ£ºÎŞ
 ]]
 local function rcvmessagecb(topic,payload,qos)
 	print("rcvmessagecb",topic,payload,qos)
 end
 
 --[[
-å‡½æ•°åï¼šconnectedcb
-åŠŸèƒ½  ï¼šMQTT CONNECTæˆåŠŸå›è°ƒå‡½æ•°
-å‚æ•°  ï¼šæ— 		
-è¿”å›å€¼ï¼šæ— 
+º¯ÊıÃû£ºconnectedcb
+¹¦ÄÜ  £ºMQTT CONNECT³É¹¦»Øµ÷º¯Êı
+²ÎÊı  £ºÎŞ		
+·µ»ØÖµ£ºÎŞ
 ]]
 local function connectedcb()
 	print("connectedcb")
-	--è®¢é˜…ä¸»é¢˜
+	--¶©ÔÄÖ÷Ìâ
 	mqttclient:subscribe({{topic="/event0",qos=0}, {topic="/event1",qos=1}}, subackcb, "subscribetest")
-	--æ³¨å†Œäº‹ä»¶çš„å›è°ƒå‡½æ•°ï¼ŒMESSAGEäº‹ä»¶è¡¨ç¤ºæ”¶åˆ°äº†PUBLISHæ¶ˆæ¯
+	--×¢²áÊÂ¼şµÄ»Øµ÷º¯Êı£¬MESSAGEÊÂ¼ş±íÊ¾ÊÕµ½ÁËPUBLISHÏûÏ¢
 	mqttclient:regevtcb({MESSAGE=rcvmessagecb})
-	--å‘å¸ƒä¸€æ¡qosä¸º0çš„æ¶ˆæ¯
+	--·¢²¼Ò»ÌõqosÎª0µÄÏûÏ¢
 	pubqos0test()
-	--å‘å¸ƒä¸€æ¡qosä¸º1çš„æ¶ˆæ¯
+	--·¢²¼Ò»ÌõqosÎª1µÄÏûÏ¢
 	pubqos1test()
 end
 
 --[[
-å‡½æ•°åï¼šconnecterrcb
-åŠŸèƒ½  ï¼šMQTT CONNECTå¤±è´¥å›è°ƒå‡½æ•°
-å‚æ•°  ï¼š
-		rï¼šå¤±è´¥åŸå› å€¼
-			1ï¼šConnection Refused: unacceptable protocol version
-			2ï¼šConnection Refused: identifier rejected
-			3ï¼šConnection Refused: server unavailable
-			4ï¼šConnection Refused: bad user name or password
-			5ï¼šConnection Refused: not authorized
-è¿”å›å€¼ï¼šæ— 
+º¯ÊıÃû£ºconnecterrcb
+¹¦ÄÜ  £ºMQTT CONNECTÊ§°Ü»Øµ÷º¯Êı
+²ÎÊı  £º
+		r£ºÊ§°ÜÔ­ÒòÖµ
+			1£ºConnection Refused: unacceptable protocol version
+			2£ºConnection Refused: identifier rejected
+			3£ºConnection Refused: server unavailable
+			4£ºConnection Refused: bad user name or password
+			5£ºConnection Refused: not authorized
+·µ»ØÖµ£ºÎŞ
 ]]
 local function connecterrcb(r)
 	print("connecterrcb",r)
 end
 
 --[[
-å‡½æ•°åï¼šimeirdy
-åŠŸèƒ½  ï¼šIMEIè¯»å–æˆåŠŸï¼ŒæˆåŠŸåï¼Œæ‰å»åˆ›å»ºmqtt clientï¼Œè¿æ¥æœåŠ¡å™¨ï¼Œå› ä¸ºç”¨åˆ°äº†IMEIå·
-å‚æ•°  ï¼šæ— 		
-è¿”å›å€¼ï¼šæ— 
+º¯ÊıÃû£ºimeirdy
+¹¦ÄÜ  £ºIMEI¶ÁÈ¡³É¹¦£¬³É¹¦ºó£¬²ÅÈ¥´´½¨mqtt client£¬Á¬½Ó·şÎñÆ÷£¬ÒòÎªÓÃµ½ÁËIMEIºÅ
+²ÎÊı  £ºÎŞ		
+·µ»ØÖµ£ºÎŞ
 ]]
 local function imeirdy()
-	--åˆ›å»ºä¸€ä¸ªmqtt client
+	--´´½¨Ò»¸ömqtt client
 	mqttclient = mqtt.create(PROT,ADDR,PORT)
-	--è¿æ¥mqttæœåŠ¡å™¨
+	--Á¬½Ómqtt·şÎñÆ÷
 	mqttclient:connect(misc.getimei(),600,"user","password",connectedcb,connecterrcb)
 end
 
@@ -144,5 +144,5 @@ local procer =
 {
 	IMEI_READY = imeirdy,
 }
---æ³¨å†Œæ¶ˆæ¯çš„å¤„ç†å‡½æ•°
+--×¢²áÏûÏ¢µÄ´¦Àíº¯Êı
 sys.regapp(procer)

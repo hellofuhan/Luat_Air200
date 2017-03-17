@@ -99,7 +99,7 @@ local function sndack(idx,suc,item)
 	end
 end
 
-local function sckrsp(id,evt,val)--å¯¹æ­¤è¿æ¥çš„çŠ¶æ€é€šçŸ¥å’Œå¤„ç†çš„ç¨‹åº
+local function sckrsp(id,evt,val)--¶Ô´ËÁ¬½ÓµÄ×´Ì¬Í¨ÖªºÍ´¦ÀíµÄ³ÌĞò
 	local idx = getidxbyid(id)
 	if not idx then print("sckrsp err idx",id,evt,val) return end
 	print("sckrsp",id,evt,val)
@@ -128,7 +128,7 @@ local function sckrsp(id,evt,val)--å¯¹æ­¤è¿æ¥çš„çŠ¶æ€é€šçŸ¥å’Œå¤„ç†çš„ç¨‹åº
 			if scks[idx].sndretry >= 1 then
 				sndack(idx,false,item)
 			else
-				if not link.send(id,item.data) then---å‘æœåŠ¡å™¨å‘é€æ•°æ®
+				if not link.send(id,item.data) then---Ïò·şÎñÆ÷·¢ËÍÊı¾İ
 					sndack(idx,false,item)
 				end
 			end
@@ -159,7 +159,7 @@ local function sckrsp(id,evt,val)--å¯¹æ­¤è¿æ¥çš„çŠ¶æ€é€šçŸ¥å’Œå¤„ç†çš„ç¨‹åº
 	end
 end
 
-local function sckrcv(id,data)--å¯¹æ­¤è¿æ¥æ”¶åˆ°æ•°æ®è¿›è¡Œå¤„ç†çš„ç¨‹åº
+local function sckrcv(id,data)--¶Ô´ËÁ¬½ÓÊÕµ½Êı¾İ½øĞĞ´¦ÀíµÄ³ÌĞò
 	scks[getidxbyid(id)].rcv(getidxbyid(id),data)
 end
 
@@ -241,7 +241,7 @@ function send(idx,data,para,pos,ins)
 		if scks[idx].sndingitem.data or scks[idx].waitingrspitem.data then
 			table.insert(scks[idx].sndpending,pos or tail,item)
 		else
-			if link.send(sckid,data) then  --å‘é€æ•°æ®
+			if link.send(sckid,data) then  --·¢ËÍÊı¾İ
 				scks[idx].sndingitem = item
 			end
 		end
@@ -252,7 +252,7 @@ end
 function disconnect(idx,cause)
 	if not checkidx1(idx,"disconnect") then return end
 	scks[idx].discause = cause
-	return link.disconnect(scks[idx].id) --å…³é—­è¿æ¥
+	return link.disconnect(scks[idx].id) --¹Ø±ÕÁ¬½Ó
 end
 
 function isactive(idx)
@@ -260,7 +260,7 @@ function isactive(idx)
 	return link.getstate(scks[idx].id) == "CONNECTED"
 end
 
---å¾ˆæ—©ä»¥å‰coreå†…éƒ¨æœ‰bugï¼Œè¿æ¥åå°æ—¶ï¼Œå¾ˆé•¿æ—¶é—´éƒ½æ²¡æœ‰å¾—åˆ°è¿æ¥ç»“æœçš„åé¦ˆï¼Œå½“æ—¶é‡‡å–çš„luaè§„é¿å¤„ç†çš„æ–¹å¼ï¼Œå¦‚æœ90ç§’æ²¡æœ‰åé¦ˆï¼Œå°±å»é‡å¯è½¯ä»¶
---æœ€æ–°çš„coreå·²ç»è§£å†³äº†è¿™ä¸ªé—®é¢˜ï¼Œluaçš„è¿™ä¸ªè§„é¿æªæ–½ä¹Ÿæ²¡å»æ‰ï¼Œä¿ç•™ç€åªæ˜¯å¤šä¸€å±‚ä¿é™©å§
+--ºÜÔçÒÔÇ°coreÄÚ²¿ÓĞbug£¬Á¬½ÓºóÌ¨Ê±£¬ºÜ³¤Ê±¼ä¶¼Ã»ÓĞµÃµ½Á¬½Ó½á¹ûµÄ·´À¡£¬µ±Ê±²ÉÈ¡µÄlua¹æ±Ü´¦ÀíµÄ·½Ê½£¬Èç¹û90ÃëÃ»ÓĞ·´À¡£¬¾ÍÈ¥ÖØÆôÈí¼ş
+--×îĞÂµÄcoreÒÑ¾­½â¾öÁËÕâ¸öÎÊÌâ£¬luaµÄÕâ¸ö¹æ±Ü´ëÊ©Ò²Ã»È¥µô£¬±£Áô×ÅÖ»ÊÇ¶àÒ»²ã±£ÏÕ°É
 link.setconnectnoretrestart(true,90000)
 

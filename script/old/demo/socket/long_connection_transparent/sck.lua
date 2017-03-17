@@ -1,60 +1,60 @@
 module(...,package.seeall)
 
 --[[
-åŠŸèƒ½éœ€æ±‚ï¼š
-1ã€æ•°æ®ç½‘ç»œå‡†å¤‡å°±ç»ªåŽï¼Œè¿žæŽ¥åŽå°
-2ã€è¿žæŽ¥æˆåŠŸåŽï¼Œå¾ªçŽ¯â€œè¯»å–mcué€šè¿‡ä¸²å£å‘é€è¿‡æ¥çš„æ•°æ®ï¼Œæ¯æ¬¡æœ€å¤šå‘é€1Kå­—èŠ‚â€
-3ã€ä¸ŽåŽå°ä¿æŒé•¿è¿žæŽ¥ï¼Œæ–­å¼€åŽä¸»åŠ¨å†åŽ»é‡è¿žï¼Œè¿žæŽ¥æˆåŠŸä»ç„¶æŒ‰ç…§ç¬¬2æ¡å‘é€æ•°æ®
-4ã€æ”¶åˆ°åŽå°çš„æ•°æ®æ—¶ï¼Œåœ¨rcvå‡½æ•°ä¸­æ‰“å°å‡ºæ¥ï¼Œå¹¶ä¸”é€šè¿‡ä¸²å£é€ä¼ ç»™mcu
-æµ‹è¯•æ—¶è¯·æ­å»ºè‡ªå·±çš„åŽå°æœåŠ¡å™¨ï¼Œå¹¶ä¸”ä¿®æ”¹ä¸‹é¢çš„PROTï¼ŒADDRï¼ŒPORT 
+¹¦ÄÜÐèÇó£º
+1¡¢Êý¾ÝÍøÂç×¼±¸¾ÍÐ÷ºó£¬Á¬½ÓºóÌ¨
+2¡¢Á¬½Ó³É¹¦ºó£¬Ñ­»·¡°¶ÁÈ¡mcuÍ¨¹ý´®¿Ú·¢ËÍ¹ýÀ´µÄÊý¾Ý£¬Ã¿´Î×î¶à·¢ËÍ1K×Ö½Ú¡±
+3¡¢ÓëºóÌ¨±£³Ö³¤Á¬½Ó£¬¶Ï¿ªºóÖ÷¶¯ÔÙÈ¥ÖØÁ¬£¬Á¬½Ó³É¹¦ÈÔÈ»°´ÕÕµÚ2Ìõ·¢ËÍÊý¾Ý
+4¡¢ÊÕµ½ºóÌ¨µÄÊý¾ÝÊ±£¬ÔÚrcvº¯ÊýÖÐ´òÓ¡³öÀ´£¬²¢ÇÒÍ¨¹ý´®¿ÚÍ¸´«¸ømcu
+²âÊÔÊ±Çë´î½¨×Ô¼ºµÄºóÌ¨·þÎñÆ÷£¬²¢ÇÒÐÞ¸ÄÏÂÃæµÄPROT£¬ADDR£¬PORT 
 
-æ­¤ä¾‹å­ä¸ºé•¿è¿žæŽ¥ï¼Œåªè¦æ˜¯è½¯ä»¶ä¸Šèƒ½å¤Ÿæ£€æµ‹åˆ°çš„ç½‘ç»œå¼‚å¸¸ï¼Œå¯ä»¥è‡ªåŠ¨åŽ»é‡æ–°è¿žæŽ¥
+´ËÀý×ÓÎª³¤Á¬½Ó£¬Ö»ÒªÊÇÈí¼þÉÏÄÜ¹»¼ì²âµ½µÄÍøÂçÒì³££¬¿ÉÒÔ×Ô¶¯È¥ÖØÐÂÁ¬½Ó
 ]]
 
 local ssub,schar,smatch,sbyte,slen = string.sub,string.char,string.match,string.byte,string.len
---æµ‹è¯•æ—¶è¯·æ­å»ºè‡ªå·±çš„æœåŠ¡å™¨
+--²âÊÔÊ±Çë´î½¨×Ô¼ºµÄ·þÎñÆ÷
 local SCK_IDX,PROT,ADDR,PORT = 1,"TCP","120.26.196.195",9999
---linksta:ä¸ŽåŽå°çš„socketè¿žæŽ¥çŠ¶æ€
+--linksta:ÓëºóÌ¨µÄsocketÁ¬½Ó×´Ì¬
 local linksta
---ä¸€ä¸ªè¿žæŽ¥å‘¨æœŸå†…çš„åŠ¨ä½œï¼šå¦‚æžœè¿žæŽ¥åŽå°å¤±è´¥ï¼Œä¼šå°è¯•é‡è¿žï¼Œé‡è¿žé—´éš”ä¸ºRECONN_PERIODç§’ï¼Œæœ€å¤šé‡è¿žRECONN_MAX_CNTæ¬¡
---å¦‚æžœä¸€ä¸ªè¿žæŽ¥å‘¨æœŸå†…éƒ½æ²¡æœ‰è¿žæŽ¥æˆåŠŸï¼Œåˆ™ç­‰å¾…RECONN_CYCLE_PERIODç§’åŽï¼Œé‡æ–°å‘èµ·ä¸€ä¸ªè¿žæŽ¥å‘¨æœŸ
---å¦‚æžœè¿žç»­RECONN_CYCLE_MAX_CNTæ¬¡çš„è¿žæŽ¥å‘¨æœŸéƒ½æ²¡æœ‰è¿žæŽ¥æˆåŠŸï¼Œåˆ™é‡å¯è½¯ä»¶
+--Ò»¸öÁ¬½ÓÖÜÆÚÄÚµÄ¶¯×÷£ºÈç¹ûÁ¬½ÓºóÌ¨Ê§°Ü£¬»á³¢ÊÔÖØÁ¬£¬ÖØÁ¬¼ä¸ôÎªRECONN_PERIODÃë£¬×î¶àÖØÁ¬RECONN_MAX_CNT´Î
+--Èç¹ûÒ»¸öÁ¬½ÓÖÜÆÚÄÚ¶¼Ã»ÓÐÁ¬½Ó³É¹¦£¬ÔòµÈ´ýRECONN_CYCLE_PERIODÃëºó£¬ÖØÐÂ·¢ÆðÒ»¸öÁ¬½ÓÖÜÆÚ
+--Èç¹ûÁ¬ÐøRECONN_CYCLE_MAX_CNT´ÎµÄÁ¬½ÓÖÜÆÚ¶¼Ã»ÓÐÁ¬½Ó³É¹¦£¬ÔòÖØÆôÈí¼þ
 local RECONN_MAX_CNT,RECONN_PERIOD,RECONN_CYCLE_MAX_CNT,RECONN_CYCLE_PERIOD = 3,5,3,20
---reconncnt:å½“å‰è¿žæŽ¥å‘¨æœŸå†…ï¼Œå·²ç»é‡è¿žçš„æ¬¡æ•°
---reconncyclecnt:è¿žç»­å¤šå°‘ä¸ªè¿žæŽ¥å‘¨æœŸï¼Œéƒ½æ²¡æœ‰è¿žæŽ¥æˆåŠŸ
---ä¸€æ—¦è¿žæŽ¥æˆåŠŸï¼Œéƒ½ä¼šå¤ä½è¿™ä¸¤ä¸ªæ ‡è®°
---conning:æ˜¯å¦åœ¨å°è¯•è¿žæŽ¥
+--reconncnt:µ±Ç°Á¬½ÓÖÜÆÚÄÚ£¬ÒÑ¾­ÖØÁ¬µÄ´ÎÊý
+--reconncyclecnt:Á¬Ðø¶àÉÙ¸öÁ¬½ÓÖÜÆÚ£¬¶¼Ã»ÓÐÁ¬½Ó³É¹¦
+--Ò»µ©Á¬½Ó³É¹¦£¬¶¼»á¸´Î»ÕâÁ½¸ö±ê¼Ç
+--conning:ÊÇ·ñÔÚ³¢ÊÔÁ¬½Ó
 local reconncnt,reconncyclecnt,conning = 0,0
---æ­£åœ¨å‘é€çš„æ•°æ®
+--ÕýÔÚ·¢ËÍµÄÊý¾Ý
 local sndingdata = ""
 
 --[[
-å‡½æ•°åï¼šprint
-åŠŸèƒ½  ï¼šæ‰“å°æŽ¥å£ï¼Œæ­¤æ–‡ä»¶ä¸­çš„æ‰€æœ‰æ‰“å°éƒ½ä¼šåŠ ä¸Šsckå‰ç¼€
-å‚æ•°  ï¼šæ— 
-è¿”å›žå€¼ï¼šæ— 
+º¯ÊýÃû£ºprint
+¹¦ÄÜ  £º´òÓ¡½Ó¿Ú£¬´ËÎÄ¼þÖÐµÄËùÓÐ´òÓ¡¶¼»á¼ÓÉÏsckÇ°×º
+²ÎÊý  £ºÎÞ
+·µ»ØÖµ£ºÎÞ
 ]]
 local function print(...)
 	_G.print("sck",...)
 end
 
 --[[
-å‡½æ•°åï¼šsnd
-åŠŸèƒ½  ï¼šè°ƒç”¨å‘é€æŽ¥å£å‘é€æ•°æ®
-å‚æ•°  ï¼š
-        dataï¼šå‘é€çš„æ•°æ®ï¼Œåœ¨å‘é€ç»“æžœäº‹ä»¶å¤„ç†å‡½æ•°ntfyä¸­ï¼Œä¼šèµ‹å€¼åˆ°item.dataä¸­
-		paraï¼šå‘é€çš„å‚æ•°ï¼Œåœ¨å‘é€ç»“æžœäº‹ä»¶å¤„ç†å‡½æ•°ntfyä¸­ï¼Œä¼šèµ‹å€¼åˆ°item.paraä¸­ 
-è¿”å›žå€¼ï¼šè°ƒç”¨å‘é€æŽ¥å£çš„ç»“æžœï¼ˆå¹¶ä¸æ˜¯æ•°æ®å‘é€æ˜¯å¦æˆåŠŸçš„ç»“æžœï¼Œæ•°æ®å‘é€æ˜¯å¦æˆåŠŸçš„ç»“æžœåœ¨ntfyä¸­çš„SENDäº‹ä»¶ä¸­é€šçŸ¥ï¼‰ï¼Œtrueä¸ºæˆåŠŸï¼Œå…¶ä»–ä¸ºå¤±è´¥
+º¯ÊýÃû£ºsnd
+¹¦ÄÜ  £ºµ÷ÓÃ·¢ËÍ½Ó¿Ú·¢ËÍÊý¾Ý
+²ÎÊý  £º
+        data£º·¢ËÍµÄÊý¾Ý£¬ÔÚ·¢ËÍ½á¹ûÊÂ¼þ´¦Àíº¯ÊýntfyÖÐ£¬»á¸³Öµµ½item.dataÖÐ
+		para£º·¢ËÍµÄ²ÎÊý£¬ÔÚ·¢ËÍ½á¹ûÊÂ¼þ´¦Àíº¯ÊýntfyÖÐ£¬»á¸³Öµµ½item.paraÖÐ 
+·µ»ØÖµ£ºµ÷ÓÃ·¢ËÍ½Ó¿ÚµÄ½á¹û£¨²¢²»ÊÇÊý¾Ý·¢ËÍÊÇ·ñ³É¹¦µÄ½á¹û£¬Êý¾Ý·¢ËÍÊÇ·ñ³É¹¦µÄ½á¹ûÔÚntfyÖÐµÄSENDÊÂ¼þÖÐÍ¨Öª£©£¬trueÎª³É¹¦£¬ÆäËûÎªÊ§°Ü
 ]]
 function snd(data,para)
 	return linkapp.scksnd(SCK_IDX,data,para)
 end
 
 --[[
-å‡½æ•°åï¼šsndmcuartdata
-åŠŸèƒ½  ï¼šå¦‚æžœè¿˜æœ‰ç­‰å¾…å‘é€çš„mcué€šè¿‡ä¸²å£ä¼ è¿‡æ¥çš„æ•°æ®ï¼Œåˆ™ç»§ç»­å‘é€
-å‚æ•°  ï¼šæ— 
-è¿”å›žå€¼ï¼šæ— 
+º¯ÊýÃû£ºsndmcuartdata
+¹¦ÄÜ  £ºÈç¹û»¹ÓÐµÈ´ý·¢ËÍµÄmcuÍ¨¹ý´®¿Ú´«¹ýÀ´µÄÊý¾Ý£¬Ôò¼ÌÐø·¢ËÍ
+²ÎÊý  £ºÎÞ
+·µ»ØÖµ£ºÎÞ
 ]]
 local function sndmcuartdata()
 	if sndingdata=="" then
@@ -64,18 +64,18 @@ local function sndmcuartdata()
 end
 
 --[[
-å‡½æ•°åï¼šsndcb
-åŠŸèƒ½  ï¼šæ•°æ®å‘é€ç»“æžœå¤„ç†
-å‚æ•°  ï¼š  
-        resultï¼š boolç±»åž‹ï¼Œå‘é€ç»“æžœï¼Œtrueä¸ºæˆåŠŸï¼Œå…¶ä»–ä¸ºå¤±è´¥
-		itemï¼štableç±»åž‹ï¼Œ{data=,para=}ï¼Œæ¶ˆæ¯å›žä¼ çš„å‚æ•°å’Œæ•°æ®ï¼Œä¾‹å¦‚è°ƒç”¨linkapp.scksndæ—¶ä¼ å…¥çš„ç¬¬2ä¸ªå’Œç¬¬3ä¸ªå‚æ•°åˆ†åˆ«ä¸ºdatå’Œparï¼Œåˆ™item={data=dat,para=par}
-è¿”å›žå€¼ï¼šæ— 
+º¯ÊýÃû£ºsndcb
+¹¦ÄÜ  £ºÊý¾Ý·¢ËÍ½á¹û´¦Àí
+²ÎÊý  £º  
+        result£º boolÀàÐÍ£¬·¢ËÍ½á¹û£¬trueÎª³É¹¦£¬ÆäËûÎªÊ§°Ü
+		item£ºtableÀàÐÍ£¬{data=,para=}£¬ÏûÏ¢»Ø´«µÄ²ÎÊýºÍÊý¾Ý£¬ÀýÈçµ÷ÓÃlinkapp.scksndÊ±´«ÈëµÄµÚ2¸öºÍµÚ3¸ö²ÎÊý·Ö±ðÎªdatºÍpar£¬Ôòitem={data=dat,para=par}
+·µ»ØÖµ£ºÎÞ
 ]]
 local function sndcb(item,result)
 	print("sndcb",item.para,result)
 	if not item.para then return end
 	if item.para=="TRANSPARENT" then
-		--å‘é€æˆåŠŸï¼Œç»§ç»­å‘é€ä¸‹åŒ…æ•°æ®
+		--·¢ËÍ³É¹¦£¬¼ÌÐø·¢ËÍÏÂ°üÊý¾Ý
 		if result then
 			sndingdata = ""
 			--sys.dispatch("SND_TO_SVR_CNF",true)
@@ -85,24 +85,24 @@ local function sndcb(item,result)
 end
 
 --[[
-å‡½æ•°åï¼šreconn
-åŠŸèƒ½  ï¼šé‡è¿žåŽå°å¤„ç†
-        ä¸€ä¸ªè¿žæŽ¥å‘¨æœŸå†…çš„åŠ¨ä½œï¼šå¦‚æžœè¿žæŽ¥åŽå°å¤±è´¥ï¼Œä¼šå°è¯•é‡è¿žï¼Œé‡è¿žé—´éš”ä¸ºRECONN_PERIODç§’ï¼Œæœ€å¤šé‡è¿žRECONN_MAX_CNTæ¬¡
-        å¦‚æžœä¸€ä¸ªè¿žæŽ¥å‘¨æœŸå†…éƒ½æ²¡æœ‰è¿žæŽ¥æˆåŠŸï¼Œåˆ™ç­‰å¾…RECONN_CYCLE_PERIODç§’åŽï¼Œé‡æ–°å‘èµ·ä¸€ä¸ªè¿žæŽ¥å‘¨æœŸ
-        å¦‚æžœè¿žç»­RECONN_CYCLE_MAX_CNTæ¬¡çš„è¿žæŽ¥å‘¨æœŸéƒ½æ²¡æœ‰è¿žæŽ¥æˆåŠŸï¼Œåˆ™é‡å¯è½¯ä»¶
-å‚æ•°  ï¼šæ— 
-è¿”å›žå€¼ï¼šæ— 
+º¯ÊýÃû£ºreconn
+¹¦ÄÜ  £ºÖØÁ¬ºóÌ¨´¦Àí
+        Ò»¸öÁ¬½ÓÖÜÆÚÄÚµÄ¶¯×÷£ºÈç¹ûÁ¬½ÓºóÌ¨Ê§°Ü£¬»á³¢ÊÔÖØÁ¬£¬ÖØÁ¬¼ä¸ôÎªRECONN_PERIODÃë£¬×î¶àÖØÁ¬RECONN_MAX_CNT´Î
+        Èç¹ûÒ»¸öÁ¬½ÓÖÜÆÚÄÚ¶¼Ã»ÓÐÁ¬½Ó³É¹¦£¬ÔòµÈ´ýRECONN_CYCLE_PERIODÃëºó£¬ÖØÐÂ·¢ÆðÒ»¸öÁ¬½ÓÖÜÆÚ
+        Èç¹ûÁ¬ÐøRECONN_CYCLE_MAX_CNT´ÎµÄÁ¬½ÓÖÜÆÚ¶¼Ã»ÓÐÁ¬½Ó³É¹¦£¬ÔòÖØÆôÈí¼þ
+²ÎÊý  £ºÎÞ
+·µ»ØÖµ£ºÎÞ
 ]]
 function reconn()
 	print("reconn",reconncnt,conning,reconncyclecnt)
-	--conningè¡¨ç¤ºæ­£åœ¨å°è¯•è¿žæŽ¥åŽå°ï¼Œä¸€å®šè¦åˆ¤æ–­æ­¤å˜é‡ï¼Œå¦åˆ™æœ‰å¯èƒ½å‘èµ·ä¸å¿…è¦çš„é‡è¿žï¼Œå¯¼è‡´reconncntå¢žåŠ ï¼Œå®žé™…çš„é‡è¿žæ¬¡æ•°å‡å°‘
+	--conning±íÊ¾ÕýÔÚ³¢ÊÔÁ¬½ÓºóÌ¨£¬Ò»¶¨ÒªÅÐ¶Ï´Ë±äÁ¿£¬·ñÔòÓÐ¿ÉÄÜ·¢Æð²»±ØÒªµÄÖØÁ¬£¬µ¼ÖÂreconncntÔö¼Ó£¬Êµ¼ÊµÄÖØÁ¬´ÎÊý¼õÉÙ
 	if conning then return end
-	--ä¸€ä¸ªè¿žæŽ¥å‘¨æœŸå†…çš„é‡è¿ž
+	--Ò»¸öÁ¬½ÓÖÜÆÚÄÚµÄÖØÁ¬
 	if reconncnt < RECONN_MAX_CNT then		
 		reconncnt = reconncnt+1
 		link.shut()
 		connect()
-	--ä¸€ä¸ªè¿žæŽ¥å‘¨æœŸçš„é‡è¿žéƒ½å¤±è´¥
+	--Ò»¸öÁ¬½ÓÖÜÆÚµÄÖØÁ¬¶¼Ê§°Ü
 	else
 		reconncnt,reconncyclecnt = 0,reconncyclecnt+1
 		if reconncyclecnt >= RECONN_CYCLE_MAX_CNT then
@@ -113,89 +113,89 @@ function reconn()
 end
 
 --[[
-å‡½æ•°åï¼šntfy
-åŠŸèƒ½  ï¼šsocketçŠ¶æ€çš„å¤„ç†å‡½æ•°
-å‚æ•°  ï¼š
-        idxï¼šnumberç±»åž‹ï¼Œlinkappä¸­ç»´æŠ¤çš„socket idxï¼Œè·Ÿè°ƒç”¨linkapp.sckconnæ—¶ä¼ å…¥çš„ç¬¬ä¸€ä¸ªå‚æ•°ç›¸åŒï¼Œç¨‹åºå¯ä»¥å¿½ç•¥ä¸å¤„ç†
-        evtï¼šstringç±»åž‹ï¼Œæ¶ˆæ¯äº‹ä»¶ç±»åž‹
-		resultï¼š boolç±»åž‹ï¼Œæ¶ˆæ¯äº‹ä»¶ç»“æžœï¼Œtrueä¸ºæˆåŠŸï¼Œå…¶ä»–ä¸ºå¤±è´¥
-		itemï¼štableç±»åž‹ï¼Œ{data=,para=}ï¼Œæ¶ˆæ¯å›žä¼ çš„å‚æ•°å’Œæ•°æ®ï¼Œç›®å‰åªæ˜¯åœ¨SENDç±»åž‹çš„äº‹ä»¶ä¸­ç”¨åˆ°äº†æ­¤å‚æ•°ï¼Œä¾‹å¦‚è°ƒç”¨linkapp.scksndæ—¶ä¼ å…¥çš„ç¬¬2ä¸ªå’Œç¬¬3ä¸ªå‚æ•°åˆ†åˆ«ä¸ºdatå’Œparï¼Œåˆ™item={data=dat,para=par}
-è¿”å›žå€¼ï¼šæ— 
+º¯ÊýÃû£ºntfy
+¹¦ÄÜ  £ºsocket×´Ì¬µÄ´¦Àíº¯Êý
+²ÎÊý  £º
+        idx£ºnumberÀàÐÍ£¬linkappÖÐÎ¬»¤µÄsocket idx£¬¸úµ÷ÓÃlinkapp.sckconnÊ±´«ÈëµÄµÚÒ»¸ö²ÎÊýÏàÍ¬£¬³ÌÐò¿ÉÒÔºöÂÔ²»´¦Àí
+        evt£ºstringÀàÐÍ£¬ÏûÏ¢ÊÂ¼þÀàÐÍ
+		result£º boolÀàÐÍ£¬ÏûÏ¢ÊÂ¼þ½á¹û£¬trueÎª³É¹¦£¬ÆäËûÎªÊ§°Ü
+		item£ºtableÀàÐÍ£¬{data=,para=}£¬ÏûÏ¢»Ø´«µÄ²ÎÊýºÍÊý¾Ý£¬Ä¿Ç°Ö»ÊÇÔÚSENDÀàÐÍµÄÊÂ¼þÖÐÓÃµ½ÁË´Ë²ÎÊý£¬ÀýÈçµ÷ÓÃlinkapp.scksndÊ±´«ÈëµÄµÚ2¸öºÍµÚ3¸ö²ÎÊý·Ö±ðÎªdatºÍpar£¬Ôòitem={data=dat,para=par}
+·µ»ØÖµ£ºÎÞ
 ]]
 function ntfy(idx,evt,result,item)
 	print("ntfy",evt,result,item)
-	--è¿žæŽ¥ç»“æžœ
+	--Á¬½Ó½á¹û
 	if evt == "CONNECT" then
 		conning = false
-		--è¿žæŽ¥æˆåŠŸ
+		--Á¬½Ó³É¹¦
 		if result then
 			reconncnt,reconncyclecnt,linksta = 0,0,true
-			--åœæ­¢é‡è¿žå®šæ—¶å™¨
+			--Í£Ö¹ÖØÁ¬¶¨Ê±Æ÷
 			sys.timer_stop(reconn)
-			--å‘é€mcué€šè¿‡ä¸²å£ä¼ è¿‡æ¥çš„æ•°æ®åˆ°åŽå°
+			--·¢ËÍmcuÍ¨¹ý´®¿Ú´«¹ýÀ´µÄÊý¾Ýµ½ºóÌ¨
 			sndmcuartdata()
-		--è¿žæŽ¥å¤±è´¥
+		--Á¬½ÓÊ§°Ü
 		else
-			--RECONN_PERIODç§’åŽé‡è¿ž
+			--RECONN_PERIODÃëºóÖØÁ¬
 			sys.timer_start(reconn,RECONN_PERIOD*1000)
 		end	
-	--æ•°æ®å‘é€ç»“æžœ
+	--Êý¾Ý·¢ËÍ½á¹û
 	elseif evt == "SEND" then
 		if item then
 			sndcb(item,result)
 		end
-		--å‘é€å¤±è´¥ï¼ŒRECONN_PERIODç§’åŽé‡è¿žåŽå°
+		--·¢ËÍÊ§°Ü£¬RECONN_PERIODÃëºóÖØÁ¬ºóÌ¨
 		if not result then sys.timer_start(reconn,RECONN_PERIOD*1000) end
-	--è¿žæŽ¥è¢«åŠ¨æ–­å¼€
+	--Á¬½Ó±»¶¯¶Ï¿ª
 	elseif evt == "STATE" and result == "CLOSED" then
 		linksta = false
 		reconn()
-	--è¿žæŽ¥ä¸»åŠ¨æ–­å¼€
+	--Á¬½ÓÖ÷¶¯¶Ï¿ª
 	elseif evt == "DISCONNECT" then
 		linksta = false
 		reconn()		
 	end
-	--å…¶ä»–é”™è¯¯å¤„ç†ï¼Œæ–­å¼€æ•°æ®é“¾è·¯ï¼Œé‡æ–°è¿žæŽ¥
+	--ÆäËû´íÎó´¦Àí£¬¶Ï¿ªÊý¾ÝÁ´Â·£¬ÖØÐÂÁ¬½Ó
 	if smatch((type(result)=="string") and result or "","ERROR") then
-		--RECONN_PERIODç§’åŽé‡è¿ž
+		--RECONN_PERIODÃëºóÖØÁ¬
 		sys.timer_start(reconn,RECONN_PERIOD*1000)
 	end
 end
 
 --[[
-å‡½æ•°åï¼šrcv
-åŠŸèƒ½  ï¼šsocketæŽ¥æ”¶æ•°æ®çš„å¤„ç†å‡½æ•°
-å‚æ•°  ï¼š
-        idx ï¼šlinkappä¸­ç»´æŠ¤çš„socket idxï¼Œè·Ÿè°ƒç”¨linkapp.sckconnæ—¶ä¼ å…¥çš„ç¬¬ä¸€ä¸ªå‚æ•°ç›¸åŒï¼Œç¨‹åºå¯ä»¥å¿½ç•¥ä¸å¤„ç†
-        dataï¼šæŽ¥æ”¶åˆ°çš„æ•°æ®
-è¿”å›žå€¼ï¼šæ— 
+º¯ÊýÃû£ºrcv
+¹¦ÄÜ  £ºsocket½ÓÊÕÊý¾ÝµÄ´¦Àíº¯Êý
+²ÎÊý  £º
+        idx £ºlinkappÖÐÎ¬»¤µÄsocket idx£¬¸úµ÷ÓÃlinkapp.sckconnÊ±´«ÈëµÄµÚÒ»¸ö²ÎÊýÏàÍ¬£¬³ÌÐò¿ÉÒÔºöÂÔ²»´¦Àí
+        data£º½ÓÊÕµ½µÄÊý¾Ý
+·µ»ØÖµ£ºÎÞ
 ]]
 function rcv(idx,data)
 	print("rcv",slen(data)>200 and slen(data) or data)
-	--æŠ›å‡ºSVR_TRANSPARENT_TO_MCUæ¶ˆæ¯ï¼Œæºå¸¦socketæ”¶åˆ°çš„æ•°æ®
+	--Å×³öSVR_TRANSPARENT_TO_MCUÏûÏ¢£¬Ð¯´øsocketÊÕµ½µÄÊý¾Ý
 	sys.dispatch("SVR_TRANSPARENT_TO_MCU",data)
 end
 
 --[[
-å‡½æ•°åï¼šconnect
-åŠŸèƒ½  ï¼šåˆ›å»ºåˆ°åŽå°æœåŠ¡å™¨çš„è¿žæŽ¥ï¼›
-        å¦‚æžœæ•°æ®ç½‘ç»œå·²ç»å‡†å¤‡å¥½ï¼Œä¼šç†è§£è¿žæŽ¥åŽå°ï¼›å¦åˆ™ï¼Œè¿žæŽ¥è¯·æ±‚ä¼šè¢«æŒ‚èµ·ï¼Œç­‰æ•°æ®ç½‘ç»œå‡†å¤‡å°±ç»ªåŽï¼Œè‡ªåŠ¨åŽ»è¿žæŽ¥åŽå°
-		ntfyï¼šsocketçŠ¶æ€çš„å¤„ç†å‡½æ•°
-		rcvï¼šsocketæŽ¥æ”¶æ•°æ®çš„å¤„ç†å‡½æ•°
-å‚æ•°  ï¼šæ— 
-è¿”å›žå€¼ï¼šæ— 
+º¯ÊýÃû£ºconnect
+¹¦ÄÜ  £º´´½¨µ½ºóÌ¨·þÎñÆ÷µÄÁ¬½Ó£»
+        Èç¹ûÊý¾ÝÍøÂçÒÑ¾­×¼±¸ºÃ£¬»áÀí½âÁ¬½ÓºóÌ¨£»·ñÔò£¬Á¬½ÓÇëÇó»á±»¹ÒÆð£¬µÈÊý¾ÝÍøÂç×¼±¸¾ÍÐ÷ºó£¬×Ô¶¯È¥Á¬½ÓºóÌ¨
+		ntfy£ºsocket×´Ì¬µÄ´¦Àíº¯Êý
+		rcv£ºsocket½ÓÊÕÊý¾ÝµÄ´¦Àíº¯Êý
+²ÎÊý  £ºÎÞ
+·µ»ØÖµ£ºÎÞ
 ]]
 function connect()	
 	linkapp.sckconn(SCK_IDX,linkapp.NORMAL,PROT,ADDR,PORT,ntfy,rcv)
 	conning = true
 end
 
---æ¶ˆæ¯å¤„ç†å‡½æ•°åˆ—è¡¨
+--ÏûÏ¢´¦Àíº¯ÊýÁÐ±í
 local procer =
 {
 	SND_TO_SVR_REQ = sndmcuartdata,
 }
 
---æ³¨å†Œæ¶ˆæ¯å¤„ç†å‡½æ•°åˆ—è¡¨
+--×¢²áÏûÏ¢´¦Àíº¯ÊýÁÐ±í
 sys.regapp(procer)
 connect()
