@@ -48,3 +48,9 @@ http://www.luam2m.com/forum.php?mod=post&action=edit&fid=84&tid=2479&pid=6502&pa
 添加：Luat专用看门狗芯片设计手册V1.0.pdf
       Luat模块阻抗线及天线设计建议_V1.0.pdf
 删除：Luat 模块天线设计建议20170301.pdf	
+
+20170317：
+添加：2个lua教程：lua-5.1中文手册.chm 以及 STEP BY STEP -LUA.zip
+
+20170318：
+更新：合宙通信OpenLuat开源模块LUA程序设计指南V2.3 更新为 V2.4 修正文档中一些错误
