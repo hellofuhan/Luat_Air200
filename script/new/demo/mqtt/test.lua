@@ -136,6 +136,8 @@ end
 local function imeirdy()
 	--创建一个mqtt client
 	mqttclient = mqtt.create(PROT,ADDR,PORT)
+	--配置遗嘱参数,如果有需要，打开下面一行代码，并且根据自己的需求调整will参数
+	--mqttclient:configwill(1,0,0,"/willtopic","will payload")
 	--连接mqtt服务器
 	mqttclient:connect(misc.getimei(),600,"user","password",connectedcb,connecterrcb)
 end

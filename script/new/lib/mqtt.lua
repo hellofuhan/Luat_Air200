@@ -94,8 +94,19 @@ end
 ]]
 local function pack(typ,...)
 	local para = {}
-	local function connect(alive,id,user,pwd)
-		return lpack.pack(">bAbbHAAA",CONNECT*16,encutf8(PRONAME),PROVER,(user and 1 or 0)*128+(pwd and 1 or 0)*64+CLEANSESS*2,alive,encutf8(id),encutf8(user),encutf8(pwd))
+	local function connect(alive,id,twill,user,pwd)
+		local ret = lpack.pack(">bAbbHA",
+						CONNECT*16,
+						encutf8(PRONAME),
+						PROVER,
+						(user and 1 or 0)*128+(pwd and 1 or 0)*64+twill.retain*32+twill.qos*8+twill.flg*4+CLEANSESS*2,
+						alive,
+						encutf8(id))
+		if twill.flg==1 then
+			ret = ret..encutf8(twill.topic)..encutf8(twill.payload)
+		end
+		ret = ret..encutf8(user)..encutf8(pwd)
+		return ret
 	end
 	
 	local function subscribe(p)
@@ -278,7 +289,18 @@ end
 ]]
 function mqttconndata(sckidx)
 	local mqttclientidx = getclient(sckidx)
-	return pack(CONNECT,tclients[mqttclientidx].keepalive,tclients[mqttclientidx].clientid,tclients[mqttclientidx].user,tclients[mqttclientidx].password)
+	return pack(CONNECT,
+				tclients[mqttclientidx].keepalive,
+				tclients[mqttclientidx].clientid,
+				{
+					flg=tclients[mqttclientidx].willflg or 0,
+					qos=tclients[mqttclientidx].willqos or 0,
+					retain=tclients[mqttclientidx].willretain or 0,
+					topic=tclients[mqttclientidx].willtopic or "",
+					payload=tclients[mqttclientidx].willpayload or "",
+				},
+				tclients[mqttclientidx].user,
+				tclients[mqttclientidx].password)
 end
 
 --[[
@@ -792,6 +814,25 @@ function create(prot,host,port)
 	setmetatable(mqtt_client,tmqtt)
 	table.insert(tclients,mqtt_client)
 	return(mqtt_client)
+end
+
+--[[
+函数名：configwill
+功能  ：配置遗嘱参数
+参数  ：
+		flg：number类型，遗嘱标志，仅支持0和1
+		qos：number类型，服务器端发布遗嘱消息的服务质量等级，仅支持0,1,2
+		retain：number类型，遗嘱保留标志，仅支持0和1
+		topic：string类型，服务器端发布遗嘱消息的主题，仅支持ascii字符	
+		payload：string类型，服务器端发布遗嘱消息的载荷，仅支持ascii字符
+返回值：无
+]]
+function tmqtt:configwill(flg,qos,retain,topic,payload)
+	self.willflg=flg or 0
+	self.willqos=qos or 0
+	self.willretain=retain or 0
+	self.willtopic=topic or ""
+	self.willpayload=payload or ""
 end
 
 --[[
