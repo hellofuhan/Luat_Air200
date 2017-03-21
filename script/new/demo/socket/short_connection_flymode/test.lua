@@ -186,8 +186,8 @@ function ntfy(idx,evt,result,item)
 	end
 	--其他错误处理
 	if smatch((type(result)=="string") and result or "","ERROR") then
-		--RECONN_PERIOD秒后重连
-		sys.timer_start(reconn,RECONN_PERIOD*1000)
+		--断开数据链路，重新激活
+		link.shut()
 	end
 end
 

@@ -145,8 +145,9 @@ function ntfy(idx,evt,result,item)
 		if item then
 			sndcb(item,result)
 		end
-		--发送失败，RECONN_PERIOD秒后重连后台
-		if not result then sys.timer_start(reconn,RECONN_PERIOD*1000) end
+		--发送失败，RECONN_PERIOD秒后重连后台，不要调用reconn，此时socket状态仍然是CONNECTED，会导致一直连不上服务器
+		--if not result then sys.timer_start(reconn,RECONN_PERIOD*1000) end
+		if not result then link.shut() end
 	--连接被动断开
 	elseif evt == "STATE" and result == "CLOSED" then
 		linksta = false
@@ -162,8 +163,9 @@ function ntfy(idx,evt,result,item)
 	end
 	--其他错误处理，断开数据链路，重新连接
 	if smatch((type(result)=="string") and result or "","ERROR") then
-		--RECONN_PERIOD秒后重连
-		sys.timer_start(reconn,RECONN_PERIOD*1000)
+		--RECONN_PERIOD秒后重连，不要调用reconn，此时socket状态仍然是CONNECTED，会导致一直连不上服务器
+		--sys.timer_start(reconn,RECONN_PERIOD*1000)
+		link.shut()
 	end
 end
 
