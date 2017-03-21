@@ -639,7 +639,7 @@ local handlers = {}
 base.setmetatable(handlers,{__index = function() return function() end end,})
 
 --[[
-函数名：reguart
+函数名：regmsg
 功能  ：注册“除定时器消息、物理串口消息外的其他外部消息（例如AT命令的虚拟串口数据接收消息、音频消息、充电管理消息、按键消息等）”的处理函数
 参数  ：
 		id：消息类型id

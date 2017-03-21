@@ -169,7 +169,7 @@ end
 参数  ：
 		number：号码
 		delay：延时delay毫秒后，才发送at命令呼叫，默认不延时
-返回值：无
+返回值：true表示允许发送at命令拨号并且发送at，false表示不允许at命令拨号
 ]]
 function dial(number,delay)
 	if number == "" or number == nil then

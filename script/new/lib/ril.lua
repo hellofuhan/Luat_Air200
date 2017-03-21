@@ -116,7 +116,7 @@ local formtab = {}
 		head：此应答对应的AT命令头，去掉了最前面的AT两个字符
 		fnc：AT命令应答的处理函数
 		typ：AT命令的应答类型，取值范围NORESULT,NUMBERIC,SLINE,MLINE,STRING,SPECIAL
-		intermediate：typ为STRING时，进一步定义STRING中的详细格式
+		formt：typ为STRING时，进一步定义STRING中的详细格式
 返回值：成功返回true，失败false
 ]]
 function regrsp(head,fnc,typ,formt)

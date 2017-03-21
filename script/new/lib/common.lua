@@ -27,7 +27,7 @@ function ucs2toascii(inum)
 end
 
 --[[
-函数名：ucs2toascii
+函数名：nstrToUcs2Hex
 功能  ：ascii字符串 转化为 ascii字符串的unicode编码的16进制字符串，仅支持数字和+，例如"+1234" -> "002B0031003200330034"
 参数  ：
 		inum：待转换字符串
