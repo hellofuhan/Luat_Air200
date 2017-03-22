@@ -6,6 +6,7 @@
         (1)ntp.lua：新增ntp功能模块，可同步网络时间。直接在main.lua中require"ntp"就可以使用打开此功能
     二、demo脚本修改
         (1)ntp项目：新增此项目，测试ntp功能模块
+	(2)json项目：新增此项目，测试json.encode和json.decode接口
 
 
 
