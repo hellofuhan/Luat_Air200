@@ -54,3 +54,8 @@ http://www.luam2m.com/forum.php?mod=post&action=edit&fid=84&tid=2479&pid=6502&pa
 
 20170318：
 更新：合宙通信OpenLuat开源模块LUA程序设计指南V2.3 更新为 V2.4 修正文档中一些错误
+
+20170322：
+更新：合宙通信OpenLuat开源模块LUA程序设计指南V2.4 更新为 V2.5 修正文档中图形显示错误，以及跟代码不一致之处
+      Air200开发板新手入门指导V1.1 更新为V1.2
+      LuaDB 合并下载工具使用方法V1.8 更新为 V1.9
