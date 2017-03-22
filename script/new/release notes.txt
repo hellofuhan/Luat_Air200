@@ -4,6 +4,7 @@
         lib脚本版本号：2.0.4
         支持lib脚本的最小core软件版本号：Luat_V0006_Air200
         (1)mqtt.lua：新增接口configwill，支持WILL功能
+        (1)完善代码注释
     二、demo脚本修改
         (1)mqtt项目：支持configwill接口的使用
 
