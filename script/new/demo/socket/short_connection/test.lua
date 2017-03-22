@@ -4,7 +4,7 @@ module(...,package.seeall)
 --[[
 此例子为短连接
 功能需求：
-1、每隔10秒钟发送一次位置包"loc data\r\n"到后台，无论发送成功或者失败都断开连接；
+1、每隔10秒钟发送一次位置包"loc data\r\n"到后台，无论发送成功或者失败，5秒后都断开连接；
 2、收到后台的数据时，在rcv函数中打印出来
 测试时请搭建自己的服务器，并且修改下面的PROT，ADDR，PORT，支持域名和IP地址
 ]]
@@ -73,7 +73,8 @@ end
 function locrptcb(item,result)
 	print("locrptcb",linksta)
 	--if linksta then
-		socket.disconnect(SCK_IDX)
+		--5秒后再去断开socket连接，这5秒内用来接收服务器下发的数据
+		sys.timer_start(socket.disconnect,5000,SCK_IDX)
 		sys.timer_start(locrpt,10000)
 	--end
 end

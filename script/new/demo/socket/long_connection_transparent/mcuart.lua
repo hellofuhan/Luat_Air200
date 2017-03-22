@@ -149,6 +149,6 @@ pm.wake("mcuart")
 --注册串口的数据接收函数，串口收到数据后，会以中断方式，调用read接口读取数据
 sys.reguart(UART_ID,read)
 --配置并且打开串口
-uart.setup(UART_ID,9600,8,uart.PAR_NONE,uart.STOP_1,2)
+uart.setup(UART_ID,9600,8,uart.PAR_NONE,uart.STOP_1)
 
 

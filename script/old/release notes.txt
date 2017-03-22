@@ -1,9 +1,16 @@
+发布时间：2017/3/22 19:05:21
+修改记录：
+    一、demo脚本修改
+        (1)修正demo项目中“uart.setup接口调用时传入的最后一个参数msgmode为2”的编码错误问题
+
+
+
 发布时间：2017/3/21 10:10:21
 修改记录：
     一、demo脚本修改
-        (1)long_connection项目：修正“发送数据失败后，无法重连上后台”的问题
-        (2)long_connection_transparent项目：修正“发送数据失败后，无法重连上后台”的问题
-        (3)short_connection_flymode项目：优化代码
+        (1)socket/long_connection项目：修正“发送数据失败后，无法重连上后台”的问题
+        (2)socket/long_connection_transparent项目：修正“发送数据失败后，无法重连上后台”的问题
+        (3)socket/short_connection_flymode项目：优化代码
 
 
 

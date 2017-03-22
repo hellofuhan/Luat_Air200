@@ -19,7 +19,7 @@ local uartid,uartuse = 1,true
 ∑µªÿ÷µ£∫Œﬁ
 ]]
 local function uartopn()
-	uart.setup(uartid,115200,8,uart.PAR_NONE,uart.STOP_1,2)	
+	uart.setup(uartid,115200,8,uart.PAR_NONE,uart.STOP_1)	
 end
 
 --[[
