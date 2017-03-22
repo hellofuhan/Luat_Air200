@@ -4,9 +4,8 @@
         lib脚本版本号：2.0.5
         支持lib脚本的最小core软件版本号：Luat_V0006_Air200
         (1)ntp.lua：新增ntp功能模块，可同步网络时间。直接在main.lua中require"ntp"就可以使用打开此功能
-        (1)完善代码注释
     二、demo脚本修改
-        (1)ntp项目：支持configwill接口的使用
+        (1)ntp项目：新增此项目，测试ntp功能模块
 
 
 

@@ -28,6 +28,8 @@ gpio\uart_gpio_switch：uart和gpio功能切换控制demo项目
 
 i2c：i2c通信demo项目
 
+json：json编解码测试demo项目
+
 mqtt：mqtt应用demo项目
 
 npt：模块时间自动更新demo项目
