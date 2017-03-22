@@ -46,8 +46,9 @@ local connectnoretinterval
 --flymode：是否处于飞行模式
 --updating：是否正在执行远程升级功能(update.lua)
 --dbging：是否正在执行dbg功能(dbg.lua)
+--ntping：是否正在执行NTP时间同步功能(ntp.lua)
 --shutpending：是否有等待处理的进入AT+CIPSHUT请求
-local apnflag,checkciicrtm,flymode,updating,dbging,shutpending=true
+local apnflag,checkciicrtm,flymode,updating,dbging,ntping,shutpending=true
 
 --[[
 函数名：setapn
@@ -754,8 +755,8 @@ end
 返回值：无
 ]]
 function shut()
-	--如果正在执行远程升级功能或者dbg功能，则延迟关闭
-	if updating or dbging then shutpending = true return end
+	--如果正在执行远程升级功能或者dbg功能或者ntp功能，则延迟关闭
+	if updating or dbging or ntping then shutpending = true return end
 	--发送AT命令关闭
 	req("AT+CIPSHUT")
 	--设置关闭中标志
@@ -981,6 +982,13 @@ local function proc(id,para)
 	elseif id=="DBG_END_IND" then
 		dbging = false
 		if shutpending then shut() end
+	--NTP同步开始
+	elseif id=="NTP_BEGIN_IND" then
+		ntping = true
+	--NTP同步结束
+	elseif id=="NTP_END_IND" then
+		ntping = false
+		if shutpending then shut() end
 	end
 	return true
 end
@@ -998,6 +1006,6 @@ function checkciicr(tm)
 end
 
 --注册本模块关注的内部消息的处理函数
-sys.regapp(proc,"IMSI_READY","FLYMODE_IND","UPDATE_BEGIN_IND","UPDATE_END_IND","DBG_BEGIN_IND","DBG_END_IND")
+sys.regapp(proc,"IMSI_READY","FLYMODE_IND","UPDATE_BEGIN_IND","UPDATE_END_IND","DBG_BEGIN_IND","DBG_END_IND","NTP_BEGIN_IND","NTP_END_IND")
 sys.regapp(netmsg,"NET_STATE_CHANGED")
 

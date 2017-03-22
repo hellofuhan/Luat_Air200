@@ -1096,7 +1096,7 @@ function getsatesinfo()
 end
 
 --[[
-函数名：initgps
+函数名：init
 功能  ：配置GPS
 参数  ：
 		ionum：GPS供电的GPIO

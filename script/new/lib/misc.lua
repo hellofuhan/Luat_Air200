@@ -26,8 +26,9 @@ local tonumber,tostring,print,req,smatch = base.tonumber,base.tostring,base.prin
 --clkswitch：整分时钟通知开关
 --updating：是否正在执行远程升级功能(update.lua)
 --dbging：是否正在执行dbg功能(dbg.lua)
+--ntping：是否正在执行NTP时间同步功能(ntp.lua)
 --flypending：是否有等待处理的进入飞行模式请求
-local sn,snrdy,imeirdy,--[[ver,]]imei,clkswitch,updating,dbging,flypending
+local sn,snrdy,imeirdy,--[[ver,]]imei,clkswitch,updating,dbging,ntping,flypending
 
 --calib：校准标志，true为已校准，其余未校准
 --setclkcb：执行AT+CCLK命令，应答后的用户自定义回调函数
@@ -215,8 +216,8 @@ end
 function setflymode(val)
 	--如果是进入飞行模式
 	if val then
-		--如果正在执行远程升级功能或者dbg功能，则延迟进入飞行模式
-		if updating or dbging then flypending = true return end
+		--如果正在执行远程升级功能或者dbg功能或者ntp功能，则延迟进入飞行模式
+		if updating or dbging or ntping then flypending = true return end
 	end
 	--发送AT命令进入或者退出飞行模式
 	req("AT+CFUN="..(val and 0 or 1))
@@ -278,6 +279,13 @@ local function ind(id,para)
 	elseif id=="DBG_END_IND" then
 		dbging = false
 		if flypending then setflymode(true) end
+	--NTP同步开始
+	elseif id=="NTP_BEGIN_IND" then
+		ntping = true
+	--NTP同步结束
+	elseif id=="NTP_END_IND" then
+		ntping = false
+		if flypending then setflymode(true) end
 	end
 
 	return true
@@ -302,4 +310,4 @@ req("AT+CGSN")
 --启动整分时钟通知定时器
 startclktimer()
 --注册本模块关注的内部消息的处理函数
-sys.regapp(ind,"SYS_WORKMODE_IND","UPDATE_BEGIN_IND","UPDATE_END_IND","DBG_BEGIN_IND","DBG_END_IND")
+sys.regapp(ind,"SYS_WORKMODE_IND","UPDATE_BEGIN_IND","UPDATE_END_IND","DBG_BEGIN_IND","DBG_END_IND","NTP_BEGIN_IND","NTP_END_IND")

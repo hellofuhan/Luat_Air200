@@ -934,7 +934,7 @@ function tmqtt:subscribe(topics,ackcb,usertag)
 end
 
 --[[
-函数名：subscribe
+函数名：regevtcb
 功能  ：注册事件的回调函数
 参数  ：
 		evtcbs：一对或者多对evt和cb，格式为{evt=cb,...}}，evt取值如下：
