@@ -1008,4 +1008,4 @@ end
 --注册本模块关注的内部消息的处理函数
 sys.regapp(proc,"IMSI_READY","FLYMODE_IND","UPDATE_BEGIN_IND","UPDATE_END_IND","DBG_BEGIN_IND","DBG_END_IND","NTP_BEGIN_IND","NTP_END_IND")
 sys.regapp(netmsg,"NET_STATE_CHANGED")
-
+checkciicr(120000)
