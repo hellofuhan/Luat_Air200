@@ -277,8 +277,15 @@ static int l_rtos_tick(lua_State *L)
 /*begin\NEW\zhutianhua\2017.2.28 14:12\新增rtos.set_trace接口，可控制是否输出Lua的trace*/
 static int l_set_trace(lua_State *L)
 {
-    //u32 flag = luaL_optinteger(L, 1, 0);
-    platform_set_console_port(luaL_optinteger(L, 1, 0)==1 ? PLATFORM_PORT_ID_DEBUG : NUM_UART);
+    u32 flag = luaL_optinteger(L, 1, 0);
+    if(flag==1)
+    {
+        platform_set_console_port(luaL_optinteger(L, 2, PLATFORM_PORT_ID_DEBUG));
+    }
+    else
+    {
+        platform_set_console_port(NUM_UART);
+    }
     lua_pushboolean(L,1);
     return 1;
 }

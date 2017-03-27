@@ -25,9 +25,9 @@ local assert = base.assert
 local tonumber = base.tonumber
 
 --lib脚本版本号，只要lib中的任何一个脚本做了修改，都需要更新此版本号
-SCRIPT_LIB_VER = "2.0.5"
+SCRIPT_LIB_VER = "2.0.6"
 --支持lib脚本的最小core软件版本号
-CORE_MIN_VER = "Luat_V0006_Air200"
+CORE_MIN_VER = "Luat_V0007_Air200"
 
 --“是否需要刷新界面”的标志，有GUI的项目才会用到此标志
 local refreshflag = false
@@ -451,10 +451,20 @@ end
 功能  ：开启或者关闭print的打印输出功能
 参数  ：
 		v：false或nil为关闭，其余为开启
+		uartid：输出Luatrace的端口：nil表示host口，1表示uart1,2表示uart2
+		baudrate：number类型，uartid不为nil时，此参数才有意义，表示波特率，默认115200
+				  仅支持1200,2400,4800,9600,14400,19200,28800,38400,57600,76800,115200,230400,460800,576000,921600,1152000,4000000
 返回值：无
 ]]
-function opntrace(v)
-	rtos.set_trace(v and 1 or 0)
+function opntrace(v,uartid,baudrate)
+	if uartid then
+		if v then
+			uart.setup(uartid,baudrate or 115200,8,uart.PAR_NONE,uart.STOP_1)
+		else
+			uart.close(uartid)
+		end
+	end
+	rtos.set_trace(v and 1 or 0,uartid)
 end
 
 --app存储表
