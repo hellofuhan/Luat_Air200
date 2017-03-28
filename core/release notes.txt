@@ -1,7 +1,8 @@
 版本号：Luat_V0007_Air200.lod、Luat_V0007_Air200_TTS1.lod、Luat_V0007_Air200_TTS2.lod、Luat_V0007_Air200_TTS3.lod
-发布时间：2017/3/27 13:11
+发布时间：2017/3/28 19:43
 修改记录：
 	1, 扩展rtos.setrace接口功能，可以配置uart1或者uart2输出Lua脚本的trace
+	2, 修正“支持TTS的版本，receiver播放音量小”的问题
 
 
 
