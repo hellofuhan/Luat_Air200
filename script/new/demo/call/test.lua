@@ -6,6 +6,8 @@
 
 module(...,package.seeall)
 require"cc"
+require"audio"
+require"common"
 
 --[[
 函数名：print
@@ -25,8 +27,10 @@ end
 ]]
 local function connected()
 	print("connected")
-	--10秒中之后主动结束通话
-	sys.timer_start(cc.hangup,10000,"AUTO_DISCONNECT")
+	--5秒后播放TTS给对端，底层软件必须支持TTS功能
+	sys.timer_start(audio.play,5000,0,"TTSCC",common.binstohexs(common.gb2312toucs2("通话中播放TTS测试")),audiocore.VOL7)
+	--50秒之后主动结束通话
+	sys.timer_start(cc.hangup,50000,"AUTO_DISCONNECT")
 end
 
 --[[
@@ -71,5 +75,16 @@ local function ready()
 	cc.dial("10086")
 end
 
+--[[
+函数名：dtmfdetected
+功能  ：“通话中收到对方的DTMF”消息处理函数
+参数  ：
+		dtmf：string类型，收到的DTMF字符
+返回值：无
+]]
+local function dtmfdetected(dtmf)
+	print("dtmfdetected",dtmf)
+end
+
 --注册消息的用户回调函数
-cc.regcb("READY",ready,"INCOMING",incoming,"CONNECTED",connected,"DISCONNECTED",disconnected)
+cc.regcb("READY",ready,"INCOMING",incoming,"CONNECTED",connected,"DISCONNECTED",disconnected,"DTMF",dtmfdetected)

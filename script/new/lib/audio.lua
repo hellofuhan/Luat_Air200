@@ -393,7 +393,7 @@ local function playbegin(priority,typ,path,vol,cb,dup,duprd)
     end
 	
 	--调用播放接口成功
-	if (typ=="TTS" and playtts(path)) or (typ~="TTS" and _play(path,dup and (not duprd or duprd==0))) then
+	if (typ=="TTS" and playtts(path)) or (typ=="TTSCC" and playtts(path,"net")) or (typ~="TTS" and typ~="TTSCC" and _play(path,dup and (not duprd or duprd==0))) then
 		return true
 	--调用播放接口失败
 	else
@@ -406,10 +406,11 @@ end
 功能  ：播放音频
 参数  ：
 		priority：number类型，必选参数，音频优先级，数值越大，优先级越高
-		typ：string类型，必选参数，音频类型，目前仅支持"FILE"、"TTS"、"RECORD"
+		typ：string类型，必选参数，音频类型，目前仅支持"FILE"、"TTS"、"TTSCC"、"RECORD"
 		path：必选参数，音频文件路径，跟typ有关：
 		      typ为"FILE"时：string类型，表示音频文件路径
 			  typ为"TTS"时：string类型，表示要播放数据的UCS2十六进制字符串
+			  typ为"TTSCC"时：string类型，表示要播放给通话对端数据的UCS2十六进制字符串
 			  typ为"RECORD"时：number类型，表示录音ID
 		vol：number类型，可选参数，播放音量，取值范围audiocore.VOL0到audiocore.VOL7
 		cb：function类型，可选参数，音频播放结束或者出错时的回调函数，回调时包含一个参数：0表示播放成功结束；1表示播放出错；2表示播放优先级不够，没有播放
@@ -461,7 +462,7 @@ function stop()
 		sys.timer_stop_all(play)
 		--停止音频播放
 		_stop()
-		if typ=="TTS" then stoptts() return end
+		if typ=="TTS" or typ=="TTSCC" then stoptts() return end
 	end
 	return true
 end
@@ -474,14 +475,14 @@ end
 ]]
 function playend()
 	print("playend",sdup,sduprd)
-	if styp=="TTS" and not sdup then stoptts() end
+	if (styp=="TTS" or styp=="TTSCC") and not sdup then stoptts() end
 	--需要重复播放
 	if sdup then
 		--存在重复播放间隔
 		if sduprd then
 			sys.timer_start(play,sduprd,spriority,styp,spath,svol,scb,sdup,sduprd)
 		--不存在重复播放间隔
-		elseif styp=="TTS" then
+		elseif styp=="TTS" or styp=="TTSCC" then
 			play(spriority,styp,spath,svol,scb,sdup,sduprd)
 		end
 	--不需要重复播放
@@ -500,7 +501,7 @@ end
 ]]
 function playerr()
 	print("playerr")
-	if styp=="TTS" then stoptts() end
+	if styp=="TTS" or styp=="TTSCC" then stoptts() end
 	--如果正在播放的音频有回调函数，则执行回调，传入参数1
 	if scb then scb(1) end
 	spriority,styp,spath,svol,scb,sdup,sduprd,spending = nil

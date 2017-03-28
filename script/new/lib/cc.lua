@@ -60,7 +60,7 @@ end
 函数名：regcb
 功能  ：注册一个或者多个消息的用户回调函数
 参数  ：
-		evt1：消息类型，目前仅支持"READY","INCOMING","CONNECTED","DISCONNECTED"
+		evt1：消息类型，目前仅支持"READY","INCOMING","CONNECTED","DISCONNECTED","DTMF"
 		cb1：消息对应的用户回调函数
 		...：evt和cb成对出现
 返回值：无
@@ -333,7 +333,7 @@ local function parsedtmfnum(data)
 	end
 
 	if dtmf then
-		dispatch("AUDIO_DTMF_DETECT",dtmf)
+		dispatch("CALL_DTMF",dtmf)
 	end
 end
 
@@ -433,3 +433,4 @@ ril.regrsp("+CHLD",ccrsp)
 req("ATX4") 
 --开启来电urc上报
 req("AT+CLIP=1")
+dtmfdetect(true)
