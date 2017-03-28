@@ -10,17 +10,17 @@
 \core是模块基础软件，支持Lua的运行。内含合宙自己开发的Lua扩展库（位于\core\cust_src\elua\modules\src），扩展库文档位于\doc目录中。
 
 \script是合宙范例LUA脚本，其中：  
-\product\小蛮GPS定位器\whole_project 是一款已经商用的GPS定位器软件，可以下到合宙小蛮GPS定位器（是基于Air200开发的）中运行。
+\xiaoman_gps_tracker\whole_test 是一款已经商用的GPS定位器软件，可以下到合宙小蛮GPS定位器（是基于Air200开发的）中运行。
 
 \demo下timer、 UART 等是各种应用例程，可下载到合宙EVB板中运行。合宙EVB开发板对应的硬件参考和Air200相关的AT命令位于\doc\Air200模块相关文档。 
 
-\lib 是demo，product以及所有用户脚本都需要用到的库文件，这些库文件将经常使用的AT命令以函数形式封装，方便用户使用。
+\lib 是demo以及所有用户脚本都需要用到的库文件，这些库文件将经常使用的AT命令以函数形式封装，方便用户使用。
 
 \tools目录下放了一些用户开发用到的工具。其中：  
 
 LuaForWindows 是一款Lua代码编辑和语法检查工具。它的使用方法请参考附带的安装使用说明以及\doc\合宙通信OpenLuat开源模块LUA程序设计指南 这篇文档。  
 
-CSDTK Cygwin 是合宙Lua开源项目编译调试环境。安装完成后，用户将具备core编译环境Cygwin和模块trace打印工具cool watcher。   
+CSDTK Cygwin 是合宙Lua开源项目编译调试环境。安装完成后，用户将具备core编译环境Cygwin。   
 
 LuaDB合并及下载工具是下载lod文件和用户Lua脚本到模块的工具软件。
  
