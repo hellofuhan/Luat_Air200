@@ -2,6 +2,7 @@
 修改记录：
     一、demo脚本修改
         (1)新增default项目：Air200的默认出厂软件，可以使用时间线APP查看模块的基站位置
+           从2017年3月31日起，Air200模块的默认出厂软件划分为两个版本，详见：http://www.luam2m.com/forum.php?mod=viewthread&tid=2504&page=1&extra=#pid6552
 
 
 
