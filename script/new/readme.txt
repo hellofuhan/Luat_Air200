@@ -20,6 +20,8 @@ audio：音频播放demo项目
 
 call：语音通话demo项目
 
+default：Air200的默认出厂软件demo项目，可以使用时间线APP查看模块的基站位置
+
 gpio\gpio_single：纯gpio控制demo项目
 
 gpio\i2c_gpio_switch：i2c和gpio功能切换控制demo项目
