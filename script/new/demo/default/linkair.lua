@@ -89,7 +89,7 @@ end
 function pubqos0login()
 	local payload = lpack.pack(">bbHHbHHbHAbHbbHAbHAbHA",
 								14,
-								0,2,16,
+								0,2,22,
 								1,2,300,
 								2,2,bcd(sgsub(_G.VERSION,"%.",""),2),
 								3,1,gpsupport and 1 or 0,
