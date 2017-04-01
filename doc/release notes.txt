@@ -62,4 +62,6 @@ http://www.luam2m.com/forum.php?mod=post&action=edit&fid=84&tid=2479&pid=6502&pa
 
 20170401：
 删除：合宙开源项目core+lua开发须知.md
+
 更新：合宙通信OpenLuat开源模块LUA程序设计指南V2.5 更新为 V2.6，删除脚本示例部分，改为超链接形式
+      README.md
