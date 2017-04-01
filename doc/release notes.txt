@@ -1,67 +1,67 @@
 
-×¢£º¶ÔLuat_Air200Ïà¹ØÎÄµµµÄÃèÊö£¬Çëµã¿ª£º
+æ³¨ï¼šå¯¹Luat_Air200ç›¸å…³æ–‡æ¡£çš„æè¿°ï¼Œè¯·ç‚¹å¼€ï¼š
 http://www.luam2m.com/forum.php?mod=post&action=edit&fid=84&tid=2479&pid=6502&page=1
 
 
-20170221£º
-Ìí¼Ó£ºLuat¿´ÃÅ¹·µçÂ·²Î¿¼Éè¼ÆV1.0.pdf
+20170221ï¼š
+æ·»åŠ ï¼šLuatçœ‹é—¨ç‹—ç”µè·¯å‚è€ƒè®¾è®¡V1.0.pdf
 
-20170223£º
-É¾³ý£ºÔõÑùÍ¨¹ýAir200Ä£¿éÎïÀí´®¿Ú·¢ËÍATÃüÁî.pdf
-      /Air200Ä£¿éÏà¹ØÎÄµµ/EVB_Air200_V1.0_20170117_1800.pcb
-      /Air200Ä£¿éÏà¹ØÎÄµµ/EVB_Air200_V1.0_20170117_1800.sch
-Ìí¼Ó£º/Air200Ä£¿éÏà¹ØÎÄµµ/EVB_S1_Ai200_Ô­ÀíÍ¼_V1.0.pdf 
-      /Air200Ä£¿éÏà¹ØÎÄµµ/EVB_S1_Air200_pcb_bottom_V1.0.pdf
-      /Air200Ä£¿éÏà¹ØÎÄµµ/EVB_S1_Air200_pcb_top_V1.0.pdf
+20170223ï¼š
+åˆ é™¤ï¼šæ€Žæ ·é€šè¿‡Air200æ¨¡å—ç‰©ç†ä¸²å£å‘é€ATå‘½ä»¤.pdf
+      /Air200æ¨¡å—ç›¸å…³æ–‡æ¡£/EVB_Air200_V1.0_20170117_1800.pcb
+      /Air200æ¨¡å—ç›¸å…³æ–‡æ¡£/EVB_Air200_V1.0_20170117_1800.sch
+æ·»åŠ ï¼š/Air200æ¨¡å—ç›¸å…³æ–‡æ¡£/EVB_S1_Ai200_åŽŸç†å›¾_V1.0.pdf 
+      /Air200æ¨¡å—ç›¸å…³æ–‡æ¡£/EVB_S1_Air200_pcb_bottom_V1.0.pdf
+      /Air200æ¨¡å—ç›¸å…³æ–‡æ¡£/EVB_S1_Air200_pcb_top_V1.0.pdf
 
-20170227£º
-Ìí¼Ó£ºAir200Ä£¿é¿ª·¢°åÊ¹ÓÃËµÃ÷V1.0.pdf
-      DTU²Î¿¼Éè¼ÆpcbÍ¼£ºLuat_DTU_Air200_20170224.pcb
-      DTU²Î¿¼Éè¼ÆÔ­ÀíÍ¼£ºLuat_DTU_Air200_20170224.sch
-¸üÃû£º¶¨Î»Æ÷(Air200+GPS)Ó²¼þÉè¼ÆÔ­ÀíÍ¼.pdf ¸Ä³É ³µÎÀÊ¿¶¨Î»Æ÷(Air200+GPS)Ó²¼þÉè¼ÆÔ­ÀíÍ¼.pdf
+20170227ï¼š
+æ·»åŠ ï¼šAir200æ¨¡å—å¼€å‘æ¿ä½¿ç”¨è¯´æ˜ŽV1.0.pdf
+      DTUå‚è€ƒè®¾è®¡pcbå›¾ï¼šLuat_DTU_Air200_20170224.pcb
+      DTUå‚è€ƒè®¾è®¡åŽŸç†å›¾ï¼šLuat_DTU_Air200_20170224.sch
+æ›´åï¼šå®šä½å™¨(Air200+GPS)ç¡¬ä»¶è®¾è®¡åŽŸç†å›¾.pdf æ”¹æˆ è½¦å«å£«å®šä½å™¨(Air200+GPS)ç¡¬ä»¶è®¾è®¡åŽŸç†å›¾.pdf
 
 
-20170302£º
-Ìí¼Ó£ºÐÂ¿ª·¢°åS1 pcbÍ¼£ºEVB_S1_Ai200_A10_20170208_1530.pcb  
-      ÐÂ¿ª·¢°åS1 Ô­ÀíÍ¼£ºEVB_S1_Ai200_A10_20170221_1834.sch
-¸üÐÂ£ºAir200_Ó²¼þÉè¼ÆÊÖ²á_V1.91 ¸üÐÂµ½ Air200_Ó²¼þÉè¼ÆÊÖ²á_V2.0
+20170302ï¼š
+æ·»åŠ ï¼šæ–°å¼€å‘æ¿S1 pcbå›¾ï¼šEVB_S1_Ai200_A10_20170208_1530.pcb  
+      æ–°å¼€å‘æ¿S1 åŽŸç†å›¾ï¼šEVB_S1_Ai200_A10_20170221_1834.sch
+æ›´æ–°ï¼šAir200_ç¡¬ä»¶è®¾è®¡æ‰‹å†Œ_V1.91 æ›´æ–°åˆ° Air200_ç¡¬ä»¶è®¾è®¡æ‰‹å†Œ_V2.0
 
-20170306£º
-Ìí¼Ó£ºAir200¿ª·¢°åÐÂÊÖÈëÃÅÖ¸µ¼.pdf
+20170306ï¼š
+æ·»åŠ ï¼šAir200å¼€å‘æ¿æ–°æ‰‹å…¥é—¨æŒ‡å¯¼.pdf
 
-20170307£º
-¸üÐÂ£ºAir200Ä£¿éATÃüÁîÊÖ²áV2.6 Éý¼¶³É V2.7
-      ºÏÖæÍ¨ÐÅOpenLuat¿ªÔ´Ä£¿éLUA³ÌÐòÉè¼ÆÖ¸ÄÏV2.2 ¸üÐÂÎª V2.3 ,È¥µô±àÒëcore²¿·ÖµÄÄÚÈÝ
-      Air200¿ª·¢°åÐÂÊÖÈëÃÅÖ¸µ¼ Éý¼¶Îª£ºV1.0
-Ìí¼Ó£ºEVB_S2_Air200_V1.1_20170206_1330.pcb £ºAir200¼òÒ×¿ª·¢°åS2 pcbÍ¼
+20170307ï¼š
+æ›´æ–°ï¼šAir200æ¨¡å—ATå‘½ä»¤æ‰‹å†ŒV2.6 å‡çº§æˆ V2.7
+      åˆå®™é€šä¿¡OpenLuatå¼€æºæ¨¡å—LUAç¨‹åºè®¾è®¡æŒ‡å—V2.2 æ›´æ–°ä¸º V2.3 ,åŽ»æŽ‰ç¼–è¯‘coreéƒ¨åˆ†çš„å†…å®¹
+      Air200å¼€å‘æ¿æ–°æ‰‹å…¥é—¨æŒ‡å¯¼ å‡çº§ä¸ºï¼šV1.0
+æ·»åŠ ï¼šEVB_S2_Air200_V1.1_20170206_1330.pcb ï¼šAir200ç®€æ˜“å¼€å‘æ¿S2 pcbå›¾
 
-20170308£º
-¸üÐÂ£ºAir200¿ª·¢°åÐÂÊÖÈëÃÅÖ¸µ¼V1.0 Éý¼¶Îª V1.1£¬ÐÞ¸ÄÒ»Ð©²»ÍêÉÆÖ®´¦¡£
-      Air200Ä£¿éATÃüÁîÊÖ²áV2.7.pdf Éý¼¶ÎªV2.8£¬ÐÞ¸ÄÒ»Ð©Ð¡bug¡£
-      ¸üÐÂÁË EVB_S2_Air200_V1.1_20170206_1330.sch£¬¿ª»ú¼ü¼ÓÁËÒ»¸öÉÏÀ­µç×è
-Ìí¼Ó£ºEVB_S2_Air200_V1.1_sch.pdf
-      EVB_S2_Air200_V1.1_20170206_1330.sch £ºAir200¼òÒ×¿ª·¢°åS2 Ô­ÀíÍ¼
-      Luat Ä£¿éÌìÏßÉè¼Æ½¨Òé20170301.pdf
+20170308ï¼š
+æ›´æ–°ï¼šAir200å¼€å‘æ¿æ–°æ‰‹å…¥é—¨æŒ‡å¯¼V1.0 å‡çº§ä¸º V1.1ï¼Œä¿®æ”¹ä¸€äº›ä¸å®Œå–„ä¹‹å¤„ã€‚
+      Air200æ¨¡å—ATå‘½ä»¤æ‰‹å†ŒV2.7.pdf å‡çº§ä¸ºV2.8ï¼Œä¿®æ”¹ä¸€äº›å°bugã€‚
+      æ›´æ–°äº† EVB_S2_Air200_V1.1_20170206_1330.schï¼Œå¼€æœºé”®åŠ äº†ä¸€ä¸ªä¸Šæ‹‰ç”µé˜»
+æ·»åŠ ï¼šEVB_S2_Air200_V1.1_sch.pdf
+      EVB_S2_Air200_V1.1_20170206_1330.sch ï¼šAir200ç®€æ˜“å¼€å‘æ¿S2 åŽŸç†å›¾
+      Luat æ¨¡å—å¤©çº¿è®¾è®¡å»ºè®®20170301.pdf
 
-20170309£º
-¸üÐÂ£ºAir200_Ó²¼þÉè¼ÆÊÖ²á_V2.0 Éý¼¶Îª V2.1
-Ìí¼Ó£ºLuat×¨ÓÃ¿´ÃÅ¹·Ð¾Æ¬Éè¼ÆÊÖ²áV1.0.pdf
-      LuatÄ£¿é×è¿¹Ïß¼°ÌìÏßÉè¼Æ½¨Òé_V1.0.pdf
-É¾³ý£ºLuat Ä£¿éÌìÏßÉè¼Æ½¨Òé20170301.pdf	
+20170309ï¼š
+æ›´æ–°ï¼šAir200_ç¡¬ä»¶è®¾è®¡æ‰‹å†Œ_V2.0 å‡çº§ä¸º V2.1
+æ·»åŠ ï¼šLuatä¸“ç”¨çœ‹é—¨ç‹—èŠ¯ç‰‡è®¾è®¡æ‰‹å†ŒV1.0.pdf
+      Luatæ¨¡å—é˜»æŠ—çº¿åŠå¤©çº¿è®¾è®¡å»ºè®®_V1.0.pdf
+åˆ é™¤ï¼šLuat æ¨¡å—å¤©çº¿è®¾è®¡å»ºè®®20170301.pdf	
 
-20170317£º
-Ìí¼Ó£º2¸ölua½Ì³Ì£ºlua-5.1ÖÐÎÄÊÖ²á.chm ÒÔ¼° STEP BY STEP -LUA.zip
+20170317ï¼š
+æ·»åŠ ï¼š2ä¸ªluaæ•™ç¨‹ï¼šlua-5.1ä¸­æ–‡æ‰‹å†Œ.chm ä»¥åŠ STEP BY STEP -LUA.zip
 
-20170318£º
-¸üÐÂ£ººÏÖæÍ¨ÐÅOpenLuat¿ªÔ´Ä£¿éLUA³ÌÐòÉè¼ÆÖ¸ÄÏV2.3 ¸üÐÂÎª V2.4 ÐÞÕýÎÄµµÖÐÒ»Ð©´íÎó
+20170318ï¼š
+æ›´æ–°ï¼šåˆå®™é€šä¿¡OpenLuatå¼€æºæ¨¡å—LUAç¨‹åºè®¾è®¡æŒ‡å—V2.3 æ›´æ–°ä¸º V2.4 ä¿®æ­£æ–‡æ¡£ä¸­ä¸€äº›é”™è¯¯
 
-20170322£º
-¸üÐÂ£ººÏÖæÍ¨ÐÅOpenLuat¿ªÔ´Ä£¿éLUA³ÌÐòÉè¼ÆÖ¸ÄÏV2.4 ¸üÐÂÎª V2.5 ÐÞÕýÎÄµµÖÐÍ¼ÐÎÏÔÊ¾´íÎó£¬ÒÔ¼°¸ú´úÂë²»Ò»ÖÂÖ®´¦
-      Air200¿ª·¢°åÐÂÊÖÈëÃÅÖ¸µ¼V1.1 ¸üÐÂÎªV1.2
-      LuaDB ºÏ²¢ÏÂÔØ¹¤¾ßÊ¹ÓÃ·½·¨V1.8 ¸üÐÂÎª V1.9
+20170322ï¼š
+æ›´æ–°ï¼šåˆå®™é€šä¿¡OpenLuatå¼€æºæ¨¡å—LUAç¨‹åºè®¾è®¡æŒ‡å—V2.4 æ›´æ–°ä¸º V2.5 ä¿®æ­£æ–‡æ¡£ä¸­å›¾å½¢æ˜¾ç¤ºé”™è¯¯ï¼Œä»¥åŠè·Ÿä»£ç ä¸ä¸€è‡´ä¹‹å¤„
+      Air200å¼€å‘æ¿æ–°æ‰‹å…¥é—¨æŒ‡å¯¼V1.1 æ›´æ–°ä¸ºV1.2
+      LuaDB åˆå¹¶ä¸‹è½½å·¥å…·ä½¿ç”¨æ–¹æ³•V1.8 æ›´æ–°ä¸º V1.9
 
-20170401£º
-É¾³ý£ººÏÖæ¿ªÔ´ÏîÄ¿core+lua¿ª·¢ÐëÖª.md
+20170401ï¼š
+åˆ é™¤ï¼šåˆå®™å¼€æºé¡¹ç›®core+luaå¼€å‘é¡»çŸ¥.md
 
-¸üÐÂ£ººÏÖæÍ¨ÐÅOpenLuat¿ªÔ´Ä£¿éLUA³ÌÐòÉè¼ÆÖ¸ÄÏV2.5 ¸üÐÂÎª V2.6£¬É¾³ý½Å±¾Ê¾Àý²¿·Ö£¬¸ÄÎª³¬Á´½ÓÐÎÊ½
-      README.md
+æ›´æ–°ï¼šåˆå®™é€šä¿¡OpenLuatå¼€æºæ¨¡å—LUAç¨‹åºè®¾è®¡æŒ‡å—V2.5 æ›´æ–°ä¸º V2.6ï¼Œåˆ é™¤è„šæœ¬ç¤ºä¾‹éƒ¨åˆ†ï¼Œæ”¹ä¸ºè¶…é“¾æŽ¥å½¢å¼
+ Â  Â   æ›´æ–°README.md
