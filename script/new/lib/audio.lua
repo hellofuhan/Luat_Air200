@@ -204,7 +204,7 @@ local function audiourc(data,prefix)
 	elseif prefix == "+QTTS" then
 		local flag = string.match(data,": *(%d)",string.len(prefix)+1)
 		--Í£Ö¹²¥·Åtts
-		if flag == "0" then
+		if flag == "0" or flag == "1" then
 			playend()
 		end	
 	end
