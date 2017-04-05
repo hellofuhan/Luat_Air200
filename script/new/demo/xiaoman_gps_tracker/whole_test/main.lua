@@ -7,8 +7,6 @@ require"light"
 require"gpsapp"
 require"wdt153b"
 require"keypad"
-require"link"
-require"linkapp"
 require"sck"
 
 sys.init(0,0)
