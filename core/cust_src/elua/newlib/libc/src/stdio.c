@@ -205,7 +205,7 @@ FILE *lualibc_fopen(const char *file, const char *mode)
     //if(oflags & O_APPEND)
     //    (void)__sseek((void *)fp, (fpos_t)0, SEEK_END);
 
-    printf("%s %s", __FUNCTION__, file);
+    printf("%s %s\r\n", __FUNCTION__, file);
 
     /*+\NEW\zhuth\2014.3.2\通过文件记录表访问luadb中未压缩的文件*/
     #ifdef AM_LUA_UNCOMPRESS_SCRIPT_TABLE_ACESS_SUPPORT
