@@ -6,6 +6,7 @@
         (1)audio.lua：修正“通话中正在播放TTS时，对方挂断电话后，后续再建立通话无法播放TTS”的问题
         (2)record.lua：新增此文件，支持录音功能
         (3)pins.lua：修正“PIN脚配置的valid为0时，初始化pin脚时的电平错误”的问题
+        (4)mqtt.lua：修正“无法解析payload内容为空的publish消息”的问题
     二、demo脚本修改
         (1)default项目：项目ID修改为22
         (2)socket项目：完善注释

@@ -210,7 +210,7 @@ local function unpack(s)
 		if slen(d) < 4 then return end
 		local _,tplen = lpack.unpack(ssub(d,1,2),">H")		
 		local pay = (rcvpacket.qos > 0 and 5 or 3)
-		if slen(d) < tplen + pay then return end
+		if slen(d) < tplen+pay-1 then return end
 		rcvpacket.topic = ssub(d,3,2+tplen)
 		
 		if rcvpacket.qos > 0 then
