@@ -21,13 +21,14 @@ local function init()
 		elseif v.ptype == nil or v.ptype == "GPIO" then
 			v.inited = true
 			pio.pin.setdir(v.dir or pio.OUTPUT,v.pin)
-			if v.dir == nil or v.dir == pio.OUTPUT then
+			--[[if v.dir == nil or v.dir == pio.OUTPUT then
 				set(v.defval or false,v)
-			elseif v.dir == pio.INPUT or v.dir == pio.INT then
+			else]]
+			if v.dir == pio.INPUT or v.dir == pio.INT then
 				v.val = pio.pin.getval(v.pin) == v.valid
 			end
-		elseif v.set then
-			set(v.defval or false,v)
+		--[[elseif v.set then
+			set(v.defval or false,v)]]
 		end
 	end
 end
