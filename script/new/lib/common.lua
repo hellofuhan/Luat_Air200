@@ -171,7 +171,7 @@ end
 函数名：gb2312toucs2
 功能  ：gb2312编码 转化为 unicode小端编码
 参数  ：
-		ucs2s：gb2312编码数据
+		gb2312s：gb2312编码数据
 返回值：unicode小端编码数据
 ]]
 function gb2312toucs2(gb2312s)
@@ -195,12 +195,88 @@ end
 函数名：gb2312toucs2be
 功能  ：gb2312编码 转化为 unicode大端编码
 参数  ：
-		ucs2s：gb2312编码数据
+		gb2312s：gb2312编码数据
 返回值：unicode大端编码数据
 ]]
 function gb2312toucs2be(gb2312s)
 	local cd = iconv.open("ucs2be","gb2312")
 	return cd:iconv(gb2312s)
+end
+
+--[[
+函数名：ucs2toutf8
+功能  ：unicode小端编码 转化为 utf8编码
+参数  ：
+		ucs2s：unicode小端编码数据
+返回值：utf8码数据
+]]
+function ucs2toutf8(ucs2s)
+	local cd = iconv.open("utf8","ucs2")
+	return cd:iconv(ucs2s)
+end
+
+--[[
+函数名：utf8toucs2
+功能  ：utf8编码 转化为 unicode小端编码
+参数  ：
+		utf8s：utf8编码数据
+返回值：unicode小端编码数据
+]]
+function utf8toucs2(utf8s)
+	local cd = iconv.open("ucs2","utf8")
+	return cd:iconv(utf8s)
+end
+
+--[[
+函数名：ucs2betoutf8
+功能  ：unicode大端编码 转化为 utf8编码
+参数  ：
+		ucs2s：unicode大端编码数据
+返回值：utf8编码数据
+]]
+function ucs2betoutf8(ucs2s)
+	local cd = iconv.open("utf8","ucs2be")
+	return cd:iconv(ucs2s)
+end
+
+--[[
+函数名：utf8toucs2be
+功能  ：utf8编码 转化为 unicode大端编码
+参数  ：
+		utf8s：utf8编码数据
+返回值：unicode大端编码数据
+]]
+function utf8toucs2be(utf8s)
+	local cd = iconv.open("ucs2be","utf8")
+	return cd:iconv(utf8s)
+end
+
+--[[
+函数名：utf8togb2312
+功能  ：utf8编码 转化为 gb2312编码
+参数  ：
+		utf8s：utf8编码数据
+返回值：gb2312编码数据
+]]
+function utf8togb2312(utf8s)
+	local cd = iconv.open("ucs2","utf8")
+	local ucs2s = cd:iconv(utf8s)
+	cd = iconv.open("gb2312","ucs2")
+	return cd:iconv(ucs2s)
+end
+
+--[[
+函数名：gb2312toutf8
+功能  ：gb2312编码 转化为 utf8编码
+参数  ：
+		gb2312s：gb2312编码数据
+返回值：utf8编码数据
+]]
+function gb2312toutf8(gb2312s)
+	local cd = iconv.open("ucs2","gb2312")
+	local ucs2s = cd:iconv(gb2312s)
+	cd = iconv.open("utf8","ucs2")
+	return cd:iconv(ucs2s)
 end
 
 local function timeAddzone(y,m,d,hh,mm,ss,zone)
