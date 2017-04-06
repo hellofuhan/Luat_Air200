@@ -86,7 +86,7 @@ end
 		duration：录音时长，单位毫秒
 返回值：true
 ]]
-local function beginrecord(id,duration)
+function beginrecord(id,duration)
 	req(string.format("AT+AUDREC=0,0,1," .. id .. "," .. duration))
 	return true
 end
@@ -196,8 +196,8 @@ local function audiourc(data,prefix)
 					playerr()
 				end
 			--删除录音
-			elseif action == "4" then
-				dispatch("AUDIO_RECORD_IND",true,duration)
+			--[[elseif action == "4" then
+				dispatch("AUDIO_RECORD_IND",true,duration)]]
 			end
 		end
 	--tts功能
@@ -225,7 +225,12 @@ local function audiorsp(cmd,success,response,intermediate)
 
 	--录音或者播放录音确认应答
 	if prefix == "+AUDREC" then
-		dispatch("AUDIO_RECORD_CNF",success)
+		local action = smatch(cmd,"AUDREC=%d,%d,(%d)")		
+		if action=="1" then
+			dispatch("AUDIO_RECORD_CNF",success)
+		elseif action=="3" then
+			recordstopind()
+		end
 	--播放tts或者关闭tts应答
 	elseif prefix == "+QTTS" then
 		local action = smatch(cmd,"QTTS=(%d)")
@@ -374,7 +379,7 @@ local spriority,styp,spath,svol,scb,sdup,sduprd
 功能  ：关闭上次播放后，再播放本次请求
 参数  ：
 		priority：音频优先级，数值越小，优先级越高
-		typ：音频类型，目前仅支持"FILE"、"TTS"、"RECORD"
+		typ：音频类型，目前仅支持"FILE"、"TTS"、"TTSCC"、"RECORD"
 		path：音频文件路径
 		vol：播放音量，取值范围audiocore.VOL0到audiocore.VOL7。此参数可选
 		cb：音频播放结束或者出错时的回调函数，回调时包含一个参数：0表示播放成功结束；1表示播放出错；2表示播放优先级不够，没有播放。此参数可选
@@ -393,7 +398,10 @@ local function playbegin(priority,typ,path,vol,cb,dup,duprd)
     end
 	
 	--调用播放接口成功
-	if (typ=="TTS" and playtts(path)) or (typ=="TTSCC" and playtts(path,"net")) or (typ~="TTS" and typ~="TTSCC" and _play(path,dup and (not duprd or duprd==0))) then
+	if (typ=="TTS" and playtts(path))
+		or (typ=="TTSCC" and playtts(path,"net"))
+		or (typ=="RECORD" and playrecord(true,false,tonumber(smatch(path,"(%d+)&")),tonumber(smatch(path,"&(%d+)"))))
+		or (typ=="FILE" and _play(path,dup and (not duprd or duprd==0))) then
 		return true
 	--调用播放接口失败
 	else
@@ -411,7 +419,7 @@ end
 		      typ为"FILE"时：string类型，表示音频文件路径
 			  typ为"TTS"时：string类型，表示要播放数据的UCS2十六进制字符串
 			  typ为"TTSCC"时：string类型，表示要播放给通话对端数据的UCS2十六进制字符串
-			  typ为"RECORD"时：number类型，表示录音ID
+			  typ为"RECORD"时：string类型，表示录音ID&录音时长（毫秒）
 		vol：number类型，可选参数，播放音量，取值范围audiocore.VOL0到audiocore.VOL7
 		cb：function类型，可选参数，音频播放结束或者出错时的回调函数，回调时包含一个参数：0表示播放成功结束；1表示播放出错；2表示播放优先级不够，没有播放
 		dup：bool类型，可选参数，是否循环播放，true循环，false或者nil不循环
@@ -456,13 +464,14 @@ end
 ]]
 function stop()
 	if styp then
-		local typ = styp
+		local typ,path = styp,spath		
 		spriority,styp,spath,svol,scb,sdup,sduprd,spending = nil
 		--停止循环播放定时器
 		sys.timer_stop_all(play)
 		--停止音频播放
 		_stop()
 		if typ=="TTS" or typ=="TTSCC" then stoptts() return end
+		if typ=="RECORD" then stoprecord(true,false,tonumber(smatch(path,"(%d+)&")),tonumber(smatch(path,"&(%d+)"))) return end
 	end
 	return true
 end
@@ -476,13 +485,14 @@ end
 function playend()
 	print("playend",sdup,sduprd)
 	if (styp=="TTS" or styp=="TTSCC") and not sdup then stoptts() end
+	if styp=="RECORD" and not sdup then stoprecord(true,false,tonumber(smatch(spath,"(%d+)&")),tonumber(smatch(spath,"&(%d+)"))) end
 	--需要重复播放
 	if sdup then
 		--存在重复播放间隔
 		if sduprd then
 			sys.timer_start(play,sduprd,spriority,styp,spath,svol,scb,sdup,sduprd)
 		--不存在重复播放间隔
-		elseif styp=="TTS" or styp=="TTSCC" then
+		elseif styp=="TTS" or styp=="TTSCC" or styp=="RECORD" then
 			play(spriority,styp,spath,svol,scb,sdup,sduprd)
 		end
 	--不需要重复播放
@@ -502,6 +512,7 @@ end
 function playerr()
 	print("playerr")
 	if styp=="TTS" or styp=="TTSCC" then stoptts() end
+	if styp=="RECORD" then stoprecord(true,false,tonumber(smatch(spath,"(%d+)&")),tonumber(smatch(spath,"&(%d+)"))) end
 	--如果正在播放的音频有回调函数，则执行回调，传入参数1
 	if scb then scb(1) end
 	spriority,styp,spath,svol,scb,sdup,sduprd,spending = nil
@@ -528,6 +539,22 @@ end
 ]]
 function ttstopind()
 	print("ttstopind",spending,stopreqcb)
+	if stopreqcb then
+		stopreqcb()
+		stopreqcb = nil
+	elseif spending then
+		playbegin(spriority,styp,spath,svol,scb,sdup,sduprd)
+	end
+end
+
+--[[
+函数名：recordstopind
+功能  ：调用stoprecord()接口后，record停止播放后的消息处理函数
+参数  ：无
+返回值：无
+]]
+function recordstopind()
+	print("recordstopind",spending,stopreqcb)
 	if stopreqcb then
 		stopreqcb()
 		stopreqcb = nil
