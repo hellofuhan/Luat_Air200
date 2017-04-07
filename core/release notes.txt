@@ -1,3 +1,10 @@
+版本号：Luat_V0008_Air200.lod、Luat_V0008_Air200_TTS1.lod、Luat_V0008_Air200_TTS2.lod、Luat_V0008_Air200_TTS3.lod
+发布时间：2017/4/7 15:24
+修改记录：
+	1, 修正“开机时uart2会输出很多数据”的问题
+
+
+
 版本号：Luat_V0007_Air200.lod、Luat_V0007_Air200_TTS1.lod、Luat_V0007_Air200_TTS2.lod、Luat_V0007_Air200_TTS3.lod
 发布时间：2017/3/28 19:43
 修改记录：
