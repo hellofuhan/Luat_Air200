@@ -6,7 +6,6 @@
 
 --[[
 目前只支持QoS=0和QoS=1，不支持QoS=2
-topic、client identifier、user、password只支持ascii字符串
 ]]
 
 module(...,package.seeall)
@@ -31,7 +30,8 @@ end
 
 local function encutf8(s)
 	if not s then return "" end
-	return lpack.pack(">HA",slen(s),s)
+	local utf8s = common.gb2312toutf8(s)
+	return lpack.pack(">HA",slen(utf8s),utf8s)
 end
 
 local function enclen(s)
@@ -636,7 +636,7 @@ local function svrpublish(sckidx,mqttpacket)
 	print("svrpublish",mqttpacket.topic,mqttpacket.seq,mqttpacket.payload)	
 	if mqttpacket.qos == 1 then snd(sckidx,pack(PUBACK,mqttpacket.seq)) end
 	if tclients[mqttclientidx].evtcbs then
-		if tclients[mqttclientidx].evtcbs["MESSAGE"] then tclients[mqttclientidx].evtcbs["MESSAGE"](mqttpacket.topic,mqttpacket.payload,mqttpacket.qos) end
+		if tclients[mqttclientidx].evtcbs["MESSAGE"] then tclients[mqttclientidx].evtcbs["MESSAGE"](common.utf8togb2312(mqttpacket.topic),mqttpacket.payload,mqttpacket.qos) end
 	end
 end
 
@@ -823,8 +823,8 @@ end
 		flg：number类型，遗嘱标志，仅支持0和1
 		qos：number类型，服务器端发布遗嘱消息的服务质量等级，仅支持0,1,2
 		retain：number类型，遗嘱保留标志，仅支持0和1
-		topic：string类型，服务器端发布遗嘱消息的主题，仅支持ascii字符	
-		payload：string类型，服务器端发布遗嘱消息的载荷，仅支持ascii字符
+		topic：string类型，服务器端发布遗嘱消息的主题，gb2312编码	
+		payload：string类型，服务器端发布遗嘱消息的载荷，gb2312编码
 返回值：无
 ]]
 function tmqtt:configwill(flg,qos,retain,topic,payload)
@@ -839,10 +839,10 @@ end
 函数名：connect
 功能  ：连接mqtt服务器
 参数  ：
-		clientid：string类型，client identifier，仅支持ascii字符[必选]
+		clientid：string类型，client identifier，gb2312编码[必选]
 		keepalive：number类型，保活时间，单位秒[可选，默认600]
-		user：string类型，用户名，仅支持ascii字符[可选，默认""]
-		password：string类型，密码，仅支持ascii字符[可选，默认""]		
+		user：string类型，用户名，gb2312编码[可选，默认""]
+		password：string类型，密码，gb2312编码[可选，默认""]		
 		connectedcb：function类型，连接成功的回调函数[可选]
 		connecterrcb：function类型，连接失败的回调函数[可选]
 返回值：无
@@ -874,8 +874,8 @@ end
 函数名：publish
 功能  ：发布一条消息
 参数  ：
-		topic：string类型，消息主题，仅支持ascii字符[必选]
-		payload：二进制数据，消息负载[必选]
+		topic：string类型，消息主题，gb2312编码[必选]
+		payload：二进制数据，消息负载，用户自定义编码，本文件不会对数据做任何编码转换处理[必选]
 		qos：number类型，服务质量等级，仅支持0和1[可选，默认0]		
 		ackcb：function类型，qos为1时表示收到PUBACK的回调函数,qos为0时消息发送结果的回调函数[可选]
 		usertag：string类型，用户回调函数ackcb用到的第一个参数[可选]
@@ -905,7 +905,7 @@ end
 函数名：subscribe
 功能  ：订阅主题
 参数  ：
-		topics：table类型，一个或者多个主题，主题名仅支持ascii字符，质量等级仅支持0和1，{{topic="/topic1",qos=质量等级}, {topic="/topic2",qos=质量等级}, ...}[必选]
+		topics：table类型，一个或者多个主题，主题名gb2312编码，质量等级仅支持0和1，{{topic="/topic1",qos=质量等级}, {topic="/topic2",qos=质量等级}, ...}[必选]
 		ackcb：function类型，表示收到SUBACK的回调函数[可选]
 		usertag：string类型，用户回调函数ackcb用到的第一个参数[可选]
 返回值：无

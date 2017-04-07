@@ -1,5 +1,6 @@
 require"misc"
 require"mqtt"
+require"common"
 module(...,package.seeall)
 
 local ssub,schar,smatch,sbyte,slen = string.sub,string.char,string.match,string.byte,string.len
@@ -41,6 +42,7 @@ end
 返回值：无
 ]]
 function pubqos0test()
+	--注意：在此处自己去控制payload的内容编码，mqtt库中不会对payload的内容做任何编码转换
 	mqttclient:publish("/qos0topic","qos0data",0,pubqos0testsndcb,"publish0test_"..qos0cnt)
 end
 
@@ -65,7 +67,8 @@ end
 返回值：无
 ]]
 function pubqos1test()
-	mqttclient:publish("/qos1topic","qos1data",1,pubqos1testackcb,"publish1test_"..qos1cnt)
+	--注意：在此处自己去控制payload的内容编码，mqtt库中不会对payload的内容做任何编码转换
+	mqttclient:publish("/中文qos1topic","中文qos1data",1,pubqos1testackcb,"publish1test_"..qos1cnt)
 end
 
 --[[
@@ -84,8 +87,8 @@ end
 函数名：rcvmessage
 功能  ：收到PUBLISH消息时的回调函数
 参数  ：
-		topic：消息主题
-		payload：消息负载
+		topic：消息主题（gb2312编码）
+		payload：消息负载（原始编码，收到的payload是什么内容，就是什么内容，没有做任何编码转换）
 		qos：消息质量等级
 返回值：无
 ]]
@@ -102,7 +105,7 @@ end
 local function connectedcb()
 	print("connectedcb")
 	--订阅主题
-	mqttclient:subscribe({{topic="/event0",qos=0}, {topic="/event1",qos=1}}, subackcb, "subscribetest")
+	mqttclient:subscribe({{topic="/event0",qos=0}, {topic="/中文event1",qos=1}}, subackcb, "subscribetest")
 	--注册事件的回调函数，MESSAGE事件表示收到了PUBLISH消息
 	mqttclient:regevtcb({MESSAGE=rcvmessagecb})
 	--发布一条qos为0的消息
