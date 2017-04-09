@@ -143,14 +143,14 @@ end
 local function getpack(data)
 	--判断包长度是否正确
 	local len = string.len(data)
-	if (packid < total and len ~= 1024) or (packid >= total and (len - 1) ~= last) then
+	if (packid < total and len ~= 1024) or (packid >= total and (len - 2) ~= last) then
 		print("getpack:len not match",packid,len,last)
 		retry("ERROR_PACK")
 		return
 	end
 
 	--判断包序号是否正确
-	local id = string.byte(data,1)
+	local id = string.byte(data,1)*256+string.byte(data,2)
 	if id ~= packid then
 		print("getpack:packid not match",id,packid)
 		retry("ERROR_PACK")
@@ -161,7 +161,7 @@ local function getpack(data)
 	retry("STOP")
 
 	--保存升级包
-	save(string.sub(data,2,-1))
+	save(string.sub(data,3,-1))
 	--如果是用户自定义模式，产生一个内部消息UP_PROGRESS_IND，表示升级进度
 	if updmode == 1 then
 		dispatch("UP_EVT","UP_PROGRESS_IND",packid*100/total)

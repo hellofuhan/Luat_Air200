@@ -1,3 +1,13 @@
+发布时间：2017/4/9 14:18:21
+修改记录：
+    一、lib脚本修改
+        lib脚本版本号：2.0.8
+        支持lib脚本的最小core软件版本号：Luat_V0008_Air200
+        (1)net.lua：新增接口getmulticell，实时获取多基站信息
+        (2)update.lua：修改升级协议，包索引字段扩大为两个字节表示；http://www.luam2m.com/forum.php?mod=viewthread&tid=2397&page=1&extra=#pid6360中的升级协议已做同步修改
+
+
+
 发布时间：2017/4/7 12:01:21
 修改记录：
     一、lib脚本修改

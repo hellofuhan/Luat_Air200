@@ -40,7 +40,8 @@ local csqqrypriod,cengqrypriod = 60*1000
 --flymode：是否处于飞行模式
 --csqswitch：定时查询信号强度开关
 --cengswitch：定时查询当前和临近小区信息开关
-local cellinfo,flymode,csqswitch,cengswitch = {}
+--multicellcb：获取多小区的回调函数
+local cellinfo,flymode,csqswitch,cengswitch,multicellcb = {}
 
 --ledstate：网络指示灯状态INIT,FLYMODE,SIMERR,IDLE,CREG,CGATT,SCK
 --INIT：功能关闭状态
@@ -498,6 +499,35 @@ function setcengswitch(v)
 end
 
 --[[
+函数名：cellinfoind
+功能  ：CELL_INFO_IND消息的处理函数
+参数  ：无
+返回值：如果有用户自定义的获取多基站信息的回调函数，则返回nil；否则返回true
+]]
+local function cellinfoind()
+	if multicellcb then
+		local cb = multicellcb
+		multicellcb = nil
+		cb(getcellinfoext())
+	else
+		return true
+	end
+end
+
+--[[
+函数名：getmulticell
+功能  ：读取“当前和临近小区信息”
+参数  ：
+		cb：回调函数，当读取到小区信息后，会调用此回调函数，调用形式为cb(cells)，其中cells为string类型，格式为：
+		    当前和临近位置区、小区、mcc、mnc、以及信号强度的拼接字符串，例如：460.01.6311.49234.30;460.01.6311.49233.23;460.02.6322.49232.18;
+返回值：无 
+]]
+function getmulticell(cb)
+	multicellcb = cb
+	cengquery()
+end
+
+--[[
 函数名：csqquery
 功能  ：查询“信号强度”
 参数  ：无
@@ -682,6 +712,7 @@ local procer =
 	SYS_WORKMODE_IND = workmodeind,
 	USER_SOCKET_CONNECT = usersckind,
 	NET_GPRS_READY = cgattind,
+	CELL_INFO_IND = cellinfoind,
 }
 --注册消息处理函数表
 sys.regapp(procer)
