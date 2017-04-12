@@ -688,8 +688,18 @@ static int decodeHeadInfo(const u8 *pData, DbHeadInfo *pHeadInfo, u32 *pOffset)
             break;
 
         case HeadInfoFilecount:
-            err = ASSERT_LEN(length, 1);
-            pHeadInfo->filecount = pData[pos];
+            /*begin\NEW\zhutianhua\2017.4.12 17:55\兼容IDE脚本打包协议，文件个数字段扩大为2个字节*/
+            if(pHeadInfo->verNum==0)
+            {
+                err = ASSERT_LEN(length, 1);
+                pHeadInfo->filecount = pData[pos];
+            }
+            else
+            {
+                err = ASSERT_LEN(length, 2);
+                pHeadInfo->filecount = DBMAKEU16(pData, pos);
+            }
+            /*end\NEW\zhutianhua\2017.4.12 17:55\兼容IDE脚本打包协议，文件个数字段扩大为2个字节*/
             break;
 
         case HeadInfoReserved0x00:

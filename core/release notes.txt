@@ -1,3 +1,10 @@
+版本号：Luat_V0009_Air200.lod、Luat_V0009_Air200_TTS1.lod、Luat_V0009_Air200_TTS2.lod、Luat_V0009_Air200_TTS3.lod
+发布时间：2017/4/13 06:38
+修改记录：
+	1, 支持“Luat IDE通过uart下载脚本”的功能
+
+
+
 版本号：Luat_V0008_Air200.lod、Luat_V0008_Air200_TTS1.lod、Luat_V0008_Air200_TTS2.lod、Luat_V0008_Air200_TTS3.lod
 发布时间：2017/4/7 15:24
 修改记录：
