@@ -70,3 +70,6 @@ http://www.luam2m.com/forum.php?mod=post&action=edit&fid=84&tid=2479&pid=6502&pa
 更新：将合宙通信OpenLuat开源模块LUA程序设计指南V2.6 改为 Luat脚本开发指南V2.6
 
 
+20170411：
+更新：将Air200系列开发板新手入门指导V1.2 更新为 V1.4
+添加：Air200封装库文件 Air200LIB.rar
