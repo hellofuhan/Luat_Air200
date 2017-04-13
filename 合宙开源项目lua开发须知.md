@@ -8,7 +8,7 @@
 
 \core是模块基础软件代码，支持Lua的运行。core代码编译生成的文件叫做lod文件。我司已经提供了几个lod文件，放置在core根目录。core内含合宙自己开发的Lua扩展库（位于\core\cust_src\elua\modules\src），扩展库文档位于\doc目录中。
 
-\script是合宙范例LUA脚本，其中：  
+\script是Luat范例脚本，其中：  
 \xiaoman_gps_tracker\whole_test 是一款已经商用的GPS定位器软件，可以下到合宙小蛮GPS定位器（是基于Air200开发的）中运行。
 
 \demo下timer、 UART 等是各种应用例程，可下载到合宙EVB板中运行。     合宙EVB开发板对应的硬件参考和Air200相关的AT命令位于\doc\Air200模块相关文档。 
