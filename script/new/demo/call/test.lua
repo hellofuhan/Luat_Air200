@@ -86,5 +86,15 @@ local function dtmfdetected(dtmf)
 	print("dtmfdetected",dtmf)
 end
 
+--[[
+函数名：alerting
+功能  ：“呼叫过程中已收到对方振铃”消息处理函数
+参数  ：无
+返回值：无
+]]
+local function alerting()
+	print("alerting")
+end
+
 --注册消息的用户回调函数
-cc.regcb("READY",ready,"INCOMING",incoming,"CONNECTED",connected,"DISCONNECTED",disconnected,"DTMF",dtmfdetected)
+cc.regcb("READY",ready,"INCOMING",incoming,"CONNECTED",connected,"DISCONNECTED",disconnected,"DTMF",dtmfdetected,"ALERTING",alerting)

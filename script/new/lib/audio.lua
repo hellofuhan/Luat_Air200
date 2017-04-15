@@ -527,7 +527,7 @@ local stopreqcb
 ∑µªÿ÷µ£∫Œﬁ
 ]]
 local function audstopreq(cb)
-	if stop() then cb() return end
+	if stop() and cb then cb() return end
 	stopreqcb = cb
 end
 

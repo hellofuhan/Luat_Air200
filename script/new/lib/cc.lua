@@ -28,7 +28,7 @@ local incoming_num = nil
 --紧急号码表
 local emergency_num = {"112", "911", "000", "08", "110", "119", "118", "999"}
 --通话列表
-local clcc = {}
+local oldclcc,clcc = {},{}
 --状态变化通知回调
 local usercbs = {}
 
@@ -60,7 +60,7 @@ end
 函数名：regcb
 功能  ：注册一个或者多个消息的用户回调函数
 参数  ：
-		evt1：消息类型，目前仅支持"READY","INCOMING","CONNECTED","DISCONNECTED","DTMF"
+		evt1：消息类型，目前仅支持"READY","INCOMING","CONNECTED","DISCONNECTED","DTMF","ALERTING"
 		cb1：消息对应的用户回调函数
 		...：evt和cb成对出现
 返回值：无
@@ -77,7 +77,7 @@ end
 函数名：deregcb
 功能  ：撤销注册一个或者多个消息的用户回调函数
 参数  ：
-		evt1：消息类型，目前仅支持"READY","INCOMING","CONNECTED","DISCONNECTED"
+		evt1：消息类型，目前仅支持"READY","INCOMING","CONNECTED","DISCONNECTED","DTMF","ALERTING"
 		...：0个或者多个evt
 返回值：无
 ]]
@@ -128,6 +128,7 @@ local function discevt(reason)
 	pm.sleep("cc")
 	--产生内部消息CALL_DISCONNECTED，通知用户程序通话结束
 	dispatch("CALL_DISCONNECTED",reason)
+	sys.timer_stop(qrylist,"MO")
 end
 
 --[[
@@ -146,7 +147,8 @@ end
 参数  ：无
 返回值：无
 ]]
-local function qrylist()
+function qrylist()
+	oldclcc = clcc
 	clcc = {}
 	req("AT+CLCC")
 end
@@ -158,7 +160,22 @@ local function proclist()
 	end
 	if isactive and #clcc > 1 then
 		for k,v in pairs(clcc) do
-			if v.sta ~= "0" then req("AT+CHLD=1"..v.id) end
+			if v.sta ~= "0" then req("AT+CHLD=1"..v.id) end			
+		end
+	end
+	
+	if usercbs["ALERTING"] and #clcc >= 1 then
+		for k,v in pairs(clcc) do
+			if v.sta == "3" then
+				--[[dispatch("CALL_ALERTING")
+				break]]
+				for m,n in pairs(oldclcc) do
+					if v.id==n.id and v.dir==n.dir and n.sta~="3" then
+						dispatch("CALL_ALERTING")
+						break
+					end
+				end
+			end
 		end
 	end
 end
@@ -354,9 +371,10 @@ local function ccurc(data,prefix)
 	--通话建立通知
 	elseif data == "CONNECT" then
 		qrylist()		
-		dispatch("CALL_CONNECTED")		
+		dispatch("CALL_CONNECTED")
+		sys.timer_stop(qrylist,"MO")
 		--先停止音频播放
-		sys.dispatch("AUDIO_STOP_REQ",acceptnxt)
+		sys.dispatch("AUDIO_STOP_REQ")
 	--通话挂断通知
 	elseif data == "NO CARRIER" or data == "BUSY" or data == "NO ANSWER" then
 		qrylist()
@@ -401,6 +419,8 @@ local function ccrsp(cmd,success,response,intermediate)
 	if prefix == "D" then
 		if not success then
 			discevt("CALL_FAILED")
+		else
+			if usercbs["ALERTING"] then sys.timer_loop_start(qrylist,1000,"MO") end
 		end
 	--挂断所有通话应答
 	elseif prefix == "+CHUP" then
@@ -409,6 +429,7 @@ local function ccrsp(cmd,success,response,intermediate)
 	elseif prefix == "A" then
 		incoming_num = nil
 		dispatch("CALL_CONNECTED")
+		sys.timer_stop(qrylist,"MO")
 	end
 	qrylist()
 end
