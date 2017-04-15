@@ -44,3 +44,13 @@ int platform_pmd_get_charger(void)
 
     return 1;
 }
+
+int platform_pmd_get_chg_param(BOOL *battStatus, u16 *battVolt, u8 *battLevel, BOOL *chargerStatus, u8 *chargeState)
+{
+	*battStatus = TRUE;
+	*battVolt = 3800;
+	*battLevel = 50;
+	*chargerStatus = FALSE;
+	*chargeState = 0;
+	return PLATFORM_OK;
+}

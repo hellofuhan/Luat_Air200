@@ -214,3 +214,13 @@ void platform_poweron_try(void)
 
 }
 /*-\NEW\liweiqiang\2013.12.12\增加充电开机时由用户自行决定是否启动系统 */
+
+char *platform_rtos_get_version(void)
+{
+	return "Luat_Airm2m_V9999";
+}
+
+int platform_get_env_usage(void)
+{
+    return 50;
+}
