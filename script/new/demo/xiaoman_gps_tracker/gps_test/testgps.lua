@@ -38,6 +38,15 @@ end
 --UART2外接UBLOX GPS模块
 gps.init(nil,nil,true,1000,2,9600,8,uart.PAR_NONE,uart.STOP_1)
 
+--[[
+sys.timer_start(gps.writegpscmd,1000,true,"B56206010600F00000000000FD15",true) --关闭GGA
+sys.timer_start(gps.writegpscmd,1000,true,"B56206010600F00100000000FE1A",true) --关闭GLL
+sys.timer_start(gps.writegpscmd,1000,true,"B56206010600F00200000000FF1F",true) --关闭GSA
+sys.timer_start(gps.writegpscmd,1000,true,"B56206010600F003000000000024",true) --关闭GSV
+sys.timer_start(gps.writegpscmd,1000,true,"B56206010600F00500000000022E",true) --关闭VTG
+]]
+--sys.timer_start(gps.writegpscmd,1000,true,"B562060806006400010001007A12",true) --100ms
+
 --测试代码开关，取值1,2
 local testidx = 1
 
