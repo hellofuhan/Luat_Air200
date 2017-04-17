@@ -73,3 +73,6 @@ http://www.luam2m.com/forum.php?mod=post&action=edit&fid=84&tid=2479&pid=6502&pa
 20170411：
 更新：将Air200系列开发板新手入门指导V1.2 更新为 V1.4
 添加：Air200封装库文件 Air200LIB.rar
+
+20170417:
+更新：将Luat专用看门狗芯片设计手册V1.0 更新为 V1.1
