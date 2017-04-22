@@ -11,7 +11,8 @@ package.path = "/?.lua;".."/?.luae;"..package.path
 --默认参数配置存储在configname文件中
 --实时参数配置存储在paraname文件中
 --para：实时参数表
-local paraname,configname,econfigname,para = "/para.lua"
+--config：默认参数表
+local paraname,para,libdftconfig,configname,econfigname = "/para.lua",{}
 
 --[[
 函数名：print
@@ -35,7 +36,7 @@ function restore()
 	fpara:write(fconfig:read("*a"))
 	fpara:close()
 	fconfig:close()
-	para = config
+	upd(true)
 end
 
 --[[
@@ -79,13 +80,14 @@ end
 --[[
 函数名：upd
 功能  ：更新实时参数表
-参数  ：无
+参数  ：
+		overide：是否用默认参数强制更新实时参数
 返回值：无
 ]]
-local function upd()
-	for k,v in pairs(config) do
+function upd(overide)
+	for k,v in pairs(libdftconfig) do
 		if k ~= "_M" and k ~= "_NAME" and k ~= "_PACKAGE" then
-			if para[k] == nil then
+			if overide or para[k] == nil then
 				para[k] = v
 			end			
 		end
@@ -236,7 +238,8 @@ end
 返回值：无
 ]]
 function init(dftcfgfile)
-	pcall(require,string.match(dftcfgfile,"(.+)%.lua"))
+	local f
+	f,libdftconfig = pcall(require,string.match(dftcfgfile,"(.+)%.lua"))
 	configname,econfigname = "/lua/"..dftcfgfile,"/lua/"..dftcfgfile.."e"
 	--初始化配置文件，从文件中把参数读取到内存中
 	load()
