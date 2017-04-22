@@ -34,7 +34,7 @@ json：json编解码测试demo项目
 
 mqtt：mqtt应用demo项目
 
-npt：模块时间自动更新demo项目
+ntp：模块时间自动更新demo项目
 
 nvm：参数存储读写demo项目
 
