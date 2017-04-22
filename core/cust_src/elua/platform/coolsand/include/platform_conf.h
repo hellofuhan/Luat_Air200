@@ -113,7 +113,8 @@
     _ROM( AUXLIB_WATCHDOG, luaopen_watchdog, watchdog_map ) \
     _ROM( AUXLIB_CPU, luaopen_cpu, cpu_map) \
     APN_LINE \
-    _ROM( AUXLIB_GPSCORE, luaopen_gpscore, gpscore_map) 
+    _ROM( AUXLIB_GPSCORE, luaopen_gpscore, gpscore_map) \
+    _ROM( AUXLIB_CRYPTO, luaopen_crypto, crypto_map ) 
 
 
 

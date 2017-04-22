@@ -32,4 +32,7 @@ endif
 #-\NEW\zhutianhua\2014.1.24\添加libpng库
 
 LOCAL_MODULE_DEPENDS  += cust_src/elua/lib/json
+#/*begin\NEW\zhutianhua\2017.4.17 15:7\新增crypto算法库*/
+LOCAL_MODULE_DEPENDS  += cust_src/elua/lib/crypto
+#/*end\NEW\zhutianhua\2017.4.17 15:7\新增crypto算法库*/
 

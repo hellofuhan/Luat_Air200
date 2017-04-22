@@ -108,6 +108,11 @@ LUALIB_API int ( luaopen_gpscore )( lua_State *L );
 LUALIB_API int ( luaopen_apn )( lua_State *L );
 /*-\NEW\liulean\2015.6.15\增加获取默认APN的库 */
 
+/*begin\NEW\zhutianhua\2017.4.17 15:8\新增crypto算法库*/
+#define  AUXLIB_CRYPTO               "crypto"
+LUALIB_API int ( luaopen_crypto )( lua_State *L );
+/*end\NEW\zhutianhua\2017.4.17 15:8\新增crypto算法库*/
+
 
 // Helper macros
 #define MOD_CHECK_ID( mod, id )\
