@@ -478,9 +478,14 @@ local function reconn(sckidx)
 	else
 		tclients[mqttclientidx].sckreconncnt,tclients[mqttclientidx].sckreconncyclecnt = 0,tclients[mqttclientidx].sckreconncyclecnt+1
 		if tclients[mqttclientidx].sckreconncyclecnt >= RECONN_CYCLE_MAX_CNT then
-			sys.restart("connect fail")
-		end
-		sys.timer_start(reconn,RECONN_CYCLE_PERIOD*1000,sckidx)
+			if tclients[mqttclientidx].sckerrcb then
+				tclients[mqttclientidx].sckerrcb("CONNECT")
+			else
+				sys.restart("connect fail")
+			end
+		else
+			sys.timer_start(reconn,RECONN_CYCLE_PERIOD*1000,sckidx)
+		end		
 	end
 end
 
@@ -843,11 +848,12 @@ end
 		keepalive：number类型，保活时间，单位秒[可选，默认600]
 		user：string类型，用户名，gb2312编码[可选，默认""]
 		password：string类型，密码，gb2312编码[可选，默认""]		
-		connectedcb：function类型，连接成功的回调函数[可选]
-		connecterrcb：function类型，连接失败的回调函数[可选]
+		connectedcb：function类型，mqtt连接成功的回调函数[可选]
+		connecterrcb：function类型，mqtt连接失败的回调函数[可选]
+		sckerrcb：function类型，socket连接失败的回调函数[可选]
 返回值：无
 ]]
-function tmqtt:connect(clientid,keepalive,user,password,connectedcb,connecterrcb)
+function tmqtt:connect(clientid,keepalive,user,password,connectedcb,connecterrcb,sckerrcb)
 	self.clientid=clientid
 	self.keepalive=keepalive or 600
 	self.user=user or ""
@@ -856,6 +862,7 @@ function tmqtt:connect(clientid,keepalive,user,password,connectedcb,connecterrcb
 	--self.autoreconnect=autoreconnect
 	self.connectedcb=connectedcb
 	self.connecterrcb=connecterrcb
+	self.sckerrcb=sckerrcb
 	
 	tclients[getclient(self.sckidx)]=self
 	

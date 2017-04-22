@@ -131,6 +131,18 @@ local function connecterrcb(r)
 end
 
 --[[
+函数名：sckerrcb
+功能  ：SOCKET失败回调函数
+参数  ：
+		r：string类型，失败原因值
+			CONNECT：mqtt内部，socket一直连接失败，不再尝试自动重连
+返回值：无
+]]
+local function sckerrcb(r)
+	print("sckerrcb",r)
+end
+
+--[[
 函数名：imeirdy
 功能  ：IMEI读取成功，成功后，才去创建mqtt client，连接服务器，因为用到了IMEI号
 参数  ：无		
@@ -142,7 +154,9 @@ local function imeirdy()
 	--配置遗嘱参数,如果有需要，打开下面一行代码，并且根据自己的需求调整will参数
 	--mqttclient:configwill(1,0,0,"/willtopic","will payload")
 	--连接mqtt服务器
-	mqttclient:connect(misc.getimei(),600,"user","password",connectedcb,connecterrcb)
+	--mqtt lib中，如果socket一直重连失败，默认会自动重启软件
+	--注意sckerrcb参数，如果打开了注释掉的sckerrcb，则mqtt lib中socket一直重连失败时，不会自动重启软件，而是调用sckerrcb函数
+	mqttclient:connect(misc.getimei(),600,"user","password",connectedcb,connecterrcb--[[,sckerrcb]])
 end
 
 local procer =
