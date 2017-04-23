@@ -479,6 +479,8 @@ local function reconn(sckidx)
 		tclients[mqttclientidx].sckreconncnt,tclients[mqttclientidx].sckreconncyclecnt = 0,tclients[mqttclientidx].sckreconncyclecnt+1
 		if tclients[mqttclientidx].sckreconncyclecnt >= RECONN_CYCLE_MAX_CNT then
 			if tclients[mqttclientidx].sckerrcb then
+				tclients[mqttclientidx].sckreconncnt=0
+				tclients[mqttclientidx].sckreconncyclecnt=0
 				tclients[mqttclientidx].sckerrcb("CONNECT")
 			else
 				sys.restart("connect fail")
@@ -542,8 +544,6 @@ function ntfy(idx,evt,result,item)
 	--连接被动断开
 	elseif evt == "STATE" and result == "CLOSED" then
 		sys.timer_stop(pingreq,idx)
-		--sys.timer_stop(loc0snd)
-		--sys.timer_stop(loc1snd)
 		mqttdup.rmvall(idx)
 		tclients[mqttclientidx].sckconnected=false
 		tclients[mqttclientidx].mqttconnected=false
@@ -552,8 +552,6 @@ function ntfy(idx,evt,result,item)
 	--连接主动断开（调用link.shut后的异步事件）
 	elseif evt == "STATE" and result == "SHUTED" then
 		sys.timer_stop(pingreq,idx)
-		--sys.timer_stop(loc0snd)
-		--sys.timer_stop(loc1snd)
 		mqttdup.rmvall(idx)
 		tclients[mqttclientidx].sckconnected=false
 		tclients[mqttclientidx].mqttconnected=false
@@ -562,13 +560,18 @@ function ntfy(idx,evt,result,item)
 	--连接主动断开（调用socket.disconnect后的异步事件）
 	elseif evt == "DISCONNECT" then
 		sys.timer_stop(pingreq,idx)
-		--sys.timer_stop(loc0snd)
-		--sys.timer_stop(loc1snd)
 		mqttdup.rmvall(idx)
 		tclients[mqttclientidx].sckconnected=false
 		tclients[mqttclientidx].mqttconnected=false
 		tclients[mqttclientidx].sckrcvs=""
-		reconn(idx)		
+		reconn(idx)
+	--连接主动断开并且销毁（调用socket.close后的异步事件）
+	elseif evt == "CLOSE" then
+		sys.timer_stop(pingreq,idx)
+		mqttdup.rmvall(idx)
+		local cb = tclients[mqttclientidx].destroycb
+		table.remove(tclients,mqttclientidx)
+		if cb then cb() end
 	end
 	--其他错误处理，断开数据链路，重新连接
 	if smatch((type(result)=="string") and result or "","ERROR") then
@@ -819,6 +822,36 @@ function create(prot,host,port)
 	setmetatable(mqtt_client,tmqtt)
 	table.insert(tclients,mqtt_client)
 	return(mqtt_client)
+end
+
+--[[
+函数名：change
+功能  ：改变一个mqtt client的socket参数
+参数  ：
+		prot：string类型，传输层协议，仅支持"TCP"和"UDP"[必选]
+		host：string类型，服务器地址，支持域名和IP地址[必选]
+		port：number类型，服务器端口[必选]
+返回值：无
+]]
+function tmqtt:change(prot,host,port)
+	self.prot,self.host,self.port=prot or self.prot,host or self.host,port or self.port
+end
+
+--[[
+函数名：destroy
+功能  ：销毁一个mqtt client
+参数  ：
+		destroycb：function类型，mqtt client销毁后的回调函数[可选]
+返回值：无
+]]
+function tmqtt:destroy(destroycb)
+	local k,v
+	self.destroycb = destroycb
+	for k,v in pairs(tclients) do
+		if v.sckidx==self.sckidx then
+			socket.close(v.sckidx)
+		end
+	end
 end
 
 --[[

@@ -146,6 +146,9 @@ local function sckrsp(id,evt,val)--对此连接的状态通知和处理的程序
 			scks[idx].concause = cause
 		end
 		scks[idx].rsp(idx,"DISCONNECT",true,cause)
+	elseif evt == "CLOSE" then
+		scks[idx].rsp(idx,"CLOSE",true)
+		scks[idx] = nil
 	elseif evt == "STATE" and val == "CLOSED" then
 		if #scks[idx].sndpending ~= 0 then
 			--link.connect(id,scks[idx].prot,scks[idx].addr,scks[idx].port)
@@ -298,6 +301,18 @@ function disconnect(idx,cause)
 	if not checkidx1(idx,"disconnect") then return end
 	scks[idx].discause = cause
 	return link.disconnect(scks[idx].id) --关闭连接
+end
+
+--[[
+函数名：close
+功能  ：断开一个socket连接,并且销毁
+参数  ：
+		idx：number类型，socket id，如果使用了mqtt模块，取值范围是1、2、3；如果没使用mqtt模块，取值范围是1、2、3、4、5。[必选]
+返回值：true表示成功调用了断开接口（断开结果会有异步消息通知到socket的状态处理函数中），false表示没有成功调用断开接口
+]]
+function close(idx)
+	if not checkidx1(idx,"close") then return end
+	return link.close(scks[idx].id) --销毁连接
 end
 
 function isactive(idx)

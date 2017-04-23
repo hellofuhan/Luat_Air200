@@ -239,7 +239,9 @@ local function parsedatasvr()
 	end
 	
 	print("parsedatasvr",host,#ports,clientid,username)
-	sys.dispatch("ALIYUN_DATA_BGN",host,ports,clientid,username,productkey,getdevice("name"))
+	if host and #ports>0 and clientid and username then
+		sys.dispatch("ALIYUN_DATA_BGN",host,ports,clientid,username,productkey,getdevice("name"))
+	end
 	
 	return host and #ports>0 and clientid and username
 end
@@ -347,6 +349,7 @@ function ntfy(idx,evt,result,item)
 	--连接被动断开
 	elseif evt == "STATE" and result == "CLOSED" then
 		linksta = false
+		socket.close(SCK_IDX)
 		--reconn()
 	--连接主动断开（调用link.shut后的异步事件）
 	elseif evt == "STATE" and result == "SHUTED" then
@@ -437,7 +440,7 @@ local function parse()
 	
 	rcvbuf = ""
 	parsevalidbody()
-	socket.disconnect(SCK_IDX)
+	socket.close(SCK_IDX)
 end
 
 --[[

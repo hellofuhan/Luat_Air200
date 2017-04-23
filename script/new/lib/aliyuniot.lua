@@ -15,7 +15,7 @@ require"aliyuniotauth"
 module(...,package.seeall)
 
 --mqtt客户端对象,数据服务器地址,数据服务器端口表
-local mqttclient,gaddr,gport
+local mqttclient,gaddr,gports,gclientid,gusername
 --目前使用的gport表中的index
 local gportidx = 1
 local gconnectedcb,gconnecterrcb
@@ -39,7 +39,28 @@ end
 返回值：无
 ]]
 local function sckerrcb(r)
-	print("sckerrcb",r)
+	print("sckerrcb",r,gportidx,#gports)
+	if r=="CONNECT" then
+		if gportidx<#gports then
+			gportidx = gportidx+1
+			connect(true)
+		else
+			sys.restart("aliyuniot sck connect err")
+		end
+	end
+end
+
+function connect(change)
+	if change then
+		mqttclient:change("TCP",gaddr,gports[gportidx])
+	else
+		--创建一个mqtt client
+		mqttclient = mqtt.create("TCP",gaddr,gports[gportidx])
+	end
+	--配置遗嘱参数,如果有需要，打开下面一行代码，并且根据自己的需求调整will参数
+	--mqttclient:configwill(1,0,0,"/willtopic","will payload")
+	--连接mqtt服务器
+	mqttclient:connect(gclientid,600,gusername,"",gconnectedcb,gconnecterrcb,sckerrcb)
 end
 
 --[[
@@ -48,15 +69,10 @@ end
 参数  ：无		
 返回值：无
 ]]
-local function databgn(host,ports,clientid,username,produckey,devicename)
-	gaddr,gport = host or gaddr,ports or gport
+local function databgn(host,ports,clientid,username)
+	gaddr,gports,gclientid,gusername = host or gaddr,ports or gports,clientid,username
 	gportidx = 1
-	--创建一个mqtt client
-	mqttclient = mqtt.create("TCP",gaddr,gport[gportidx])
-	--配置遗嘱参数,如果有需要，打开下面一行代码，并且根据自己的需求调整will参数
-	--mqttclient:configwill(1,0,0,"/willtopic","will payload")
-	--连接mqtt服务器
-	mqttclient:connect(clientid,600,username,"",gconnectedcb,gconnecterrcb,sckerrcb)
+	connect()
 end
 
 local procer =
