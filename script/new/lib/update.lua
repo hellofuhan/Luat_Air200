@@ -1,8 +1,6 @@
 --[[
 模块名称：远程升级
 模块功能：只在每次开机或者重启时，连接升级服务器，如果服务器存在新版本，lib和应用脚本远程升级
-请先参考：http://www.openluat.com/forum.php?mod=viewthread&tid=2397&extra=page%3D1
-然后再阅读本模块
 模块最后修改时间：2017.02.09
 ]]
 
