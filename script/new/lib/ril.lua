@@ -55,6 +55,13 @@ local RILCMD = {
 	["+CPBR"] = 3,
  	["+CIPSEND"] = 10,
 	["+CIPCLOSE"] = 10,
+	["+SSLINIT"] = 10,
+	["+SSLCERT"] = 10,
+	["+SSLCREATE"] = 10,
+	["+SSLCONNECT"] = 10,
+	["+SSLSEND"] = 10,
+	["+SSLDESTROY"] = 10,
+	["+SSLTERM"] = 10,
 	["+CIFSR"] = 10,
 }
 
@@ -215,7 +222,7 @@ local function urc(data)
 	if data == "RDY" then
 		radioready = true
 	else
-		local prefix = smatch(data,"(%+*[%u%d ]+)")
+		local prefix = smatch(data,"(%+*[%u%d& ]+)")
 		--执行prefix的urc处理函数，返回数据过滤器
 		urcfilter = urctable[prefix](data,prefix)
 	end
@@ -282,7 +289,7 @@ local function procatc(data)
 			print("send:",currarg)
 			vwrite(uart.ATC,currarg,"\026")
 		--发送数据
-		elseif cmdhead == "+CIPSEND" then
+		elseif cmdhead == "+CIPSEND" or cmdhead == "+SSLSEND" or cmdhead == "+SSLCERT" then
 			print("send:",currarg)
 			vwrite(uart.ATC,currarg)
 		else
@@ -338,6 +345,17 @@ local function procatc(data)
 			elseif data == "+PDP: DEACT" then
 				result = true
 				respdata = data
+			else
+				isurc = true
+			end
+		elseif cmdhead=="+SSLINIT" or cmdhead=="+SSLCERT" or cmdhead=="+SSLCREATE" or cmdhead=="+SSLCONNECT" or cmdhead=="+SSLSEND" or cmdhead=="+SSLDESTROY" or cmdhead=="+SSLTERM" then
+			if smatch(data,"^SSL&%d,") then
+				respdata = data
+				if smatch(data,"ERROR") then
+					result = false
+				else
+					result = true
+				end
 			else
 				isurc = true
 			end

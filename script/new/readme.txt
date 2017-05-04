@@ -16,6 +16,10 @@ demo：以下所有项目的“应用脚本”，xiaoman_gps_tracker下的脚本在小蛮GPS定位器硬件
 由于时间有限，部分项目没有仔细测试，运行过程中可能出错，请自行验证，有问题QQ交流，谢谢！
 
 在demo中：
+aliyun：TCP直连阿里云物联网后台的demo项目
+
+aliyun_ssl：SSL连接阿里云物联网后台的demo项目
+
 audio：音频播放demo项目
 
 call：语音通话demo项目
@@ -50,9 +54,17 @@ socket\short_connection：基于TCP的socket短连接通信demo项目（UDP使用方式和TCP完全
 
 socket\short_connection_flymode：基于TCP的socket短连接通信demo项目，会进入飞行模式并且定时退出飞行模式（UDP使用方式和TCP完全相同）
 
+socket_ssl\long_connection：基于SSL-TCP的socket长连接通信demo项目（UDP使用方式和TCP完全相同）
+
+socket_ssl\short_connection：基于SSL-TCP的socket短连接通信demo项目（UDP使用方式和TCP完全相同）
+
+socket_ssl\short_connection_flymode：基于SSL-TCP的socket短连接通信demo项目，会进入飞行模式并且定时退出飞行模式（UDP使用方式和TCP完全相同）
+
 timer：定时器demo项目
 
 uart：串口demo项目
+
+uart_prot1项目：通过uart解析外围设备输入的一种报文（起始标志，长度，指令，数据，校验码，结束标志）
 
 wdt：开启开发板上的硬件看门狗功能项目
 

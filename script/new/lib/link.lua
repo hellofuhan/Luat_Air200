@@ -13,7 +13,7 @@ local ril = require"ril"
 local net = require"net"
 local rtos = require"rtos"
 local sim = require"sim"
-module("link",package.seeall)
+module(...,package.seeall)
 
 --加载常用的全局函数至本地
 local print = base.print
@@ -133,7 +133,7 @@ end
 参数  ：无
 返回值：无
 ]]
-local function setupIP()
+function setupIP()
 	print("link.setupIP:",ipstatus,cgatt,flymode)
 	--数据网络已激活或者处于飞行模式，直接返回
 	if ipstatus ~= "IP INITIAL" or flymode then
@@ -150,6 +150,7 @@ local function setupIP()
 	req("AT+CIICR")
 	--查询激活状态
 	req("AT+CIPSTATUS")
+	ipstatus = "IP START"
 end
 
 --[[
@@ -579,6 +580,11 @@ local function connpend()
 	end	
 end
 
+local ipstatusind
+function regipstatusind()
+	ipstatusind = true
+end
+
 --[[
 函数名：setIPStatus
 功能  ：设置IP网络状态
@@ -588,6 +594,10 @@ end
 ]]
 local function setIPStatus(status)
 	print("ipstatus:",status)
+	
+	if ipstatusind and ipstatus~=status then
+		sys.dispatch("IP_STATUS_IND",status=="IP GPRSACT" or status=="IP PROCESSING" or status=="IP STATUS")
+	end
 
 	if ipstatus ~= status or status=="IP START" or status == "IP CONFIG" or status == "IP GPRSACT" or status == "PDP DEACT" then
 		if status=="IP GPRSACT" and checkciicrtm then
@@ -630,6 +640,7 @@ end
 ]]
 local function shutcnf(result)
 	shuting = false
+	if ipstatusind then sys.dispatch("IP_SHUTING_IND",false) end
 	--关闭成功
 	if result == "SHUT OK" then
 		setIPStatus("IP INITIAL")
@@ -761,6 +772,7 @@ function shut()
 	req("AT+CIPSHUT")
 	--设置关闭中标志
 	shuting = true
+	if ipstatusind then sys.dispatch("IP_SHUTING_IND",true) end
 	shutpending = false
 end
 reset = shut

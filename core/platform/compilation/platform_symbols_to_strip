@@ -210,3 +210,6 @@ vsscanf
 sscanf
 __gtdf2
 __fpcmp_parts_d
+__floatsidf
+__fixdfsi
+__gedf2

@@ -59,7 +59,7 @@ export ECHO := echo
 export MAKEFLAGS += -s --no-print-directory
 
 export LIBGCC_PATH := ${SOFT_WORKDIR}/platform/lib/gcc/mips-elf/4.4.2
-
+export CYGPATH := cygpath -am
 ##############################################################################
 # Generic environment stuff
 ###############################################################################
@@ -690,6 +690,8 @@ ifneq "${AM_PLT_LOD_FILE}" ""
 				exit 1; \
 			fi;\
 			${ECHO} "LODCOMBINE        Combine sucessful";                                     \
+			${ECHO} "AirLodModify        $(shell ${CYGPATH} $(WITH_PLT_LOD_FILE)) $(shell ${CYGPATH} ${BAS_FINAL}_${PLT_LOD_VERSION}_LAST.lod )";                       \
+			${SOFT_WORKDIR}/platform/AirLodModify.exe $(shell ${CYGPATH} $(WITH_PLT_LOD_FILE)); \
 		else                                                                                    \
 			${ECHO} "LODCOMBINE        Cannot find Platform lod file:$(AM_PLT_LOD_FILE)";   \
 		fi;                                                                                     \

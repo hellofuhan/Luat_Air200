@@ -1,4 +1,4 @@
-发布时间：2017/4/23 02:31:21
+发布时间：2017/5/2 16:11:21
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.0
@@ -6,11 +6,17 @@
         (1)net.lua：修改两种状态下的网络指示灯定义“注册上GSM网络，未附着上GPRS网络：亮0.3秒，灭1.7秒”、“附着上GPRS网络，未连接上服务器：亮0.3秒，灭0.7秒”
         (2)mqtt.lua：connect接口增加一个sckerrcb参数，如果用户自定了此参数，则socket一直重连失败时，不再自动重启，而是去调用sckerrcb
         (3)nvm.lua：修正“调用restore接口恢复默认参数功能后，内存中的参数没有恢复”的问题
-        (4)新增aliyuniot.lua和aliyuniotauth.lua，支持阿里云物联网后台
+        (4)新增aliyuniot.lua和aliyuniotauth.lua：支持TCP直连阿里云物联网后台
+        (5)新增linkssl.lua和aliyuniotssl.lua：支持SSL连接阿里云物联网后台
+        (6)新增socketssl.lua：支持SSL的socket连接
+        (7)新增mqttssl.lua：支持MQTT-SSL的client连接
     二、demo脚本修改
         (1)mqtt项目：演示mqtt的connect接口中sckerrcb参数的使用方法
         (2)新增crypto项目：加密算法库使用说明demo项目
-        (3)新增aliyun项目：阿里云物联网后台连接测试demo项目
+        (3)新增socket_ssl项目：SSL测试项目
+        (4)新增aliyun项目：阿里云物联网后台TCP连接测试demo项目
+        (5)新增aliyun_ssl项目：阿里云物联网后台SSL连接测试demo项目
+        (6)新增uart_prot1项目：通过uart解析外围设备输入的一种报文（起始标志，长度，指令，数据，校验码，结束标志）
 
 
 

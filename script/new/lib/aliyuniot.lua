@@ -1,15 +1,7 @@
 --定义模块,导入依赖库
 local base = _G
 local string = require"string"
-local io = require"io"
-local os = require"os"
-local rtos = require"rtos"
 local sys  = require"sys"
-local misc = require"misc"
-local common = require"common"
-local link = require"link"
-local socket = require"socket"
-local crypto = require"crypto"
 local mqtt = require"mqtt"
 require"aliyuniotauth"
 module(...,package.seeall)

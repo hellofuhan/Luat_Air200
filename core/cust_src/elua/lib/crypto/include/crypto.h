@@ -25,6 +25,7 @@
 #include "aliyun_iot_common_base64.h"
 #include "aliyun_iot_common_hmac.h"
 #include "aliyun_iot_common_md5.h"
-
+#include "aes.h"
+#include "crc.h"
 
 #endif

@@ -782,9 +782,19 @@ static int str_format (lua_State *L) {
           sprintf(buff, form, (LUA_INTFRM_T)luaL_checknumber(L, arg));
           break;
         }
-        case 'o':  case 'u':  case 'x':  case 'X': {
+        case 'o':  case 'u':  case 'x':{
           addintlen(form);
           sprintf(buff, form, (unsigned LUA_INTFRM_T)luaL_checknumber(L, arg));
+          break;
+        }
+        case 'X': {
+          addintlen(form);
+          sprintf(buff, form, (unsigned LUA_INTFRM_T)luaL_checknumber(L, arg));
+          {
+              size_t i;
+              for (i=0; i<strlen(buff); i++)
+              buff[i] = toupper(buff[i]);
+          }
           break;
         }
 #if !defined LUA_NUMBER_INTEGRAL        
