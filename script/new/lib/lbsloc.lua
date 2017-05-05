@@ -1,0 +1,275 @@
+--[[
+模块名称：基站信息转经纬度
+模块功能：连接基站定位后台，上报多基站给后台，后台返回经纬度
+模块最后修改时间：2017.05.05
+]]
+
+--定义模块,导入依赖库
+local base = _G
+local string = require"string"
+local table = require"table"
+local lpack = require"pack"
+local bit = require"bit"
+local sys  = require"sys"
+local link = require"link"
+local misc = require"misc"
+local common = require"common"
+local net = require"net"
+module(...)
+
+--加载常用的全局函数至本地
+local print,tonumber,pairs = base.print,base.tonumber,base.pairs
+local slen,sbyte,ssub = string.len,string.byte,string.sub
+
+--在Luat云后台上创建项目时生成的ProductKey
+local productkey
+local PROTOCOL,SERVER,PORT = "UDP","bs.openluat.com","12411"
+
+--GET命令等待时间
+local CMD_GET_TIMEOUT = 2000
+--错误包(格式不对) 在一段时间后进行重新获取
+local ERROR_PACK_TIMEOUT = 2000
+-- 每次GET命令重试次数
+local CMD_GET_RETRY_TIMES = 3
+--socket id
+local lid
+--连接状态，连接已经销毁则为false或者nil，其余为true
+local linksta,usercb
+--getretries：获取每个包已经重试的次数
+local getretries = 0
+
+--[[
+函数名：print
+功能  ：打印接口，此文件中的所有打印都会加上lbsloc前缀
+参数  ：无
+返回值：无
+]]
+local function print(...)
+	base.print("lbsloc",...)
+end
+
+--[[
+函数名：retry
+功能  ：请求过程中的重试动作
+参数  ：
+返回值：无
+]]
+local function retry()
+	print("retry",getretries)
+	--重试次数加1
+	getretries = getretries + 1
+	if getretries < CMD_GET_RETRY_TIMES then
+		-- 未达重试次数,继续重试
+		reqget()
+	else
+		-- 超过重试次数,升级失败
+		reqend(false)
+	end
+end
+
+local function encellinfo(s)
+	local ret,t,mcc,mnc,lac,ci,rssi,k,v,m,n,cntrssi = "",{}
+	print("encellinfo",s)
+	for mcc,mnc,lac,ci,rssi in string.gmatch(s,"(%d+)%.(%d+)%.(%d+)%.(%d+)%.(%d+);") do
+		mcc,mnc,lac,ci,rssi = tonumber(mcc),tonumber(mnc),tonumber(lac),tonumber(ci),(tonumber(rssi) > 31) and 31 or tonumber(rssi)
+		local handle = nil
+		for k,v in pairs(t) do
+			if v.lac == lac and v.mcc == mcc and v.mnc == mnc then
+				if #v.rssici < 8 then
+					table.insert(v.rssici,{rssi=rssi,ci=ci})
+				end
+				handle = true
+				break
+			end
+		end
+		if not handle then
+			table.insert(t,{mcc=mcc,mnc=mnc,lac=lac,rssici={{rssi=rssi,ci=ci}}})
+		end
+	end
+	for k,v in pairs(t) do
+		ret = ret .. lpack.pack(">HHb",v.lac,v.mcc,v.mnc)
+		for m,n in pairs(v.rssici) do
+			cntrssi = bit.bor(bit.lshift(((m == 1) and (#v.rssici-1) or 0),5),n.rssi)
+			ret = ret .. lpack.pack(">bH",cntrssi,n.ci)
+		end
+	end
+
+	return string.char(#t)..ret
+end
+
+local function bcd(d,n)
+	local l = slen(d or "")
+	local num
+	local t = {}
+
+	for i=1,l,2 do
+		num = tonumber(ssub(d,i,i+1),16)
+
+		if i == l then
+			num = 0xf0+num
+		else
+			num = (num%0x10)*0x10 + num/0x10
+		end
+
+		table.insert(t,num)
+	end
+
+	local s = string.char(base.unpack(t))
+
+	l = slen(s)
+
+	if l < n then
+		s = s .. string.rep("\255",n-l)
+	elseif l > n then
+		s = ssub(s,1,n)
+	end
+
+	return s
+end
+
+--460.01.6311.49234.30;460.01.6311.49233.23;460.02.6322.49232.18;
+local function getcellcb(s)
+	print("getcellcb")
+	link.send(lid,lpack.pack("bAAA",slen(productkey),productkey,bcd(misc.getimei(),8),encellinfo(s)))
+	--启动“CMD_GET_TIMEOUT毫秒后重试”定时器
+	sys.timer_start(retry,CMD_GET_TIMEOUT)
+end
+
+--[[
+函数名：reqget
+功能  ：发送基站信息到服务器
+参数  ：无
+返回值：无
+]]
+function reqget()
+	print("reqget")
+	net.getmulticell(getcellcb)
+end
+
+--[[
+函数名：reqend
+功能  ：获取结束
+参数  ：
+		suc：结果，true为成功，其余为失败
+返回值：无
+]]
+function reqend(suc)
+	print("reqend",suc)
+	if not suc then
+		local tmpcb=usercb
+		usercb=nil
+		sys.timer_stop(tmoutfnc)
+		if tmpcb then tmpcb(4) end
+	end
+	--停止重试定时器
+	sys.timer_stop(retry)
+	--断开链接
+	link.close(lid)
+	linksta = false
+end
+
+--[[
+函数名：nofity
+功能  ：socket状态的处理函数
+参数  ：
+        id：socket id，程序可以忽略不处理
+        evt：消息事件类型
+		val： 消息事件参数
+返回值：无
+]]
+local function nofity(id,evt,val)
+	--连接结果
+	if evt == "CONNECT" then
+		--连接成功
+		if val == "CONNECT OK" then
+			getretries = 0
+			reqget()
+		--连接失败
+		else
+			reqend(false)
+		end
+	--连接被动断开
+	elseif evt == "STATE" and (val=="CLOSED" or val=="SHUTED") then
+		reqend(false)
+	end
+end
+
+local function unbcd(d)
+	local byte,v1,v2
+	local t = {}
+
+	for i=1,slen(d) do
+		byte = sbyte(d,i)
+		v1,v2 = bit.band(byte,0x0f),bit.band(bit.rshift(byte,4),0x0f)
+
+		if v1 == 0x0f then break end
+		table.insert(t,v1)
+
+		if v2 == 0x0f then break end
+		table.insert(t,v2)
+	end
+
+	return table.concat(t)
+end
+
+--[[
+函数名：rcv
+功能  ：socket接收数据的处理函数
+参数  ：
+        id ：socket id，程序可以忽略不处理
+        data：接收到的数据
+返回值：无
+]]
+local function rcv(id,s)
+	print("rcv",slen(s),(slen(s)==11) and common.binstohexs(s) or "")
+	if slen(s)~=11 then return end
+	reqend(true)
+	local tmpcb=usercb
+	usercb=nil
+	sys.timer_stop(tmoutfnc)
+	if sbyte(s,1)~=0 then
+		if tmpcb then tmpcb(3) end
+	else
+		local lat,lng = unbcd(ssub(s,2,6)),unbcd(ssub(s,7,-1))
+		if tmpcb then tmpcb(0,ssub(lat,1,3).."."..ssub(lat,4,-1),ssub(lng,1,3).."."..ssub(lng,4,-1)) end
+	end	
+end
+
+function tmoutfnc()
+	print("tmoutfnc")
+	local tmpcb=usercb
+	usercb=nil
+	if tmpcb then tmpcb(2) end
+end
+
+--[[
+函数名：request
+功能  ：发起获取经纬度请求
+参数  ：
+        cb：获取到经纬度或者超时后的回调函数，调用形式为：cb(result,lat,lng)
+		tmout：获取经纬度超时时间，单位秒，默认20秒
+返回值：无
+]]
+function request(cb,tmout)
+	print("request",cb,tmout,usercb,linksta)
+	if usercb then print("request usercb err") cb(1) end
+	if not linksta then
+		lid = link.open(nofity,rcv,"lbsloc")
+		link.connect(lid,PROTOCOL,SERVER,PORT)
+		linksta = true
+	end
+	sys.timer_start(tmoutfnc,(tmout or 20)*1000)
+	usercb = cb
+end
+
+--[[
+函数名：setup
+功能  ：配置在Luat云后台上创建项目时生成的ProductKey
+参数  ：
+        productkey：Luat云后台上创建项目时生成的ProductKey
+返回值：无
+]]
+function setup(key)
+	print("setup",key)
+	productkey = key	
+end

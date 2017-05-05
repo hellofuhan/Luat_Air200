@@ -36,6 +36,8 @@ i2c：i2c通信demo项目
 
 json：json编解码测试demo项目
 
+lbs_loc：根据多基站获取经纬度的demo项目
+
 luatyun：TCP直连Luat云后台的demo项目
 
 luatyun_ssl：SSL连接Luat云后台的demo项目
