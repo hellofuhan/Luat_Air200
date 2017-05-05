@@ -36,6 +36,10 @@ i2c：i2c通信demo项目
 
 json：json编解码测试demo项目
 
+luatyun：TCP直连Luat云后台的demo项目
+
+luatyun_ssl：SSL连接Luat云后台的demo项目
+
 mqtt：mqtt应用demo项目
 
 ntp：模块时间自动更新demo项目

@@ -1,3 +1,18 @@
+发布时间：2017/5/ ::
+修改记录：
+    一、lib脚本修改
+        lib脚本版本号：2.1.1
+        支持lib脚本的最小core软件版本号：Luat_V0010_Air200
+        (1)新增luatyun.lua和luatyunssl.lua：支持Luat云后台功能
+        (2)新增lbsloc.lua：支持多基站获取经纬度的功能
+    二、demo脚本修改
+        (1)socket/short_connection项目：修正“代码中的一处笔误，会导致重启”的问题
+        (2)新增luatyun项目：Luat云后台TCP连接测试demo项目
+        (3)新增luatyun_ssl项目：Luat云后台SSL连接测试demo项目
+        (4)新增lbs_loc项目：测试多基站获取经纬度功能
+
+
+
 发布时间：2017/5/2 16:11:21
 修改记录：
     一、lib脚本修改

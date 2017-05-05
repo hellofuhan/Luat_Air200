@@ -2,7 +2,10 @@ module(...,package.seeall)
 
 require"aliyuniotssl"
 
+--阿里云上创建的key和secret，用户如果自己在阿里云上创建项目，根据自己的项目信息，修改这两个值
 local PRODUCT_KEY,PRODUCT_SECRET = "1000163201","4K8nYcT4Wiannoev"
+--除了上面的两个信息外，还需要DEVICE_NAME和DEVICE_SECRET
+--lib中会使用设备的IMEI和SN号用做DEVICE_NAME和DEVICE_SECRET，所以在阿里云上添加设备时，DEVICE_NAME就用IMEI，然后把生成的DEVICE_SECRET当做SN写入设备中
 
 local qos1cnt = 1
 

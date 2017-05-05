@@ -58,7 +58,7 @@ end
 function locrpt()
 	print("locrpt",linksta)
 	--if linksta then
-		if not snd("loc data\r\n","LOCRPT")	then locrpt1cb({data="loc data\r\n",para="LOCRPT"},false) end	
+		if not snd("loc data\r\n","LOCRPT")	then locrptcb({data="loc data\r\n",para="LOCRPT"},false) end	
 	--end
 end
 
