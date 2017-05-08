@@ -3,10 +3,10 @@
     一、lib脚本修改
         lib脚本版本号：2.1.1
         支持lib脚本的最小core软件版本号：Luat_V0010_Air200
-        (1)
+        (1)lbsloc.lua：支持设备密钥以及GPS位置字符串的查询
     二、demo脚本修改
         (1)新增mqtt_ssl项目：MQTT-SSL协议连接后台测试demo项目
-        (2)
+        (2)lbs_loc项目：支持GPS位置字符串的查询
 
 
 

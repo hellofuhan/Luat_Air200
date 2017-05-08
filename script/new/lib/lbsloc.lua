@@ -34,7 +34,7 @@ local CMD_GET_RETRY_TIMES = 3
 --socket id
 local lid
 --连接状态，连接已经销毁则为false或者nil，其余为true
-local linksta,usercb
+local linksta,usercb,userlocstr
 --getretries：获取每个包已经重试的次数
 local getretries = 0
 
@@ -130,7 +130,17 @@ end
 --460.01.6311.49234.30;460.01.6311.49233.23;460.02.6322.49232.18;
 local function getcellcb(s)
 	print("getcellcb")
-	link.send(lid,lpack.pack("bAAA",slen(productkey),productkey,bcd(misc.getimei(),8),encellinfo(s)))
+	local sn,sninvalid,len,i = misc.getsn(),""
+	len = slen(sn)
+	for i=1,len do
+		sninvalid = sninvalid.."0"
+	end
+	local status = (sn==sninvalid and 0 or 1) + (userlocstr and 1 or 0)*2
+	local dsecret = ""
+	if sn~=sninvalid then
+		dsecret = lpack.pack("bA",slen(sn),sn)
+	end
+	link.send(lid,lpack.pack("bAbAAA",slen(productkey),productkey,status,dsecret,bcd(misc.getimei(),8),encellinfo(s)))
 	--启动“CMD_GET_TIMEOUT毫秒后重试”定时器
 	sys.timer_start(retry,CMD_GET_TIMEOUT)
 end
@@ -221,8 +231,8 @@ end
 返回值：无
 ]]
 local function rcv(id,s)
-	print("rcv",slen(s),(slen(s)==11) and common.binstohexs(s) or "")
-	if slen(s)~=11 then return end
+	print("rcv",slen(s),(slen(s)<270) and common.binstohexs(s) or "")
+	if slen(s)>=11 then return end
 	reqend(true)
 	local tmpcb=usercb
 	usercb=nil
@@ -230,8 +240,8 @@ local function rcv(id,s)
 	if sbyte(s,1)~=0 then
 		if tmpcb then tmpcb(3) end
 	else
-		local lat,lng = unbcd(ssub(s,2,6)),unbcd(ssub(s,7,-1))
-		if tmpcb then tmpcb(0,ssub(lat,1,3).."."..ssub(lat,4,-1),ssub(lng,1,3).."."..ssub(lng,4,-1)) end
+		local lat,lng = unbcd(ssub(s,2,6)),unbcd(ssub(s,7,11))
+		if tmpcb then tmpcb(0,ssub(lat,1,3).."."..ssub(lat,4,-1),ssub(lng,1,3).."."..ssub(lng,4,-1),common.ucs2betogb2312(ssub(s,13,-1))) end
 	end	
 end
 
@@ -246,12 +256,13 @@ end
 函数名：request
 功能  ：发起获取经纬度请求
 参数  ：
-        cb：获取到经纬度或者超时后的回调函数，调用形式为：cb(result,lat,lng)
+        cb：获取到经纬度或者超时后的回调函数，调用形式为：cb(result,lat,lng,location)		
+		locstr：是否支持位置字符串返回，true支持，false或者nil不支持，默认不支持
 		tmout：获取经纬度超时时间，单位秒，默认20秒
 返回值：无
 ]]
-function request(cb,tmout)
-	print("request",cb,tmout,usercb,linksta)
+function request(cb,locstr,tmout)
+	print("request",cb,tmout,locstr,usercb,linksta)
 	if usercb then print("request usercb err") cb(1) end
 	if not linksta then
 		lid = link.open(nofity,rcv,"lbsloc")
@@ -259,17 +270,17 @@ function request(cb,tmout)
 		linksta = true
 	end
 	sys.timer_start(tmoutfnc,(tmout or 20)*1000)
-	usercb = cb
+	usercb,userlocstr = cb,locstr
 end
 
 --[[
 函数名：setup
-功能  ：配置在Luat云后台上创建项目时生成的ProductKey
+功能  ：配置参数
 参数  ：
-        productkey：Luat云后台上创建项目时生成的ProductKey
+        pkey：Luat云后台上创建项目时生成的ProductKey		
 返回值：无
 ]]
-function setup(key)
-	print("setup",key)
-	productkey = key	
+function setup(pkey)
+	print("setup",pkey)
+	productkey = pkey
 end
