@@ -54,10 +54,7 @@ uart_at_transparent_wdt：物理串口UART1透传AT命令demo项目（软件上支持硬件看门狗）
 
 wdt：开启开发板上的硬件看门狗功能项目
 
-xiaoman_gps_tracker\whole_test：针对小蛮GPS定位器硬件写的一个完整的demo项目，支持硬件的各种功能，只能用于小蛮GPS定位器硬件，不能用于开发板，也不能配合时间线APP使用，注意修改sck.lua中的后台地址
 
-xiaoman_gps_tracker\gps_test：针对小蛮GPS定位器硬件写的一个测试gps的demo项目，只能用于小蛮GPS定位器硬件，不能用于开发板，也不能配合时间线APP使用。gps接口的使用参考testgps.lua
 
-其余demo项目持续更新中......
 
 \product\小蛮GPS定位器\whole_project：是合宙量产的一个定位器项目，有配套的后台以及app支持，app的名字为“时间线”。
