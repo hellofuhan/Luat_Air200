@@ -44,6 +44,8 @@ luatyun_ssl：SSL连接Luat云后台的demo项目
 
 mqtt：mqtt应用demo项目
 
+mqtt_ssl：MQTT-SSL协议连接后台demo项目
+
 ntp：模块时间自动更新demo项目
 
 nvm：参数存储读写demo项目
