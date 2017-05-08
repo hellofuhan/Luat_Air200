@@ -21,8 +21,6 @@ module(...)
 local print,tonumber,pairs = base.print,base.tonumber,base.pairs
 local slen,sbyte,ssub = string.len,string.byte,string.sub
 
---在Luat云后台上创建项目时生成的ProductKey
-local productkey
 local PROTOCOL,SERVER,PORT = "UDP","bs.openluat.com","12411"
 
 --GET命令等待时间
@@ -140,7 +138,7 @@ local function getcellcb(s)
 	if sn~=sninvalid then
 		dsecret = lpack.pack("bA",slen(sn),sn)
 	end
-	link.send(lid,lpack.pack("bAbAAA",slen(productkey),productkey,status,dsecret,bcd(misc.getimei(),8),encellinfo(s)))
+	link.send(lid,lpack.pack("bAbAAA",slen(_G.PRODUCT_KEY),_G.PRODUCT_KEY,status,dsecret,bcd(misc.getimei(),8),encellinfo(s)))
 	--启动“CMD_GET_TIMEOUT毫秒后重试”定时器
 	sys.timer_start(retry,CMD_GET_TIMEOUT)
 end
@@ -271,16 +269,4 @@ function request(cb,locstr,tmout)
 	end
 	sys.timer_start(tmoutfnc,(tmout or 20)*1000)
 	usercb,userlocstr = cb,locstr
-end
-
---[[
-函数名：setup
-功能  ：配置参数
-参数  ：
-        pkey：Luat云后台上创建项目时生成的ProductKey		
-返回值：无
-]]
-function setup(pkey)
-	print("setup",pkey)
-	productkey = pkey
 end
