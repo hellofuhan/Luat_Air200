@@ -11,7 +11,6 @@
         (2)lbs_loc项目：支持GPS位置字符串的查询
         (3)luatyun项目：增加对PRODUCT_KEY的使用说明
         (4)luatyun_ssl项目：增加对PRODUCT_KEY的使用说明
-        (5)gpio/gpio_single项目：修改注释
 
 
 
