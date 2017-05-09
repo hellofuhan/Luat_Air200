@@ -1,12 +1,17 @@
-发布时间：2017/5/8 12:02
+发布时间：2017/5/9 15:15
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.1
         支持lib脚本的最小core软件版本号：Luat_V0010_Air200
         (1)lbsloc.lua：支持设备密钥以及GPS位置字符串的查询
+        (2)luatiot.lua、luatiotssl.lua：连接Luat云平台时，支持设备的自动录入功能
+        (3)misc.lua：新增isnvalid接口，判断设备sn是否有效
     二、demo脚本修改
         (1)新增mqtt_ssl项目：MQTT-SSL协议连接后台测试demo项目
         (2)lbs_loc项目：支持GPS位置字符串的查询
+        (3)luatyun项目：增加对PRODUCT_KEY的使用说明
+        (4)luatyun_ssl项目：增加对PRODUCT_KEY的使用说明
+        (5)gpio/gpio_single项目：修改注释
 
 
 

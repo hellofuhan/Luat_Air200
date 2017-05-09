@@ -128,17 +128,13 @@ end
 --460.01.6311.49234.30;460.01.6311.49233.23;460.02.6322.49232.18;
 local function getcellcb(s)
 	print("getcellcb")
-	local sn,sninvalid,len,i = misc.getsn(),""
-	len = slen(sn)
-	for i=1,len do
-		sninvalid = sninvalid.."0"
-	end
-	local status = (sn==sninvalid and 0 or 1) + (userlocstr and 1 or 0)*2
+	local status = (misc.isnvalid() and 1 or 0) + (userlocstr and 1 or 0)*2
 	local dsecret = ""
-	if sn~=sninvalid then
-		dsecret = lpack.pack("bA",slen(sn),sn)
+	if misc.isnvalid() then
+		dsecret = lpack.pack("bA",slen(misc.getsn()),misc.getsn())
 	end
-	link.send(lid,lpack.pack("bAbAAA",slen(_G.PRODUCT_KEY),_G.PRODUCT_KEY,status,dsecret,bcd(misc.getimei(),8),encellinfo(s)))
+	base.assert(base.PRODUCT_KEY,"undefine PRODUCT_KEY in main.lua")
+	link.send(lid,lpack.pack("bAbAAA",slen(base.PRODUCT_KEY),base.PRODUCT_KEY,status,dsecret,bcd(misc.getimei(),8),encellinfo(s)))
 	--启动“CMD_GET_TIMEOUT毫秒后重试”定时器
 	sys.timer_start(retry,CMD_GET_TIMEOUT)
 end
@@ -230,7 +226,7 @@ end
 ]]
 local function rcv(id,s)
 	print("rcv",slen(s),(slen(s)<270) and common.binstohexs(s) or "")
-	if slen(s)>=11 then return end
+	if slen(s)<11 then return end
 	reqend(true)
 	local tmpcb=usercb
 	usercb=nil

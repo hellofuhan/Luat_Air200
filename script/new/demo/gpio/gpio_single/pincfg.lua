@@ -16,15 +16,15 @@ module(...,package.seeall)
 
 --valid值定义如下（默认值为1）：
 --valid的值跟pins.lua中的set、get接口配合使用
---dir为输出时，配合set接口使用，set的第一个参数如果为true，则会输出valid值表示的电平，0表示低电平，1表示高电平
+--dir为输出时，配合pins.set接口使用，pins.set的第一个参数如果为true，则会输出valid值表示的电平，0表示低电平，1表示高电平
 --dir为输入或中断时，配合get接口使用，如果引脚的电平和valid的值一致，get接口返回true；否则返回false
 --dir为中断时，cb为中断引脚的回调函数，有中断产生时，如果配置了cb，会调用cb，如果产生中断的电平和valid的值相同，则cb(true)，否则cb(false)
 
 --等价于PIN22 = {pin=pio.P1_8,dir=pio.OUTPUT,valid=1}
---第22个引脚：GPO8，配置为输出，初始化输出低电平；valid=1，调用set(true,PIN22),则输出高电平，调用set(false,PIN22),则输出低电平
+--第22个引脚：GPO8，配置为输出，初始化输出低电平；valid=1，调用pins.set(true,PIN22),则输出高电平，调用pins.set(false,PIN22),则输出低电平
 PIN22 = {pin=pio.P1_8}
 
---第23个引脚：GPO6；配置为输出，初始化输出高电平；valid=0，调用set(true,PIN23),则输出低电平，调用set(false,PIN23),则输出高电平
+--第23个引脚：GPO6；配置为输出，初始化输出高电平；valid=0，调用pins.set(true,PIN23),则输出低电平，调用pins.set(false,PIN23),则输出高电平
 PIN23 = {pin=pio.P1_6,dir=pio.OUTPUT1,valid=0}
 
 --如下三个配置含义和PIN22相似

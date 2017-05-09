@@ -1,15 +1,6 @@
 module(...,package.seeall)
 require"lbsloc"
 
---[[
-使用基站获取经纬度的功能，必须按照以下步骤操作：
-1、打开Luat物联云平台前端页面：https://iot.openluat.com/
-2、注册用户
-3、注册用户之后，创建一个新项目
-4、创建新项目之后，进入项目
-5、进入项目后，点击左边的项目信息，右边会出现信息内容，找到ProductKey：把ProductKey的内容，赋值给main.lua中的PRODUCT_KEY变量
-]]
-
 --是否查询GPS位置字符串信息
 local qrylocation
 
