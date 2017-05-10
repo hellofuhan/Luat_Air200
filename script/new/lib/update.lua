@@ -128,7 +128,7 @@ end
 返回值：无
 ]]
 function reqget(index)
-	send(lid,string.format("Get%d,%d",index,projectid))
+	send(lid,string.format("%sGet%d,%d",usersvr and "" or "0,",index,projectid))
 	--启动“CMD_GET_TIMEOUT毫秒后重试”定时器
 	sys.timer_start(retry,CMD_GET_TIMEOUT)
 end
