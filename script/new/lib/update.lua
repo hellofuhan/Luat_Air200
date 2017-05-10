@@ -128,7 +128,10 @@ end
 返回值：无
 ]]
 function reqget(index)
-	send(lid,string.format("%sGet%d,%d",usersvr and "" or "0,",index,projectid))
+	send(lid,string.format("%sGet%d,%d",
+							usersvr and "" or string.format("0,%s,%s,%s,%s,%s",base.PRODUCT_KEY,misc.getimei(),misc.isnvalid() and misc.getsn() or "",base.PROJECT.."_"..sys.getcorever(),base.VERSION),
+							index,
+							projectid))
 	--启动“CMD_GET_TIMEOUT毫秒后重试”定时器
 	sys.timer_start(retry,CMD_GET_TIMEOUT)
 end
