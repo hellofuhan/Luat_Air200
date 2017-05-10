@@ -84,3 +84,6 @@ http://www.luam2m.com/forum.php?mod=post&action=edit&fid=84&tid=2479&pid=6502&pa
 20170502：
 更名：Air200模块开发板使用说明V1.0.pdf 更名为 Air200模块S1和S2开发板使用说明V1.0.pdf
 添加：Air200模块S3开发板使用说明V1.0.pdf
+
+20170510:
+更新：lua扩展库V1.2 更新 为V1.3，去掉disp的内容
