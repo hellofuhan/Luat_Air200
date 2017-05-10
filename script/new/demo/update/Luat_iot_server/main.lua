@@ -1,10 +1,10 @@
 --必须在这个位置定义PROJECT和VERSION变量
 --PROJECT：ascii string类型，可以随便定义，只要不使用,就行
 --VERSION：ascii string类型，如果使用Luat物联云平台固件升级的功能，必须按照"X.X.X"定义，X表示1位数字；否则可随便定义
-PROJECT = "LUATYUN_SSL"
+PROJECT = "LUAT_IOT_SERVER_UPDATE"
 VERSION = "1.0.0"
 --[[
-使用Luat物联云平台管理的功能，必须按照以下步骤操作：
+使用Luat物联云平台固件升级的功能，必须按照以下步骤操作：
 1、打开Luat物联云平台前端页面：https://iot.openluat.com/
 2、如果没有用户名，注册用户
 3、注册用户之后，如果没有对应的项目，创建一个新项目
@@ -12,10 +12,8 @@ VERSION = "1.0.0"
 ]]
 PRODUCT_KEY = "v32xEAKsGTIEQxtqgwCldp5aPlcnPs3K"
 require"sys"
+require"update"
 require"test"
 
 sys.init(0,0)
-ril.request("AT*TRACE=\"DSS\",0,0")
-ril.request("AT*TRACE=\"RDA\",0,0")
-ril.request("AT*TRACE=\"SXS\",0,0")
 sys.run()

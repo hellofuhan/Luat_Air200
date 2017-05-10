@@ -28,7 +28,9 @@ local updmode = base.UPDMODE or 0
 
 --PROTOCOL：传输层协议，只支持TCP和UDP
 --SERVER,PORT为服务器地址和端口
-local PROTOCOL,SERVER,PORT
+local PROTOCOL,SERVER,PORT = "UDP","api.airm2m.com",12410
+--是否使用用户自定义的升级服务器
+local usersvr
 --升级包保存路径
 local UPDATEPACK = "/luazip/update.bin"
 
@@ -236,7 +238,11 @@ end
 ]]
 function reqcheck()
 	state = "CHECK"
-	send(lid,string.format("%s,%s,%s",misc.getimei(),base.PROJECT.."_"..sys.getcorever(),base.VERSION))
+	if usersvr then
+		send(lid,string.format("%s,%s,%s",misc.getimei(),base.PROJECT.."_"..sys.getcorever(),base.VERSION))
+	else
+		send(lid,string.format("0,%s,%s,%s,%s,%s",base.PRODUCT_KEY,misc.getimei(),misc.isnvalid() and misc.getsn() or "",base.PROJECT.."_"..sys.getcorever(),base.VERSION))
+	end
 	sys.timer_start(retry,CMD_GET_TIMEOUT)
 end
 
@@ -350,6 +356,12 @@ function settimezone(zone)
 	timezone = zone
 end
 
+local function connect()
+	--连接服务器
+	lid = link.open(nofity,recv,"update")
+	link.connect(lid,PROTOCOL,SERVER,PORT)
+end
+
 --[[
 函数名：setup
 功能  ：配置服务器的传输协议、地址和端口
@@ -362,13 +374,19 @@ end
 function setup(prot,server,port)
 	if prot and server and port then
 		PROTOCOL,SERVER,PORT = prot,server,port
-		-- 只有当定义了项目标识与版本号才支持远程升级
-		if base.PROJECT ~= nil and base.VERSION ~= nil and updmode ~= nil then
-			--连接服务器
-			lid = link.open(nofity,recv,"update")
-			link.connect(lid,PROTOCOL,SERVER,PORT)
-		end
+		usersvr = true
+		base.assert(base.PROJECT and base.VERSION,"undefine PROJECT or VERSION in main.lua")		
+		connect()
 	end
 end
 
+local function defaultbgn()
+	print("defaultbgn",usersvr)
+	if not usersvr then
+		base.assert(base.PRODUCT_KEY and base.PROJECT and base.VERSION,"undefine PRODUCT_KEY or PROJECT or VERSION in main.lua")
+		base.assert(string.match(_G.VERSION,"%d%.%d%.%d%") and string.len(_G.VERSION)==5,"VERSION in main.lua format error")
+		connect()
+	end
+end
 
+sys.timer_start(defaultbgn,10000)

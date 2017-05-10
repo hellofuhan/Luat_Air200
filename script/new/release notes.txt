@@ -6,11 +6,14 @@
         (1)lbsloc.lua：支持设备密钥以及GPS位置字符串的查询
         (2)luatiot.lua、luatiotssl.lua：连接Luat云平台时，支持设备的自动录入功能
         (3)misc.lua：新增isnvalid接口，判断设备sn是否有效
+	(4)update.lua：兼容用户后台和Luat物联网平台的固件升级功能
     二、demo脚本修改
         (1)新增mqtt_ssl项目：MQTT-SSL协议连接后台测试demo项目
         (2)lbs_loc项目：支持GPS位置字符串的查询
         (3)luatyun项目：增加对PRODUCT_KEY的使用说明
         (4)luatyun_ssl项目：增加对PRODUCT_KEY的使用说明
+        (5)新增update/Luat_iot_server项目：使用Luat物联云平台进行固件升级的demo项目
+        (6)新增update/user_server项目：使用用户自己的后台进行固件升级的demo项目
 
 
 
