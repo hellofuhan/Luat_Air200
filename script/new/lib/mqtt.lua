@@ -19,7 +19,7 @@ local slen,sbyte,ssub,sgsub,schar,srep,smatch,sgmatch = string.len,string.byte,s
 --报文类型
 CONNECT,CONNACK,PUBLISH,PUBACK,PUBREC,PUBREL,PUBCOMP,SUBSCRIBE,SUBACK,UNSUBSCRIBE,UNSUBACK,PINGREQ,PINGRSP,DISCONNECT = 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 
-local PRONAME,PROVER,CLEANSESS = "MQIsdp",3,1
+local CLEANSESS = 1
 
 --报文序列号
 local seq = 1
@@ -88,17 +88,18 @@ end
 函数名：pack
 功能  ：MQTT组包
 参数  ：
+		mqttver：mqtt协议版本号
 		typ：报文类型
 		...：可变参数
 返回值：第一个返回值是报文数据，第二个返回值是每种报文自定义的参数
 ]]
-local function pack(typ,...)
+local function pack(mqttver,typ,...)
 	local para = {}
 	local function connect(alive,id,twill,user,pwd)
 		local ret = lpack.pack(">bAbbHA",
 						CONNECT*16,
-						encutf8(PRONAME),
-						PROVER,
+						encutf8(mqttver=="3.1.1" and "MQTT" or "MQIsdp"),
+						mqttver=="3.1.1" and 4 or 3,
 						(user and 1 or 0)*128+(pwd and 1 or 0)*64+twill.retain*32+twill.qos*8+twill.flg*4+CLEANSESS*2,
 						alive,
 						encutf8(id))
@@ -178,10 +179,11 @@ local rcvpacket = {}
 函数名：unpack
 功能  ：MQTT解包
 参数  ：
+		mqttver：mqtt协议版本号
 		s：一条完整的报文
 返回值：如果解包成功，返回一个table类型数据，数据元素由报文类型决定；如果解包失败，返回nil
 ]]
-local function unpack(s)
+local function unpack(mqttver,s)
 	rcvpacket = {}
 
 	local function connack(d)
@@ -289,7 +291,8 @@ end
 ]]
 function mqttconndata(sckidx)
 	local mqttclientidx = getclient(sckidx)
-	return pack(CONNECT,
+	return pack(tclients[mqttclientidx].mqttver,
+				CONNECT,
 				tclients[mqttclientidx].keepalive,
 				tclients[mqttclientidx].clientid,
 				{
@@ -315,7 +318,7 @@ end
 local function mqttsubcb(sckidx,result,tpara)	
 	--重新封装MQTT SUBSCRIBE报文，重复标志设为true，序列号和topic都是用原始值，数据保存起来，如果超时DUP_TIME秒中没有收到SUBACK，则会自动重发SUBSCRIBE报文
 	--重发的触发开关在mqttdup.lua中
-	mqttdup.ins(sckidx,tpara.key,pack(SUBSCRIBE,tpara.val),tpara.val.seq,tpara.ackcb,tpara.usertag)
+	mqttdup.ins(sckidx,tpara.key,pack(tclients[getclient(sckidx)].mqttver,SUBSCRIBE,tpara.val),tpara.val.seq,tpara.ackcb,tpara.usertag)
 end
 
 --[[
@@ -333,7 +336,7 @@ local function mqttpubcb(sckidx,result,tpara)
 	elseif tpara.qos==1 then
 		--重新封装MQTT PUBLISH报文，重复标志设为true，序列号、topic、payload都是用原始值，数据保存起来，如果超时DUP_TIME秒中没有收到PUBACK，则会自动重发PUBLISH报文
 		--重发的触发开关在mqttdup.lua中
-		mqttdup.ins(sckidx,tpara.key,pack(PUBLISH,tpara.val),tpara.val.seq,tpara.ackcb,tpara.usertag)
+		mqttdup.ins(sckidx,tpara.key,pack(tclients[getclient(sckidx)].mqttver,PUBLISH,tpara.val),tpara.val.seq,tpara.ackcb,tpara.usertag)
 	end	
 end
 
@@ -353,11 +356,12 @@ end
 --[[
 函数名：mqttdiscdata
 功能  ：组包MQTT DISCONNECT报文数据
-参数  ：无		
+参数  ：
+		sckidx：socket idx
 返回值：DISCONNECT报文数据和报文参数
 ]]
-function mqttdiscdata()
-	return pack(DISCONNECT)
+function mqttdiscdata(sckidx)
+	return pack(tclients[getclient(sckidx)].mqttver,DISCONNECT)
 end
 
 --[[
@@ -374,11 +378,12 @@ end
 --[[
 函数名：mqttpingreqdata
 功能  ：组包MQTT PINGREQ报文数据
-参数  ：无		
+参数  ：
+		sckidx：socket idx
 返回值：PINGREQ报文数据和报文参数
 ]]
-function mqttpingreqdata()
-	return pack(PINGREQ)
+function mqttpingreqdata(sckidx)
+	return pack(tclients[getclient(sckidx)].mqttver,PINGREQ)
 end
 
 --[[
@@ -642,7 +647,7 @@ end
 local function svrpublish(sckidx,mqttpacket)
 	local mqttclientidx = getclient(sckidx)
 	print("svrpublish",mqttpacket.topic,mqttpacket.seq,mqttpacket.payload)	
-	if mqttpacket.qos == 1 then snd(sckidx,pack(PUBACK,mqttpacket.seq)) end
+	if mqttpacket.qos == 1 then snd(sckidx,pack(tclients[mqttclientidx].mqttver,PUBACK,mqttpacket.seq)) end
 	if tclients[mqttclientidx].evtcbs then
 		if tclients[mqttclientidx].evtcbs["MESSAGE"] then tclients[mqttclientidx].evtcbs["MESSAGE"](common.utf8togb2312(mqttpacket.topic),mqttpacket.payload,mqttpacket.qos) end
 	end
@@ -710,7 +715,7 @@ function rcv(idx,data)
 	while f do
 		data = ssub(tclients[mqttclientidx].sckrcvs,h,t)
 		tclients[mqttclientidx].sckrcvs = ssub(tclients[mqttclientidx].sckrcvs,t+1,-1)
-		local packet = unpack(data)
+		local packet = unpack(tclients[mqttclientidx].mqttver,data)
 		if packet and packet.typ and mqttcmds[packet.typ] then
 			mqttcmds[packet.typ](idx,packet)
 			if packet.typ ~= CONNACK and packet.typ ~= SUBACK then
@@ -802,9 +807,10 @@ tmqtt.__index = tmqtt
 		prot：string类型，传输层协议，仅支持"TCP"和"UDP"[必选]
 		host：string类型，服务器地址，支持域名和IP地址[必选]
 		port：number类型，服务器端口[必选]
+		ver：string类型，MQTT协议版本号，仅支持"3.1"和"3.1.1"，默认"3.1"
 返回值：无
 ]]
-function create(prot,host,port)
+function create(prot,host,port,ver)
 	if #tclients>=2 then assert(false,"tclients maxcnt error") return end
 	local mqtt_client =
 	{
@@ -818,6 +824,7 @@ function create(prot,host,port)
 		sckreconncyclecnt=0,
 		sckrcvs="",
 		mqttconnected=false,
+		mqttver = ver or "3.1",
 	}
 	setmetatable(mqtt_client,tmqtt)
 	table.insert(tclients,mqtt_client)
@@ -932,7 +939,7 @@ function tmqtt:publish(topic,payload,qos,ackcb,usertag)
 	--仅支持qos 0和1
 	if qos and qos~=0 and qos~=1 then assert(false,"tmqtt:publish not support qos 2") return end
 	--打包publish报文
-	local dat,para = pack(PUBLISH,{qos=qos or 0,topic=topic,payload=payload})
+	local dat,para = pack(self.mqttver,PUBLISH,{qos=qos or 0,topic=topic,payload=payload})
 	
 	--发送
 	local tpara = {key="MQTTPUB", val=para, qos=qos or 0, usertag=usertag, ackcb=ackcb}
@@ -964,7 +971,7 @@ function tmqtt:subscribe(topics,ackcb,usertag)
 	end
 
 	--打包subscribe报文
-	local dat,para = pack(SUBSCRIBE,{topic=topics})
+	local dat,para = pack(self.mqttver,SUBSCRIBE,{topic=topics})
 	
 	--发送
 	local tpara = {key="MQTTSUB", val=para, usertag=usertag, ackcb=ackcb}
