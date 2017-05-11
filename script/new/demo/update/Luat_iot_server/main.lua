@@ -18,7 +18,16 @@ require"sys"
 如果写在后面的其他位置，很有可能无法输出错误信息，从而增加调试难度
 ]]
 --sys.opntrace(true,1)
+--[[
+使用Luat物联云平台的升级服务器时，按照如下步骤操作
+1、加载update模块 require"update"
+执行了以上一步后，设备每次开机，网络准备就绪后，就会自动连接升级服务器执行升级功能
+2、如果需要定时执行升级功能，打开--update.setperiod(3600)的注释，根据自己的需要，配置定时周期
+4、如果需要实时执行升级功能，参考--sys.timer_start(update.request,120000)，根据自己的需要，调用update.request()即可
+]]
 require"update"
+--update.setperiod(3600)
+--sys.timer_start(update.request,120000)
 require"test"
 
 sys.init(0,0)

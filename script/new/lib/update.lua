@@ -41,7 +41,9 @@ local ERROR_PACK_TIMEOUT = 10000
 -- 每次GET命令重试次数
 local CMD_GET_RETRY_TIMES = 5
 --socket id
-local lid
+local lid,updsuc
+--设置定时升级的时间周期，单位秒，0表示关闭定时升级
+local period = 0
 --状态机状态
 --IDLE：空闲状态
 --CHECK：“查询服务器是否有新版本”状态
@@ -61,6 +63,16 @@ BEIJING_TIME = 8
 GREENWICH_TIME = 0
 
 --[[
+函数名：print
+功能  ：打印接口，此文件中的所有打印都会加上update前缀
+参数  ：无
+返回值：无
+]]
+local function print(...)
+	base.print("update",...)
+end
+
+--[[
 函数名：save
 功能  ：保存数据包到升级文件中
 参数  ：
@@ -74,7 +86,7 @@ local function save(data)
 	local f = io.open(UPDATEPACK,mode)
 
 	if f == nil then
-		print("update.save:file nil")
+		print("save:file nil")
 		return
 	end
 	--写文件
@@ -215,12 +227,15 @@ end
 返回值：无
 ]]
 function upend(succ)
+	print("upend",succ)
+	updsuc = succ
 	local tmpsta = state
 	state = "IDLE"
 	--停止重试定时器
 	sys.timer_stop(retry)
 	--断开链接
 	link.close(lid)
+	lid = nil
 	--升级成功并且是自动升级模式则重启
 	if succ == true and updmode == 0 then
 		sys.restart("update.upend")
@@ -231,6 +246,7 @@ function upend(succ)
 	end
 	--产生一个内部消息UPDATE_END_IND，目前与飞行模式配合使用
 	dispatch("UPDATE_END_IND")
+	if period~=0 then sys.timer_start(connect,period*1000,"period") end
 end
 
 --[[
@@ -240,6 +256,7 @@ end
 返回值：无
 ]]
 function reqcheck()
+	print("reqcheck",usersvr)
 	state = "CHECK"
 	if usersvr then
 		send(lid,string.format("%s,%s,%s",misc.getimei(),base.PROJECT.."_"..sys.getcorever(),base.VERSION))
@@ -292,6 +309,7 @@ local upselcb = function(sel)
 	--不允许升级
 	else
 		link.close(lid)
+		lid = nil
 		dispatch("UPDATE_END_IND")
 	end
 end
@@ -359,10 +377,21 @@ function settimezone(zone)
 	timezone = zone
 end
 
-local function connect()
-	--连接服务器
-	lid = link.open(nofity,recv,"update")
-	link.connect(lid,PROTOCOL,SERVER,PORT)
+function connect()
+	print("connect",lid,updsuc)
+	if not lid and not updsuc then
+		lid = link.open(nofity,recv,"update")
+		link.connect(lid,PROTOCOL,SERVER,PORT)
+	end
+end
+
+local function defaultbgn()
+	print("defaultbgn",usersvr)
+	if not usersvr then
+		base.assert(base.PRODUCT_KEY and base.PROJECT and base.VERSION,"undefine PRODUCT_KEY or PROJECT or VERSION in main.lua")
+		base.assert(string.match(_G.VERSION,"%d%.%d%.%d%") and string.len(_G.VERSION)==5,"VERSION in main.lua format error")
+		connect()
+	end
 end
 
 --[[
@@ -383,13 +412,33 @@ function setup(prot,server,port)
 	end
 end
 
-local function defaultbgn()
-	print("defaultbgn",usersvr)
-	if not usersvr then
-		base.assert(base.PRODUCT_KEY and base.PROJECT and base.VERSION,"undefine PRODUCT_KEY or PROJECT or VERSION in main.lua")
-		base.assert(string.match(_G.VERSION,"%d%.%d%.%d%") and string.len(_G.VERSION)==5,"VERSION in main.lua format error")
-		connect()
+--[[
+函数名：setperiod
+功能  ：配置定时升级的周期
+参数  ：
+        prd：number类型，定时升级的周期，单位秒；0表示关闭定时升级功能，其余值要大于等于60秒
+返回值：无
+]]
+function setperiod(prd)
+	base.assert(prd==0 or prd>=60,"undefine PROJECT or VERSION in main.lua")
+	print("setperiod",prd)
+	period = prd
+	if prd==0 then
+		sys.timer_stop(connect,"period")
+	else
+		sys.timer_start(connect,prd*1000,"period")
 	end
+end
+
+--[[
+函数名：request
+功能  ：实时启动一次升级
+参数  ：无
+返回值：无
+]]
+function request()
+	print("request")
+	connect()
 end
 
 sys.timer_start(defaultbgn,10000)
