@@ -141,7 +141,7 @@ end
 ]]
 function reqget(index)
 	send(lid,string.format("%sGet%d,%d",
-							usersvr and "" or string.format("0,%s,%s,%s,%s,%s",base.PRODUCT_KEY,misc.getimei(),misc.isnvalid() and misc.getsn() or "",base.PROJECT.."_"..sys.getcorever(),base.VERSION),
+							usersvr and "" or string.format("0,%s,%s,%s,%s,%s,",base.PRODUCT_KEY,misc.getimei(),misc.isnvalid() and misc.getsn() or "",base.PROJECT.."_"..sys.getcorever(),base.VERSION),
 							index,
 							projectid))
 	--启动“CMD_GET_TIMEOUT毫秒后重试”定时器
@@ -389,7 +389,8 @@ local function defaultbgn()
 	print("defaultbgn",usersvr)
 	if not usersvr then
 		base.assert(base.PRODUCT_KEY and base.PROJECT and base.VERSION,"undefine PRODUCT_KEY or PROJECT or VERSION in main.lua")
-		base.assert(string.match(_G.VERSION,"%d%.%d%.%d%") and string.len(_G.VERSION)==5,"VERSION in main.lua format error")
+		base.assert(not string.match(base.PROJECT,","),"PROJECT in main.lua format error")
+		base.assert(string.match(base.VERSION,"%d%.%d%.%d") and string.len(base.VERSION)==5,"VERSION in main.lua format error")
 		connect()
 	end
 end
