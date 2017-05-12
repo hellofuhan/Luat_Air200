@@ -68,7 +68,7 @@ local function connectedcb()
 	mqttclient:subscribe({{topic="/"..PRODUCT_KEY.."/"..misc.getimei().."/get",qos=0}, {topic="/"..PRODUCT_KEY.."/"..misc.getimei().."/get",qos=1}}, subackcb, "subscribegetopic")
 	assert(_G.PRODUCT_KEY and _G.PROJECT and _G.VERSION,"undefine PRODUCT_KEY or PROJECT or VERSION in main.lua")
 	local tpayload = {cmd="0",ProductKey=_G.PRODUCT_KEY,IMEI=misc.getimei(),DeviceSecret=misc.getsn(),ICCID=sim.geticcid(),imsi=sim.getimsi(),project=_G.PROJECT,version=_G.VERSION}
-	mqttclient:publish("/v1/LuatInside",json.encode(tpayload),1)
+	mqttclient:publish("/"..PRODUCT_KEY.."/"..misc.getimei().."/v1/LuatInside",json.encode(tpayload),1)
 	--注册事件的回调函数，MESSAGE事件表示收到了PUBLISH消息
 	mqttclient:regevtcb({MESSAGE=grcvmessagecb})
 	if gconnectedcb then gconnectedcb() end
