@@ -8,6 +8,7 @@
     二、demo脚本修改
         (1)update/Luat_iot_server项目：新增“开机自动升级+定时升级+实时升级”的使用说明
         (2)update/user_server项目：新增“开机自动升级+定时升级+实时升级”的使用说明
+	(3)新增write_sn项目：写SN号到设备的demo项目
 
 
 

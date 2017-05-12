@@ -33,7 +33,8 @@ local sn,snrdy,imeirdy,--[[ver,]]imei,clkswitch,updating,dbging,ntping,flypendin
 --calib：校准标志，true为已校准，其余未校准
 --setclkcb：执行AT+CCLK命令，应答后的用户自定义回调函数
 --wimeicb：执行AT+WIMEI命令，应答后的用户自定义回调函数
-local calib,setclkcb,wimeicb
+--wsncb：执行AT+WISN命令，应答后的用户自定义回调函数
+local calib,setclkcb,wimeicb,wsncb
 
 --[[
 函数名：rsp
@@ -65,7 +66,7 @@ local function rsp(cmd,success,response,intermediate)
 		if wimeicb then wimeicb(success) end
 	--写序列号
 	elseif smatch(cmd,"AT%+WISN=") then
-		req("AT+WISN?")
+		if wsncb then wsncb(success) end
 	--设置系统时间
 	elseif prefix == "+CCLK" then
 		startclktimer()
@@ -217,6 +218,26 @@ function setimei(s,cb)
 		req("AT+AMFAC="..(cb and "0" or "1"))
 		req("AT+WIMEI=\""..s.."\"")
 		wimeicb = cb
+	end
+end
+
+--[[
+函数名：setsn
+功能  ：设置SN
+		如果传入了cb，则设置SN后不会自动重启，用户必须自己保证设置成功后，调用sys.restart或者dbg.restart接口进行软重启;
+		如果没有传入cb，则设置成功后软件会自动重启
+参数  ：
+		s：新SN
+		cb：设置后的回调函数，调用时会将设置结果传出去，true表示设置成功，false或者nil表示失败；
+返回值：无
+]]
+function setsn(s,cb)
+	if s==sn then
+		if cb then cb(true) end
+	else
+		req("AT+AMFAC="..(cb and "0" or "1"))
+		req("AT+WISN=\""..s.."\"")
+		wsncb = cb
 	end
 end
 
