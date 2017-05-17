@@ -93,3 +93,6 @@ http://www.luam2m.com/forum.php?mod=post&action=edit&fid=84&tid=2479&pid=6502&pa
       Air200模块开发板S1,S2使用说明V1.0 更新为V1.2
       
 增加：S3_封装（3种格式）
+
+20170517：
+更新：Air200模块AT命令手册V2.8 更新为 V2.9
