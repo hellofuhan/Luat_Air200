@@ -1,3 +1,10 @@
+版本号：Luat_V0011_Air200.lod、Luat_V0011_Air200_SSL.lod、Luat_V0011_Air200_SSL_TTS.lod、Luat_V0011_Air200_TTS1.lod、Luat_V0011_Air200_TTS2.lod、Luat_V0011_Air200_TTS3.lod
+发布时间：2017/5/18 17:29
+修改记录：
+    (1)修正“PIN21脚用作GPIO8功能使用时，功能异常”的问题
+
+
+
 版本号：Luat_V0010_Air200.lod、Luat_V0010_Air200_SSL.lod、Luat_V0010_Air200_TTS1.lod、Luat_V0010_Air200_TTS2.lod、Luat_V0010_Air200_TTS3.lod
 发布时间：2017/5/4 23:17
 修改记录：
