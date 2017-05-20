@@ -72,6 +72,8 @@
 #endif
 /*-\NEW\liulean\2015.6.15\增加获取默认APN的库 */
 
+#define JSON_LIB_LINE   _ROM( AUXLIB_JSON, luaopen_cjson, json_map )
+
 #define LUA_PLATFORM_LIBS_ROM \
     _ROM( AUXLIB_BIT, luaopen_bit, bit_map ) \
     _ROM( AUXLIB_BITARRAY, luaopen_bitarray, bitarray_map ) \
@@ -86,6 +88,7 @@
     ICONV_LINE \
     _ROM( AUXLIB_AUDIOCORE, luaopen_audiocore, audiocore_map ) \
     ZLIB_LINE \
+    JSON_LIB_LINE \
     _ROM( AUXLIB_WATCHDOG, luaopen_watchdog, watchdog_map ) \
     _ROM( AUXLIB_CPU, luaopen_cpu, cpu_map) \
     APN_LINE \

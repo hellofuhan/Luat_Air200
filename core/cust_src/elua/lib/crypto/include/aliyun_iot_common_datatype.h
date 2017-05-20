@@ -22,8 +22,13 @@ typedef unsigned int          UINT32;
 typedef unsigned int          uint32_t;
 typedef int                   INT32;
 
+#ifdef WIN32
+typedef unsigned long    UINT64;
+typedef long             INT64;
+#else
 typedef unsigned long long    UINT64;
 typedef long long             INT64;
+#endif
 
 typedef float                 FLOAT;
 typedef double                DOUBLE;

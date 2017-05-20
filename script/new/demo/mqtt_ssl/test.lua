@@ -150,7 +150,7 @@ end
 ]]
 local function imeirdy()
 	--创建一个mqtt client，默认使用的MQTT协议版本是3.1，如果要使用3.1.1，打开下面的注释--[[,"3.1.1"]]即可
-	mqttclient = mqttssl.create(PROT,ADDR,PORT,nil,--[[,"3.1.1"]])
+	mqttclient = mqttssl.create(PROT,ADDR,PORT,nil--[[,"3.1.1"]])
 	--配置遗嘱参数,如果有需要，打开下面一行代码，并且根据自己的需求调整will参数
 	--mqttclient:configwill(1,0,0,"/willtopic","will payload")
 	--连接mqtt服务器

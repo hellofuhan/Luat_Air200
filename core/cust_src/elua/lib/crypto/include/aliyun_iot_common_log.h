@@ -12,6 +12,13 @@
 
 #include <stdio.h>
 
+#ifdef WIN32
+#define WRITE_IOT_DEBUG_LOG printf
+#define WRITE_IOT_INFO_LOG printf
+#define WRITE_IOT_NOTICE_LOG printf
+#define WRITE_IOT_WARNING_LOG printf
+#define WRITE_IOT_ERROR_LOG printf
+#else
 #define WRITE_IOT_DEBUG_LOG(format, ...) \
 {\
     {\
@@ -46,6 +53,6 @@
         printf("[error] %s:%d %s()| "format"\n",__FILE__, __LINE__, __FUNCTION__,##__VA_ARGS__);\
     }\
 }
-
+#endif
 
 #endif

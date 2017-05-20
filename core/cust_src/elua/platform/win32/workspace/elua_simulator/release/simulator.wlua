@@ -57,7 +57,7 @@ dlg = iup.dialog
 			iup.button{title="ÍË³ö",size="50x",id="btn_cancel"},
 		},
 	}
-	;title = "Ä£ÄâÆ÷",size = "200x", margin = "10x10", resize = "NO", maxbox = "NO", minbox = "NO"
+	;title = "LuatÄ£ÄâÆ÷V1.0.0",size = "200x", margin = "10x10", resize = "NO", maxbox = "NO", minbox = "NO"
 }
 
 -- ctrl event

@@ -65,7 +65,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\..\..\lua\include" /I "..\..\..\..\lib\lzma\include" /I "..\..\..\..\lib\zlib\include" /I "..\..\..\..\lib\zlib\zlib_pal\include" /I "..\..\..\..\lib\lpng\include" /I "..\..\..\..\lib\lpng\lpng_pal\include" /I "..\..\..\..\lib\iconv\include" /I "..\..\..\..\lib\iconv\src" /I "..\..\..\..\lua\src\\" /I "..\..\..\..\modules\include" /I "..\..\..\include" /I "..\..\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "AM_LUA_SUPPORT" /D "LUA_USE_COOLSAND_SXR" /D "LUA_IO_LIB" /D "LUA_DEBUG_LIB" /D "LUA_FILE_LOAD_SUPPORT" /D "LUA_TTY_SUPPORT" /D LUA_SCRIPT_SIZE=384*1024 /D "USE_DL_PREFIX" /D "USE_DLMALLOC_AS_LUA_ALLOCF" /D "USE_DLMALLOC" /D "AM_LZMA_SUPPORT" /D "AM_LPNG_SUPPORT" /D "LUA_DISP_SUPPORT_HZ" /D "LUA_ICONV_LIB" /D "LUA_OS_LIB" /D LUA_OPTIMIZE_MEMORY=0 /D fopen=elua_fopen /D getenv=lualibc_getenv /D "LUA_SAVE_LAST_ERROR" /D DEFAULT_GRANULARITY=512*1024 /D __FUNCTION__=\"func\" /D "LUA_ZLIB_LIB" /D printf=elua_printf /D fprintf=elua_fprintf /D vfprintf=elua_vfprintf /D fwrite=elua_fwrite /D fputs=elua_fputs /D freopen=elua_freopen /D "LUA_DISP_LIB" /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\..\..\lua\include" /I "..\..\..\..\lib\lzma\include" /I "..\..\..\..\lib\crypto\include" /I "..\..\..\..\lib\zlib\include" /I "..\..\..\..\lib\zlib\zlib_pal\include" /I "..\..\..\..\lib\lpng\include" /I "..\..\..\..\lib\lpng\lpng_pal\include" /I "..\..\..\..\lib\iconv\include" /I "..\..\..\..\lib\iconv\src" /I "..\..\..\..\lua\src\\" /I "..\..\..\..\modules\include" /I "..\..\..\include" /I "..\..\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "AM_LUA_SUPPORT" /D "LUA_USE_COOLSAND_SXR" /D "LUA_IO_LIB" /D "LUA_DEBUG_LIB" /D "LUA_FILE_LOAD_SUPPORT" /D "LUA_TTY_SUPPORT" /D LUA_SCRIPT_SIZE=384*1024 /D "USE_DL_PREFIX" /D "USE_DLMALLOC_AS_LUA_ALLOCF" /D "USE_DLMALLOC" /D "AM_LZMA_SUPPORT" /D "AM_LPNG_SUPPORT" /D "LUA_DISP_SUPPORT_HZ" /D "LUA_ICONV_LIB" /D "LUA_OS_LIB" /D LUA_OPTIMIZE_MEMORY=0 /D fopen=elua_fopen /D getenv=lualibc_getenv /D "LUA_SAVE_LAST_ERROR" /D DEFAULT_GRANULARITY=512*1024 /D __FUNCTION__=\"func\" /D "LUA_ZLIB_LIB" /D printf=elua_printf /D fprintf=elua_fprintf /D vfprintf=elua_vfprintf /D fwrite=elua_fwrite /D fputs=elua_fputs /D freopen=elua_freopen /D "LUA_DISP_LIB" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x804 /d "_DEBUG"
 # ADD RSC /l 0x804 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -648,6 +648,10 @@ SOURCE=..\..\..\src\common_uart.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\crc.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\dlmalloc.c
 # End Source File
 # Begin Source File
@@ -671,6 +675,58 @@ SOURCE=..\..\..\..\shell\src\shell.c
 # Begin Group "lib"
 
 # PROP Default_Filter ""
+# Begin Group "crypto"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\crypto\src\aes.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\crypto\src\aliyun_iot_common_base64.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\crypto\src\aliyun_iot_common_hmac.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\crypto\src\aliyun_iot_common_md5.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\crypto\src\aliyun_iot_common_sha1.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\crypto\src\crypto.c
+# End Source File
+# End Group
+# Begin Group "json"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\json\src\fpconv.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\json\src\fpconv.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\json\src\lua_cjson.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\json\src\strbuf.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\json\src\strbuf.h
+# End Source File
+# End Group
 # Begin Group "lzma"
 
 # PROP Default_Filter ""

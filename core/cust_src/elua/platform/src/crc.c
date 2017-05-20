@@ -138,7 +138,8 @@ u32 CRC32_table[256] =
 u32 calcCRC32(const u8* buf, u32 len)
 {
     u32 CRC32_data = 0xFFFFFFFF;
-    for (u32 i = 0; i != len; ++i)
+	u32 i = 0;
+    for (i = 0; i != len; ++i)
     {
         u32 t = (CRC32_data ^ buf[i]) & 0xFF;
         CRC32_data = ((CRC32_data >> 8) & 0xFFFFFF) ^ CRC32_table[t];

@@ -91,6 +91,12 @@ IOT_RETURN_CODES_E aliyun_iot_common_base64decode(const UINT8 *data, UINT32 inpu
     UINT32 i = 0;
     UINT32 j = 0;
 
+	UINT32 sextet_a = 0;
+    UINT32 sextet_b = 0;
+    UINT32 sextet_c = 0;
+    UINT32 sextet_d = 0;
+    UINT32 triple = 0;
+
     build_decoding_table();
 
     if (inputLength % 4 != 0)
@@ -116,13 +122,7 @@ IOT_RETURN_CODES_E aliyun_iot_common_base64decode(const UINT8 *data, UINT32 inpu
     {
         WRITE_IOT_ERROR_LOG("the length of output memory is not enough!");
         return FAIL_RETURN;
-    }
-
-    UINT32 sextet_a = 0;
-    UINT32 sextet_b = 0;
-    UINT32 sextet_c = 0;
-    UINT32 sextet_d = 0;
-    UINT32 triple = 0;
+    }    
 
     for (i = 0, j = 0; i < inputLength;)
     {

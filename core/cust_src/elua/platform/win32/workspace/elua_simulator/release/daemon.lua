@@ -33,7 +33,7 @@ end
 
 function open()
 	ctx.sockid = socket.udp()
-	ctx.sockid:setsockname("127.0.0.1",62888)
+	ctx.sockid:setsockname("127.0.0.1",22888)
 	ctx.sockid:settimeout(0)
 	addtask(poll)
 end
@@ -42,6 +42,7 @@ function emit_event(id,d)
 	if not ctx.sockid then return end
 
 	local len = string.len(d)+3
-	local outd = string.char(len/256,len%256,id) .. d
-	ctx.sockid:sendto(outd,"127.0.0.1",62887)
+	local outd = string.char(len/256,len%256,id) .. d	
+
+	ctx.sockid:sendto(outd,"127.0.0.1",22887)
 end

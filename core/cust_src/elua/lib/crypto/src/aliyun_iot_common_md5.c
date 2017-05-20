@@ -312,8 +312,8 @@ INT8 aliyun_iot_common_hb2hex(UINT8 hb)
 void aliyun_iot_common_md5(const INT8 *dat, INT32 datlen, INT8 *result)
 {
     UINT8 out[MD5_DIGEST_SIZE];
-    memset(out, 0, MD5_DIGEST_SIZE);
-    UINT32 i = 0;
+	UINT32 i = 0;
+    memset(out, 0, MD5_DIGEST_SIZE);    
 
     aliyun_iot_md5((UINT8 *)dat, datlen, out);
 

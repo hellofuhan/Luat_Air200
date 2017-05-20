@@ -28,6 +28,10 @@
 #include <string.h>
 #include "strbuf.h"
 
+#ifdef WIN32
+#define vsnprintf _vsnprintf
+#endif
+
 #define L_MALLOC malloc
 #define L_FREE  free
 #define L_REALLOC  realloc

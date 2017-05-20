@@ -13,7 +13,7 @@ local GPIO_DIR_OUTPUT=1
 local GPIO_DIR_INPUT=2
 local GPIO_DIR_INT=3
 
-local evt_gpio
+local evt_gpio,closing
 local gpio = {}
 --local piname = {}
 
@@ -79,7 +79,7 @@ end
 function closeio(port,pin)
 	local gpioid = "P" .. port.."_"..pin
 
-	if not gpio[gpioid] then iup.Message("Error",gpioid .. "not exist!") return end
+	if not gpio[gpioid] and not closing then --[[iup.Message("Error",gpioid .. "not exist!")]] return end
 
 	mat[gpio[gpioid]] = nil
 	gpio[gpioid] = nil
@@ -97,11 +97,13 @@ local function reverse(cell)
 end
 
 function setvalue(port,pin,v)
+	if closing then return end
 	local gpioid = "P" .. port.."_"..pin
 
-	if not gpio[gpioid] then iup.Message("Error",gpioid .. "not exist!") return end
+	if not gpio[gpioid] and not closing then --[[iup.Message("Error",gpioid .. "not exist!")]] return end
 
 	local cell = gpio[gpioid]
+	--if cell==nil then return end
 	local currval = mat["bgcolor"..cell] == "255 255 255" and 0 or 1
 
 	if currval == v then return end
@@ -144,6 +146,14 @@ function mat:edition_cb()
 	return iup.IGNORE
 end
 
+local function proc_ctrl_evt(d)
+	if d == "close" then
+		closing = true
+	end
+end
+
+--evt_ctrl = event.add(event.EVT_CTRL,proc_ctrl_evt)
+
 local function proc_evt(d)
 	local _,evt,port,pin,val = string.unpack(d,"bbbb")
 	local l,c
@@ -169,3 +179,5 @@ local function proc_evt(d)
 end
 
 evt_gpio = event.add(event.EVT_GPIO,proc_evt)
+
+
