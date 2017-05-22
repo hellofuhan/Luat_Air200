@@ -28,7 +28,7 @@ local updmode = base.UPDMODE or 0
 
 --PROTOCOL：传输层协议，只支持TCP和UDP
 --SERVER,PORT为服务器地址和端口
-local PROTOCOL,SERVER,PORT = "UDP","api.airm2m.com",12410
+local PROTOCOL,SERVER,PORT = "UDP","firmware.openluat.com",12410
 --是否使用用户自定义的升级服务器
 local usersvr
 --升级包保存路径
