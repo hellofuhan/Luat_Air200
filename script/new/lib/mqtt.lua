@@ -346,11 +346,13 @@ end
 参数  ：		
 		sckidx：socket idx
 		result： bool类型，发送结果，true为成功，其他为失败
+		tpara：table类型，{key="MQTTDISC", val=data, usertag=usrtag}
 返回值：无
 ]]
-function mqttdiscb(sckidx,result)
+function mqttdiscb(sckidx,result,tpara)
 	--关闭socket连接
-	socket.disconnect(sckidx)
+	tclients[getclient(sckidx)].discing = true
+	socket.disconnect(sckidx,tpara.usertag)
 end
 
 --[[
@@ -369,10 +371,11 @@ end
 功能  ：发送MQTT DISCONNECT报文
 参数  ：
 		sckidx：socket idx
-返回值：无
+		usrtag：用户自定义标记
+返回值：true表示发起了动作，nil表示没有发起
 ]]
-local function disconnect(sckidx)
-	mqttsnd(sckidx,"MQTTDISC")
+local function disconnect(sckidx,usrtag)
+	return mqttsnd(sckidx,"MQTTDISC",usrtag)
 end
 
 --[[
@@ -435,9 +438,10 @@ end
 参数  ：
 		sckidx：socket idx
         typ：报文类型
-返回值：无
+		usrtag：用户自定义标记
+返回值：true表示发起了动作，nil表示没有发起
 ]]
-function mqttsnd(sckidx,typ)
+function mqttsnd(sckidx,typ,usrtag)
 	if not tmqttpack[typ] then print("mqttsnd typ error",typ) return end
 	local mqttyp = tmqttpack[typ].mqttyp
 	local dat,para = tmqttpack[typ].mqttdatafnc(sckidx)
@@ -451,9 +455,11 @@ function mqttsnd(sckidx,typ)
 		snd(sckidx,dat,{key=tmqttpack[typ].sndpara})
 	elseif mqttyp==DISCONNECT then
 		if not snd(sckidx,dat,{key=tmqttpack[typ].sndpara}) and tmqttpack[typ].sndcb then
-			tmqttpack[typ].sndcb(sckidx,false,{key=tmqttpack[typ].sndpara})
+			tmqttpack[typ].sndcb(sckidx,false,{key=tmqttpack[typ].sndpara,usertag=usrtag})
 		end		
 	end	
+	
+	return true
 end
 
 --[[
@@ -542,7 +548,7 @@ function ntfy(idx,evt,result,item)
 				else
 					local id = getidbysndpara(item.para.key)
 					print("item.para",type(item.para) == "table",type(item.para) == "table" and item.para.typ or item.para,id)
-					if id and tmqttpack[id].sndcb then tmqttpack[id].sndcb(idx,result,item.para.val) end
+					if id and tmqttpack[id].sndcb then tmqttpack[id].sndcb(idx,result,item.para) end
 				end
 			end
 		end
@@ -553,7 +559,12 @@ function ntfy(idx,evt,result,item)
 		tclients[mqttclientidx].sckconnected=false
 		tclients[mqttclientidx].mqttconnected=false
 		tclients[mqttclientidx].sckrcvs=""
-		reconn(idx)
+		if tclients[mqttclientidx].discing then
+			if tclients[mqttclientidx].discb then tclients[mqttclientidx].discb() end
+			tclients[mqttclientidx].discing = false
+		else
+			reconn(idx)
+		end
 	--连接主动断开（调用link.shut后的异步事件）
 	elseif evt == "STATE" and result == "SHUTED" then
 		sys.timer_stop(pingreq,idx)
@@ -569,7 +580,12 @@ function ntfy(idx,evt,result,item)
 		tclients[mqttclientidx].sckconnected=false
 		tclients[mqttclientidx].mqttconnected=false
 		tclients[mqttclientidx].sckrcvs=""
-		reconn(idx)
+		if item=="USER" then
+			if tclients[mqttclientidx].discb then tclients[mqttclientidx].discb() end
+			tclients[mqttclientidx].discing = false
+		else
+			reconn(idx)
+		end
 	--连接主动断开并且销毁（调用socket.close后的异步事件）
 	elseif evt == "CLOSE" then
 		sys.timer_stop(pingreq,idx)
@@ -862,6 +878,18 @@ function tmqtt:destroy(destroycb)
 end
 
 --[[
+函数名：disconnect
+功能  ：断开一个mqtt client，并且断开socket
+参数  ：
+		discb：function类型，断开后的回调函数[可选]
+返回值：无
+]]
+function tmqtt:disconnect(discb)
+	self.discb = discb
+	if not disconnect(self.sckidx,"USER") and discb then discb() end
+end
+
+--[[
 函数名：configwill
 功能  ：配置遗嘱参数
 参数  ：
@@ -990,4 +1018,24 @@ end
 ]]
 function tmqtt:regevtcb(evtcbs)
 	self.evtcbs=evtcbs	
+end
+
+--[[
+函数名：getstatus
+功能  ：获取MQTT CLIENT的状态
+参数  ：无
+返回值：MQTT CLIENT的状态，string类型，共4种状态：
+		DISCONNECTED：未连接状态
+		CONNECTING：连接中状态
+		CONNECTED：连接状态
+		DISCONNECTING：断开连接中状态
+]]
+function tmqtt:getstatus()
+	if self.mqttconnected then
+		return self.discing and "DISCONNECTING" or "CONNECTED"
+	elseif self.sckconnected or self.sckconning then
+		return "CONNECTING"
+	else
+		return "DISCONNECTED"
+	end
 end

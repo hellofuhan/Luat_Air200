@@ -97,6 +97,28 @@ local function rcvmessagecb(topic,payload,qos)
 end
 
 --[[
+函数名：discb
+功能  ：MQTT连接断开后的回调
+参数  ：无		
+返回值：无
+]]
+local function discb()
+	print("discb")
+	--20秒后重新建立MQTT连接
+	sys.timer_start(connect,20000)
+end
+
+--[[
+函数名：disconnect
+功能  ：断开MQTT连接
+参数  ：无		
+返回值：无
+]]
+local function disconnect()
+	mqttclient:disconnect(discb)
+end
+
+--[[
 函数名：connectedcb
 功能  ：MQTT CONNECT成功回调函数
 参数  ：无		
@@ -112,6 +134,8 @@ local function connectedcb()
 	pubqos0test()
 	--发布一条qos为1的消息
 	pubqos1test()
+	--20秒后主动断开MQTT连接
+	--sys.timer_start(disconnect,20000)
 end
 
 --[[
@@ -142,6 +166,17 @@ local function sckerrcb(r)
 	print("sckerrcb",r)
 end
 
+function connect()
+	--连接mqtt服务器
+	--mqtt lib中，如果socket一直重连失败，默认会自动重启软件
+	--注意sckerrcb参数，如果打开了注释掉的sckerrcb，则mqtt lib中socket一直重连失败时，不会自动重启软件，而是调用sckerrcb函数
+	mqttclient:connect(misc.getimei(),600,"user","password",connectedcb,connecterrcb--[[,sckerrcb]])
+end
+
+local function statustest()
+	print("statustest",mqttclient:getstatus())
+end
+
 --[[
 函数名：imeirdy
 功能  ：IMEI读取成功，成功后，才去创建mqtt client，连接服务器，因为用到了IMEI号
@@ -153,10 +188,9 @@ local function imeirdy()
 	mqttclient = mqttssl.create(PROT,ADDR,PORT,nil--[[,"3.1.1"]])
 	--配置遗嘱参数,如果有需要，打开下面一行代码，并且根据自己的需求调整will参数
 	--mqttclient:configwill(1,0,0,"/willtopic","will payload")
-	--连接mqtt服务器
-	--mqtt lib中，如果socket一直重连失败，默认会自动重启软件
-	--注意sckerrcb参数，如果打开了注释掉的sckerrcb，则mqtt lib中socket一直重连失败时，不会自动重启软件，而是调用sckerrcb函数
-	mqttclient:connect(misc.getimei(),600,"user","password",connectedcb,connecterrcb--[[,sckerrcb]])
+	--查询client状态测试
+	--sys.timer_loop_start(statustest,1000)
+	connect()
 end
 
 local procer =

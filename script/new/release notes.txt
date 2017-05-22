@@ -5,6 +5,9 @@
         支持lib脚本的最小core软件版本号：Luat_V0011_Air200
         (1)update.lua：修改Luat物联云升级服务器地址
 	(2)luatiot.lua、luatiotssl.lua：精简Luat物联云使用的topic和登陆报文长度
+	(3)mqtt.lua、mqttssl.lua：新增disconnect和getstatus接口
+    二、demo脚本修改
+        (1)mqtt、mqtt_ssl项目：新增“disconnect和getstatus接口”的测试代码
 
 
 
