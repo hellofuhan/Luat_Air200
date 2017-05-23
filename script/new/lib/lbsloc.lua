@@ -19,7 +19,7 @@ module(...)
 
 --加载常用的全局函数至本地
 local print,tonumber,pairs = base.print,base.tonumber,base.pairs
-local slen,sbyte,ssub = string.len,string.byte,string.sub
+local slen,sbyte,ssub,srep = string.len,string.byte,string.sub,string.rep
 
 local PROTOCOL,SERVER,PORT = "UDP","bs.openluat.com","12411"
 
@@ -216,6 +216,41 @@ local function unbcd(d)
 	return table.concat(t)
 end
 
+local function trans(lat,lng)
+	local la,ln = lat,lng
+	if slen(lat)>10 then
+		la = ssub(lat,1,10)
+	elseif slen(lat)<10 then
+		la = lat..srep("0",10-slen(lat))
+	end
+	if slen(lng)>10 then
+		ln = ssub(lng,1,10)
+	elseif slen(lng)<10 then
+		ln = lng..srep("0",10-slen(lng))
+	end
+
+--[[	
+0.XXXXXXX度乘以60就是分，我们的Luat不支持小数，按照下面的格式计算：
+0.XXXXXXX * 60 = XXXXXXX * 60 / 10000000 = XXXXXXX * 6 / 1000000
+
+例如0.9999999度 = 9999999 * 6 / 1000000 = 59.999994分
+
+
+最终按照下面的测试计算分：
+(XXXXXXX * 6 / 1000000).."."..(XXXXXXX * 6 % 1000000)得到的就是string类型的分，
+例如0.9999999度最终结果就是string类型的59.999994分
+]]
+	local lam1,lam2 = tonumber(ssub(la,4,-1))*6/1000000,tonumber(ssub(la,4,-1))*6%1000000
+	if slen(lam1)<2 then lam1 = srep("0",2-slen(lam1))..lam1 end
+	if slen(lam2)<6 then lam2 = srep("0",6-slen(lam2))..lam2 end
+	
+	local lnm1,lnm2 = tonumber(ssub(ln,4,-1))*6/1000000,tonumber(ssub(ln,4,-1))*6%1000000
+	if slen(lnm1)<2 then lnm1 = srep("0",2-slen(lnm1))..lnm1 end
+	if slen(lnm2)<6 then lnm2 = srep("0",6-slen(lnm2))..lnm2 end
+	
+	return ssub(la,1,3).."."..ssub(la,4,-1),ssub(ln,1,3).."."..ssub(ln,4,-1),ssub(la,1,3)..lam1.."."..lam2,ssub(ln,1,3)..lnm1.."."..lnm2
+end
+
 --[[
 函数名：rcv
 功能  ：socket接收数据的处理函数
@@ -234,8 +269,8 @@ local function rcv(id,s)
 	if sbyte(s,1)~=0 then
 		if tmpcb then tmpcb(3) end
 	else
-		local lat,lng = unbcd(ssub(s,2,6)),unbcd(ssub(s,7,11))
-		if tmpcb then tmpcb(0,ssub(lat,1,3).."."..ssub(lat,4,-1),ssub(lng,1,3).."."..ssub(lng,4,-1),common.ucs2betogb2312(ssub(s,13,-1))) end
+		local lat,lng,latdm,lngdm = trans(unbcd(ssub(s,2,6)),unbcd(ssub(s,7,11)))
+		if tmpcb then tmpcb(0,lat,lng,common.ucs2betogb2312(ssub(s,13,-1)),latdm,lngdm) end
 	end	
 end
 

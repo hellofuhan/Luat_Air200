@@ -2,7 +2,7 @@ module(...,package.seeall)
 require"lbsloc"
 
 --是否查询GPS位置字符串信息
-local qrylocation
+local qryaddr
 
 --[[
 函数名：print
@@ -21,22 +21,24 @@ end
 返回值：无
 ]]
 local function qrygps()
-	qrylocation = not qrylocation
-	lbsloc.request(getgps,qrylocation)
+	qryaddr = not qryaddr
+	lbsloc.request(getgps,qryaddr)
 end
 
 --[[
 函数名：getgps
 功能  ：获取经纬度后的回调函数
 参数  ：
-		result：number类型，获取结果，0表示成功，其余表示失败。此结果为0时下面的3个参数才有意义
-		lat：string类型，纬度，整数部分3位，例如031.2425864
-		lng：string类型，经度，整数部分3位，例如121.4736522
-		location：string类型，GB2312编码的位置字符串。调用lbsloc.request查询经纬度，传入的第二个参数为true时，才返回本参数
+		result：number类型，获取结果，0表示成功，其余表示失败。此结果为0时下面的5个参数才有意义
+		lat：string类型，纬度，整数部分3位，小数部分7位，例如031.2425864
+		lng：string类型，经度，整数部分3位，小数部分7位，例如121.4736522
+		addr：string类型，GB2312编码的位置字符串。调用lbsloc.request查询经纬度，传入的第二个参数为true时，才返回本参数
+		latdm：string类型，纬度，度分格式，整数部分5位，小数部分6位，dddmm.mmmmmm，例如03114.555184
+		lngdm：string类型，纬度，度分格式，整数部分5位，小数部分6位，dddmm.mmmmmm，例如12128.419132
 返回值：无
 ]]
-function getgps(result,lat,lng,location)
-	print("getgps",result,lat,lng,location)
+function getgps(result,lat,lng,addr,latdm,lngdm)
+	print("getgps",result,lat,lng,addr,latdm,lngdm)
 	--获取经纬度成功
 	if result==0 then
 	--失败
