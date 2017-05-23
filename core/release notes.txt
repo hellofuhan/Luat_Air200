@@ -1,3 +1,11 @@
+版本号：Luat_V0012_Air200.lod、Luat_V0012_Air200_SSL.lod、Luat_V0012_Air200_SSL_TTS.lod
+发布时间：2017/5/23 11:03
+修改记录：
+    (1)Luat_V0012_Air200.lod、Luat_V0012_Air200_SSL.lod：脚本空间由原来的384KB扩大为512KB，文件系统空间不变
+    (2)新增Luat_V0012_Air200_SSL_TTS.lod文件，可同时支持SSL和TTS功能，但是脚本空间以及文件系统空间较小，脚本空间256KB，文件系统空间108KB
+
+
+
 版本号：Luat_V0011_Air200.lod、Luat_V0011_Air200_SSL.lod、Luat_V0011_Air200_SSL_TTS.lod、Luat_V0011_Air200_TTS1.lod、Luat_V0011_Air200_TTS2.lod、Luat_V0011_Air200_TTS3.lod
 发布时间：2017/5/18 17:29
 修改记录：

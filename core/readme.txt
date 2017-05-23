@@ -1,16 +1,21 @@
 Air200模块的Flash总空间为4MB
 Air200目前有三种底层软件：
 Luat_VXXX_Air200.lod：不支持SSL和TTS功能
+Luat_VXXX_Air200_SSL_TTS.lod：支持SSL和TTS功能
 Luat_VXXXX_Air200_SSL.lod：支持SSL功能、不支持TTS功能
 Luat_VXXXX_Air200_TTSX.lod：支持TTS功能、不支持SSL功能
 
 Luat_VXXX_Air200.lod：
-Lua脚本和资源（通过烧写工具烧写的文件，例如lua脚本文件，mp3音频文件）可用384KB
+Lua脚本和资源（通过烧写工具烧写的文件，例如lua脚本文件，mp3音频文件）可用512KB
 文件系统（例如脚本运行过程中创建的参数文件，录音文件，远程升级文件等）可用1008KB
 
 Luat_VXXX_Air200_SSL.lod：
-LuaDB脚本和资源（通过烧写工具烧写的文件，例如lua脚本文件，mp3音频文件）可用384KB
+LuaDB脚本和资源（通过烧写工具烧写的文件，例如lua脚本文件，mp3音频文件）可用512KB
 文件系统（例如脚本运行过程中创建的参数文件，录音文件，远程升级文件等）可用748KB
+
+Luat_VXXX_Air200_SSL_TTS.lod：
+LuaDB脚本和资源（通过烧写工具烧写的文件，例如lua脚本文件，mp3音频文件）可用256KB
+文件系统（例如脚本运行过程中创建的参数文件，录音文件，远程升级文件等）可用108KB
 
 Luat_VXXX_Air200_TTS1.lod：
 LuaDB脚本和资源（通过烧写工具烧写的文件，例如lua脚本文件，mp3音频文件）可用128KB
