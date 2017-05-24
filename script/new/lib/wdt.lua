@@ -143,6 +143,22 @@ function open()
 end
 
 --[[
+函数名：close
+功能  ：关闭Air200开发板上的硬件看门狗功能
+参数  ：无
+返回值：无
+]]
+function close()
+	sys.timer_stop_all(feedend)
+	sys.timer_stop_all(feed)
+	sys.timer_stop_all(getscm)
+	sys.timer_stop(pio.pin.setval,1,RST_SCMWD_PIN)
+	pio.pin.close(RST_SCMWD_PIN)
+	pio.pin.close(WATCHDOG_PIN)
+	scm_active,get_scm_cnt,testcnt,testing = true,20,0
+end
+
+--[[
 函数名：test
 功能  ：测试“Air200开发板上的硬件看门狗复位Air200模块”的功能
 参数  ：无
