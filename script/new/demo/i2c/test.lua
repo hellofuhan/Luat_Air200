@@ -20,6 +20,9 @@ end
 ]]
 local function init()
 	local i2cslaveaddr = 0x0E
+	--注意，此处的i2cslaveaddr是7bit地址
+	--在读操作时，第一个字节的为(i2cslaveaddr << 1) | 0x01
+	--在写操作时，第一个字节的为(i2cslaveaddr << 1) | 0x00
 	if i2c.setup(i2cid,i2c.SLOW,i2cslaveaddr) ~= i2c.SLOW then
 		print("init fail")
 		return

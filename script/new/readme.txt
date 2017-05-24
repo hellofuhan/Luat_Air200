@@ -50,6 +50,8 @@ ntp：模块时间自动更新demo项目
 
 nvm：参数存储读写demo项目
 
+pb：电话本读写demo项目
+
 pm：休眠控制demo项目
 
 sms：短信demo项目
