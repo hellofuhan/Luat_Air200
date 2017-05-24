@@ -92,7 +92,15 @@ end
 local base64bcdimei
 local function getbase64bcdimei()
 	if not base64bcdimei then
-		base64bcdimei = crypto.base64_encode(bcd(misc.getimei(),8))
+		local imei = misc.getimei()
+		local imei1,imei2 = string.sub(imei,1,7),string.sub(imei,8,14)
+		imei1,imei2 = string.format("%06X",tonumber(imei1)),string.format("%06X",tonumber(imei2))
+		imei = common.hexstobins(imei1..imei2)
+		base64bcdimei = crypto.base64_encode(imei,6)
+		if string.sub(base64bcdimei,-1,-1)=="=" then base64bcdimei = string.sub(base64bcdimei,1,-2) end
+		base64bcdimei = string.gsub(base64bcdimei,"+","-")
+		base64bcdimei = string.gsub(base64bcdimei,"/","_")
+		base64bcdimei = string.gsub(base64bcdimei,"=","@")
 	end
 	return base64bcdimei
 end
@@ -112,7 +120,7 @@ local function connectedcb()
 								0,
 								0,_G.PRODUCT_KEY,
 								1,_G.PROJECT.."_"..sys.getcorever(),
-								2,bcd(string.gsub(_G.VERSION,"%.",""),
+								2,bcd(string.gsub(_G.VERSION,"%.","")),
 								3,misc.getsn(),
 								4,sim.geticcid(),
 								5,sim.getimsi()
