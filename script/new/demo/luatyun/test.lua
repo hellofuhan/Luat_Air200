@@ -66,22 +66,4 @@ end
 
 --注册MQTT CONNECT成功回调和收到PUBLISH消息回调
 luatyuniot.regcb(connectedcb,rcvmessagecb)
---[[
-local function getbase64bcdimei()
-	if not base64bcdimei then
-		local imei = "862990013106540"
-		local imei1,imei2 = string.sub(imei,1,7),string.sub(imei,8,14)
-		imei1,imei2 = string.format("%06X",tonumber(imei1)),string.format("%06X",tonumber(imei2))
-		print(imei1..imei2)
-		imei = common.hexstobins(imei1..imei2)
-		base64bcdimei = crypto.base64_encode(imei,6)
-		if string.sub(base64bcdimei,-1,-1)=="=" then base64bcdimei = string.sub(base64bcdimei,1,-2) end
-		base64bcdimei = string.gsub(base64bcdimei,"+","-")
-		base64bcdimei = string.gsub(base64bcdimei,"/","_")
-		base64bcdimei = string.gsub(base64bcdimei,"=","@")
-	end
-	return base64bcdimei
-end
 
-print("862990013106540  –>  "..getbase64bcdimei())
-]]

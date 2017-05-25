@@ -66,3 +66,4 @@ end
 
 --注册MQTT CONNECT成功回调和收到PUBLISH消息回调
 luatyuniotssl.regcb(connectedcb,rcvmessagecb)
+

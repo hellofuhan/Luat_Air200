@@ -188,10 +188,11 @@ sys.regapp(procer)
 参数  ：
 		productkey：string类型，产品标识，必选参数
 		productsecret：string类型，产品密钥，必选参数
+		devicename：string类型，设备名
 返回值：无
 ]]
-local function config(productkey,productsecret)
-	sys.dispatch("ALIYUN_AUTH_BGN",productkey,productsecret)
+local function config(productkey,productsecret,devicename)
+	sys.dispatch("ALIYUN_AUTH_BGN",productkey,productsecret,devicename)
 end
 
 function regcb(connectedcb,rcvmessagecb,connecterrcb)
@@ -202,4 +203,10 @@ function publish(payload,qos,ackcb,usertag)
 	mqttclient:publish("/"..PRODUCT_KEY.."/"..getbase64bcdimei().."/u",payload,qos,ackcb,usertag)
 end
 
-config(PRODUCT_KEY,PRODUCT_SECRET)
+local function imeirdy()
+	getbase64bcdimei()
+	config(PRODUCT_KEY,PRODUCT_SECRET,getbase64bcdimei())
+	return true
+end
+
+sys.regapp(imeirdy,"IMEI_READY")
