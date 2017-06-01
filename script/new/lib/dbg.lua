@@ -62,14 +62,16 @@ end
 		append：是否追加到末尾
 		s：错误信息
 返回值：无
+说明：错误文件中最多保存最近的900字节数据
 ]]
 local function writerr(append,s)	
 	print("dbg_w",append,s)
 	if s then
 		local str = (append and (readtxt(DBG_FILE)..s) or s)
-		if string.len(str)<900 then
-			writetxt(DBG_FILE,str)
+		if string.len(str)>900 then
+			str = string.sub(str,-900,-1)
 		end
+		writetxt(DBG_FILE,str)
 	end
 end
 
@@ -253,7 +255,7 @@ end
 ]]
 function saverr(s)
 	writerr(true,s)
-	--init()不要立即上报，等待下次开机再上报，否则会影响CIPSHUT的顺利执行，导致用户程序应用调用异常
+	init()
 end
 
 --[[
