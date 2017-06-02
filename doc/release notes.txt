@@ -96,3 +96,6 @@ http://www.luam2m.com/forum.php?mod=post&action=edit&fid=84&tid=2479&pid=6502&pa
 
 20170517：
 更新：Air200模块AT命令手册V2.8 更新为 V2.9
+
+20170602：
+Air200模块AT命令手册V2.9 更新为 V3.0
