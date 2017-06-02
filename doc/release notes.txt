@@ -99,3 +99,4 @@ http://www.luam2m.com/forum.php?mod=viewthread&tid=2479&page=1&extra=#pid6502
 
 20170602：
 Air200模块AT命令手册V2.9 更新为 V3.0
+Air200开发板新手入门指导V1.4 更新为 V1.5
