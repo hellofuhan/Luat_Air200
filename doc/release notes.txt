@@ -98,5 +98,8 @@ http://www.luam2m.com/forum.php?mod=viewthread&tid=2479&page=1&extra=#pid6502
 更新：Air200模块AT命令手册V2.8 更新为 V2.9
 
 20170602：
-Air200模块AT命令手册V2.9 更新为 V3.0
-Air200开发板新手入门指导V1.4 更新为 V1.5
+更新：Air200模块AT命令手册V2.9 更新为 V3.0
+      Air200开发板新手入门指导V1.4 更新为 V1.5
+删除：Air200_Reference Design_20170403
+增加: Air200电池供电低功耗参考设计_20170602.pdf
+      Air200外部电源供电参考设计_20170602.pdf
