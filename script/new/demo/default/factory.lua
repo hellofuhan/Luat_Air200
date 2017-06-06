@@ -11,7 +11,7 @@ require"pm"
 
 module(...,package.seeall)
 
-local UART_ID = 3
+local UART_ID = 2
 local smatch,slen = string.match,string.len
 local waitimeirst,waitsnrst,csqshreshold
 local tgpio = {}
@@ -21,12 +21,12 @@ local function print(...)
 end
 
 local function wake()	
-	sys.timer_start(pm.sleep,300000,"factory")
+	--sys.timer_start(pm.sleep,300000,"factory")
 end
 
 local function rsp(s)
 	print("rsp",s)
-	wake()
+	--wake()
 	uart.write(UART_ID,s)
 end
 
@@ -83,7 +83,7 @@ local function proc(item)
 	print("proc",s,waitimeirst,waitsnrst)
 	if smatch(s,"AT%+WIMEI=") then
 		waitimeirst = true
-		misc.setimei(smatch(s,"=\"(.+)\""),imeicb)		
+		misc.setimei(smatch(item,"=\"(.+)\""),imeicb)		
 	elseif smatch(s,"AT%+CGSN") then
 		local imei = misc.getimei()
 		if waitimeirst or imei=="" then
@@ -93,7 +93,7 @@ local function proc(item)
 		end
 	elseif smatch(s,"AT%+WISN=") then
 		waitsnrst = true
-		misc.setsn(smatch(s,"=\"(.+)\""),sncb)		
+		misc.setsn(smatch(item,"=\"(.+)\""),sncb)		
 	elseif smatch(s,"AT%+WISN%?") then
 		local sn = misc.getsn()
 		if waitsnrst or sn=="" then
@@ -110,27 +110,27 @@ local function proc(item)
 			rsp("\r\nAT+SIM\r\nOK\r\n")
 		else
 			sys.timer_loop_start(loopqry,1000,"SIM")
-			sys.timer_start(looptimeout,tonumber(smatch(s,"=(%d+)"))*1000,"SIM")
+			sys.timer_start(looptimeout,tonumber(smatch(item,"=(%d+)"))*1000,"SIM")
 		end
 	elseif smatch(s,"AT%+CREG") then
 		if net.getstate()=="REGISTERED" then
 			rsp("\r\nAT+CREG\r\nOK\r\n")
 		else
 			sys.timer_loop_start(loopqry,1000,"CREG")
-			sys.timer_start(looptimeout,tonumber(smatch(s,"=(%d+)"))*1000,"CREG")
+			sys.timer_start(looptimeout,tonumber(smatch(item,"=(%d+)"))*1000,"CREG")
 		end
 	elseif smatch(s,"AT%+CSQ") then
-		csqshreshold = tonumber(smatch(s,"=(%d+)"))
+		csqshreshold = tonumber(smatch(item,"=(%d+)"))
 		if net.getrssi()>=csqshreshold then
 			rsp("\r\nAT+CSQ\r\nOK\r\n")
 		else
 			sys.timer_loop_start(loopqry,1000,"CSQ")
-			sys.timer_start(looptimeout,tonumber(smatch(s,",(%d+)"))*1000,"CSQ")
+			sys.timer_start(looptimeout,tonumber(smatch(item,",(%d+)"))*1000,"CSQ")
 		end
 	elseif smatch(s,"AT%+GPIO") then
 		tgpio = {}
 		local k,v
-		for v in string.gmatch(s,"(%d+)") do
+		for v in string.gmatch(item,"(%d+)") do
 			table.insert(tgpio,tonumber(v))
 		end
 		if #tgpio<2 then rsp("\r\nAT+GPIO\r\nERROR\r\n") return end
@@ -159,6 +159,8 @@ local function proc(item)
 	end
 end
 
+local rdbuf = ""
+
 --[[
 函数名：read
 功能  ：读取串口接收到的数据
@@ -166,19 +168,20 @@ end
 返回值：无
 ]]
 local function read()
-	local data,s = ""
+	local s
 	while true do
 		s = uart.read(UART_ID,"*l",0)
 		if not s or string.len(s) == 0 then break end
-		--print("read",s)
-		data = data..s
+		print("read",s)
+		rdbuf = rdbuf..s
 	end
-	if data~="" then
-		proc(data)
+	if smatch(rdbuf,"\r") then
+		proc(rdbuf)
+		rdbuf = ""
 	end
 end
 
-uart.setup(UART_ID,921600,8,uart.PAR_NONE,uart.STOP_1)
+uart.setup(UART_ID,115200,8,uart.PAR_NONE,uart.STOP_1)
 sys.reguart(UART_ID,read)
 pm.wake("factory")
-wake()
+--wake()
