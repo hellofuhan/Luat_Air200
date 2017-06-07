@@ -157,7 +157,9 @@ int platform_rtos_receive(void **ppMessage, u32 timeout);
 
 int platform_rtos_send(PlatformMessage *pMsg);
 
-int platform_rtos_start_timer(int timer_id, int milliSecond);
+int platform_rtos_send_high_priority(PlatformMessage *pMsg);
+
+int platform_rtos_start_timer(int timer_id, int milliSecond, BOOL high);
 
 int platform_rtos_stop_timer(int timer_id);
 

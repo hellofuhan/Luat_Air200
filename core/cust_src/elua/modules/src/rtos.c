@@ -167,7 +167,20 @@ static int l_rtos_timer_start(lua_State *L)
     int ms = luaL_checkinteger(L,2);
     int ret;
 
-    ret = platform_rtos_start_timer(timer_id, ms);
+    ret = platform_rtos_start_timer(timer_id, ms,FALSE);
+
+    lua_pushinteger(L, ret);
+
+    return 1;
+}
+
+static int l_rtos_timer_high_priority_start(lua_State *L)
+{
+    int timer_id = luaL_checkinteger(L,1);
+    int ms = luaL_checkinteger(L,2);
+    int ret;
+
+    ret = platform_rtos_start_timer(timer_id, ms,TRUE);
 
     lua_pushinteger(L, ret);
 
@@ -308,6 +321,7 @@ const LUA_REG_TYPE rtos_map[] =
     //{ LSTRKEY( "send" ), LFUNCVAL( l_rtos_send ) }, //暂不提供send接口
     { LSTRKEY( "sleep" ), LFUNCVAL( l_rtos_sleep ) },
     { LSTRKEY( "timer_start" ), LFUNCVAL( l_rtos_timer_start ) },
+    { LSTRKEY( "timer_high_priority_start" ), LFUNCVAL( l_rtos_timer_high_priority_start ) },
     { LSTRKEY( "timer_stop" ), LFUNCVAL( l_rtos_timer_stop ) },
 /*+\NEW\liweiqiang\2013.4.5\增加rtos.tick接口*/
     { LSTRKEY( "tick" ), LFUNCVAL( l_rtos_tick ) },

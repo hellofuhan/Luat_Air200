@@ -46,6 +46,14 @@ int platform_rtos_send(PlatformMessage *pMsg)
     return PLATFORM_OK;
 }
 
+int platform_rtos_send_high_priority(PlatformMessage *pMsg)
+{
+    IVTBL(send_high_priority_message)(g_LuaShellTaskHandle, (PVOID)pMsg);
+
+    return PLATFORM_OK;
+}
+
+
 int platform_rtos_receive(void **ppMessage, u32 timeout)
 {
     BOOL ret;
@@ -96,7 +104,38 @@ void platform_rtos_timer_callback(T_AMOPENAT_TIMER_PARAMETER *pParameter)
     IVTBL(release_semaphore)(hLuaTimerSem);
 }
 
-int platform_rtos_start_timer(int timer_id, int milliSecond)
+void platform_rtos_timer_high_priority_callback(T_AMOPENAT_TIMER_PARAMETER *pParameter)
+{
+    int timer_id = (int)(pParameter->pParameter);
+    u8 index;    
+    PlatformMessage *pMsg = IVTBL(malloc)(sizeof(PlatformMessage));
+
+    pMsg->id = RTOS_MSG_TIMER;
+    pMsg->data.timer_id = timer_id;
+
+    platform_rtos_send_high_priority(pMsg);
+    
+    IVTBL(wait_semaphore)(hLuaTimerSem, 0);
+
+    for(index = 0; index < MAX_LUA_TIMERS; index++)
+    {
+        if(luaTimerParam[index].hOsTimer == pParameter->hTimer)
+        {
+            if(timer_id != luaTimerParam[index].luaTimerId)
+            {
+                DEBUG_RTOS_TRACE("[platform_rtos_timer_high_priority_callback]: warning dismatch timer %d <-> %d", timer_id, luaTimerParam[index].luaTimerId);
+            }
+            
+            IVTBL(delete_timer)(luaTimerParam[index].hOsTimer);
+            luaTimerParam[index].hOsTimer = OPENAT_INVALID_HANDLE;
+            break;
+        }
+    }
+    
+    IVTBL(release_semaphore)(hLuaTimerSem);
+}
+
+int platform_rtos_start_timer(int timer_id, int milliSecond, BOOL high)
 {
     u8 index;
     HANDLE hTimer = OPENAT_INVALID_HANDLE;
@@ -132,7 +171,7 @@ int platform_rtos_start_timer(int timer_id, int milliSecond)
         goto start_timer_error;
     }
 
-    hTimer = IVTBL(create_timer)(platform_rtos_timer_callback, (PVOID)timer_id);
+    hTimer = IVTBL(create_timer)(high ? platform_rtos_timer_high_priority_callback : platform_rtos_timer_callback, (PVOID)timer_id);
 
     if(OPENAT_INVALID_HANDLE == hTimer)
     {

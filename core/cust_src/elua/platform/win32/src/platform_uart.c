@@ -6,8 +6,8 @@
 #include "platform_rtos.h"
 #include "cycle_queue.h"
 
-#define COM_RX_BUF_SIZE (1024)
-#define COM_TX_BUF_SIZE (1024)
+#define COM_RX_BUF_SIZE (1460)
+#define COM_TX_BUF_SIZE (1460)
 #define COM_NAME_SIZE   (30)
 
 typedef struct ComDevTag
@@ -65,7 +65,7 @@ void simulate_uart_thread(LPVOID lparam)
 {
     ComDev *dev = (ComDev *)lparam;
     DWORD dwCommEvent;
-    uint8 tempbuf[1024];
+    uint8 tempbuf[1460];
     int readsize = 0;
     uint8 *buffer = NULL;
     DWORD dwCount;
@@ -292,7 +292,7 @@ u32 platform_uart_setup( unsigned id, u32 baud, int databits, int parity, int st
     }
 #endif // 0
 
-    SetupComm(dev->hCom, 1024, 1024); //输入缓冲区和输出缓冲区的大小都是1024
+    SetupComm(dev->hCom, 1460, 1460); //输入缓冲区和输出缓冲区的大小都是1024
 
     PurgeComm(dev->hCom, PURGE_TXABORT|PURGE_TXCLEAR|PURGE_RXABORT|PURGE_RXCLEAR);
     
@@ -361,7 +361,51 @@ u32 platform_s_uart_send( unsigned id, u8 data )
     return dwWritten;
 }
 
+u32 platform_s_uart_sync_send( unsigned id, u8 data )
+{
+    ComDev *dev = _find_com_dev(id);
+    DWORD dwWritten = 0;
+    OVERLAPPED overlappedWrite;
+    memset(&overlappedWrite, 0, sizeof(overlappedWrite));
+
+    if(id == platform_get_console_port())
+    {
+        printf("%c", data);
+        return 1;
+    }
+
+    if(dev->hCom == INVALID_HANDLE_VALUE)
+    {
+        return 0;
+    }
+
+    WriteFile(dev->hCom, &data, 1, &dwWritten, &overlappedWrite);
+    return dwWritten;
+}
+
 u32 platform_s_uart_send_buff( unsigned id, const u8 *buff, u16 len )
+{
+    ComDev *dev = _find_com_dev(id);
+
+    if(id == platform_get_console_port())
+    {
+        printf("%s", buff);
+        return len;
+    }
+
+    if(dev->hCom == INVALID_HANDLE_VALUE)
+    {
+        return 0;
+    }
+    
+    QueueInsert(&dev->txq, buff, len);
+
+    ReleaseSemaphore(dev->semWrite, 1, NULL);
+
+    return len;
+}
+
+u32 platform_s_uart_sync_send_buff( unsigned id, const u8 *buff, u16 len )
 {
     ComDev *dev = _find_com_dev(id);
 
@@ -410,7 +454,7 @@ int platform_s_uart_set_flow_control( unsigned id, int type )
 
 int platform_uart_init(void){
     FILE *fset = fopen("set.ini","rb");
-    char buf[1024];
+    char buf[1460];
     static const int id_to_index[] = {
         2,
         1,

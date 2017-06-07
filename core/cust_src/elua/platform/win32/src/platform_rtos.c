@@ -40,6 +40,16 @@ int platform_rtos_send(PlatformMessage *pMsg){
     return PLATFORM_OK;
 }
 
+int platform_rtos_send_high_priority(PlatformMessage *pMsg){
+    MSG msg;
+
+    msg.message = SIMU_RTOS_MSG_ID;
+    msg.wParam = (WPARAM)pMsg;
+    SendToLuaShellMessage(&msg);
+
+    return PLATFORM_OK;
+}
+
 int platform_rtos_receive(void **ppMessage, u32 timeout)
 {
     MSG msg;
@@ -151,7 +161,7 @@ int platform_rtos_receive(void **ppMessage, u32 timeout)
     return ret;
 }
 
-int platform_rtos_start_timer(int timer_id, int milliSecond)
+int platform_rtos_start_timer(int timer_id, int milliSecond, BOOL high)
 {
     win_start_timer(timer_id, milliSecond);
     return 1;

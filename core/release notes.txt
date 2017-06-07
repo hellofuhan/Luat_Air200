@@ -1,3 +1,12 @@
+版本号：Luat_V0013_Air200.lod、Luat_V0013_Air200_SSL.lod、Luat_V0013_Air200_SSL_TTS.lod、Luat_V0013_Air200_TTS1.lod、Luat_V0013_Air200_TTS2.lod、Luat_V0013_Air200_TTS3.lod
+发布时间：2017/6/7 16:01
+修改记录：
+    (1)修正“SSL收到数据时，概率性导致一个新建的socket连接失败”的问题
+    (2)uart的缓冲区大小由1024字节扩大为1460字节
+    (3)新增uart.sync_write接口，串口写数据的同步接口
+
+
+
 版本号：Luat_V0012_Air200.lod、Luat_V0012_Air200_SSL.lod、Luat_V0012_Air200_SSL_TTS.lod
 发布时间：2017/5/23 11:03
 修改记录：

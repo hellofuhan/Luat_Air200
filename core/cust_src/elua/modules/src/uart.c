@@ -98,6 +98,39 @@ static int uart_write( lua_State* L )
   return 1;
 }
 
+// Lua: write( id, string1, [string2], ..., [stringn] )
+static int uart_sync_write( lua_State* L )
+{
+  int id;
+  const char* buf;
+  size_t len;
+  int total = lua_gettop( L ), s;
+  u32 wrote = 0;
+  
+  id = luaL_checkinteger( L, 1 );
+  MOD_CHECK_ID( uart, id );
+  for( s = 2; s <= total; s ++ )
+  {
+    if( lua_type( L, s ) == LUA_TNUMBER )
+    {
+      len = lua_tointeger( L, s );
+      if( ( len < 0 ) || ( len > 255 ) )
+        return luaL_error( L, "invalid number" );
+      wrote += platform_uart_sync_send( id, ( u8 )len );
+    }
+    else
+    {
+      luaL_checktype( L, s, LUA_TSTRING );
+      buf = lua_tolstring( L, s, &len );
+      wrote += platform_uart_send_buff(id, buf, len);
+    }
+  }
+
+  lua_pushinteger(L, wrote);
+  
+  return 1;
+}
+
 static int uart_read( lua_State* L )
 {
   int id, res, mode, issign;
@@ -282,6 +315,7 @@ const LUA_REG_TYPE uart_map[] =
   { LSTRKEY( "close" ),  LFUNCVAL( uart_close ) },
 /*-\NEW\liweiqiang\2013.4.20\增加uart.close接口 */
   { LSTRKEY( "write" ), LFUNCVAL( uart_write ) },
+  { LSTRKEY( "sync_write" ), LFUNCVAL( uart_sync_write ) },
   { LSTRKEY( "read" ), LFUNCVAL( uart_read ) },
   { LSTRKEY( "getchar" ), LFUNCVAL( uart_getchar ) },
   { LSTRKEY( "set_buffer" ), LFUNCVAL( uart_set_buffer ) },

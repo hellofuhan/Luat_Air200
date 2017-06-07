@@ -427,7 +427,8 @@ typedef struct T_AMOPENAT_INTERFACE_VTBL_TAG
     UINT32 (*write_uart)(                                       /* 实际写入长度 */
                             E_AMOPENAT_UART_PORT port,          /* UART 编号 */
                             UINT8* buf,                         /* 写入数据地址 */
-                            UINT32 bufLen                       /* 写入数据长度 */
+                            UINT32 bufLen,                      /* 写入数据长度 */
+                            BOOL bSync                          /* TRUE表示直到UART发送完成才返回 */
                         );
 /*+\NEW\liweiqiang\2014.4.12\增加串口接收中断使能接口 */
     BOOL (*uart_enable_rx_int)(

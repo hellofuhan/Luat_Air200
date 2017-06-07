@@ -147,12 +147,40 @@ u32 platform_uart_send( unsigned id, u8 data )
   return platform_s_uart_send( id, data );
 }
 
+u32 platform_uart_sync_send( unsigned id, u8 data ) 
+{
+#ifdef BUILD_SERMUX
+  if( id >= SERMUX_SERVICE_ID_FIRST && id < SERMUX_SERVICE_ID_FIRST + SERMUX_NUM_VUART )
+  {
+    if( id != uart_service_id_out )
+      platform_s_uart_sync_send( SERMUX_PHYS_ID, id );
+    uart_last_sent = data;
+    if( data == SERMUX_ESCAPE_CHAR || data == SERMUX_FORCE_SID_CHAR || ( data >= SERMUX_SERVICE_ID_FIRST && data <= SERMUX_SERVICE_ID_LAST ) )
+    {
+      platform_s_uart_sync_send( SERMUX_PHYS_ID, SERMUX_ESCAPE_CHAR );
+      platform_s_uart_sync_send( SERMUX_PHYS_ID, data ^ SERMUX_ESCAPE_XOR_MASK );
+      uart_last_sent = SERMUX_ESC_MASK | ( data ^ SERMUX_ESCAPE_XOR_MASK );
+    }
+    else
+      platform_s_uart_sync_send( SERMUX_PHYS_ID, data );
+    uart_service_id_out = id;
+  }
+  else
+#endif // #ifdef BUILD_SERMUX
+  return platform_s_uart_sync_send( id, data );
+}
+
 /*+\NEW\liweiqiang\2013.4.7\修改uart数据发送为buffer方式 */
 u32 platform_uart_send_buff( unsigned id, const u8 *buff, u16 len )
 {
     return platform_s_uart_send_buff(id, buff, len);
 }
 /*-\NEW\liweiqiang\2013.4.7\修改uart数据发送为buffer方式 */
+
+u32 platform_uart_sync_send_buff( unsigned id, const u8 *buff, u16 len )
+{
+    return platform_s_uart_sync_send_buff(id, buff, len);
+}
 
 #ifdef BUF_ENABLE_UART
 static elua_int_c_handler prev_uart_rx_handler;

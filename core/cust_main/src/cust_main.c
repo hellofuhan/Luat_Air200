@@ -986,6 +986,6 @@ static VOID cust_uart_print(CHAR * fmt, ...)
     
     if(len != 0)
     {
-        IVTBL(write_uart)(UART_USED, fmtString, len);
+        IVTBL(write_uart)(UART_USED, fmtString, len, FALSE);
     }
 }
