@@ -2,8 +2,9 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.6
-        支持lib脚本的最小core软件版本号：Luat_V0011_Air200
+        支持lib脚本的最小core软件版本号：Luat_V0013_Air200
         (1)factory.lua：删除此模块
+	(2)update.lua：修改一处注释
     二、demo脚本修改
         (1)default项目：新增factory.lua
 

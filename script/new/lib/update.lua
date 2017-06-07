@@ -421,7 +421,7 @@ end
 ·µ»ØÖµ£ºÎÞ
 ]]
 function setperiod(prd)
-	base.assert(prd==0 or prd>=60,"undefine PROJECT or VERSION in main.lua")
+	base.assert(prd==0 or prd>=60,"setperiod prd error")
 	print("setperiod",prd)
 	period = prd
 	if prd==0 then
