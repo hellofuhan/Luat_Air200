@@ -1,6 +1,6 @@
 ﻿
 注：对Luat_Air200相关文档的描述，请点开：
-http://www.luam2m.com/forum.php?mod=post&action=edit&fid=84&tid=2479&pid=6502&page=1
+http://www.luam2m.com/forum.php?mod=viewthread&tid=2479&page=1&extra=#pid6502
 
 
 20170221：
@@ -96,3 +96,11 @@ http://www.luam2m.com/forum.php?mod=post&action=edit&fid=84&tid=2479&pid=6502&pa
 
 20170517：
 更新：Air200模块AT命令手册V2.8 更新为 V2.9
+
+20170602：
+更新：Air200模块AT命令手册V2.9 更新为 V3.0
+      Air200开发板新手入门指导V1.4 更新为 V1.5
+      Air200_硬件设计手册_V2.2 升级为 V2.3
+删除：Air200_Reference Design_20170403
+增加: Air200电池供电低功耗参考设计_20170602.pdf
+      Air200外部电源供电参考设计_20170602.pdf
