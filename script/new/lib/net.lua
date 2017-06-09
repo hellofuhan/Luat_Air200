@@ -332,6 +332,7 @@ function startquerytimer() end
 返回值：无
 ]]
 local function simind(para)
+	print("simind",simerrsta,para)
 	if simerrsta ~= (para~="RDY") then
 		simerrsta = (para~="RDY")
 		procled()
@@ -615,6 +616,8 @@ function procled()
 		--飞行模式
 		if flymode then
 			newstate,newontime,newofftime = "FLYMODE",ledflymodeon,ledflymodeoff
+		elseif simerrsta then
+			newstate,newontime,newofftime = "SIMERR",ledsimerron,ledsimerroff
 		--用户socket连接到了后台
 		elseif usersckconnect then
 			newstate,newontime,newofftime = "SCK",ledsckon,ledsckoff
@@ -623,9 +626,7 @@ function procled()
 			newstate,newontime,newofftime = "CGATT",ledcgatton,ledcgattoff
 		--注册上GSM网络
 		elseif state=="REGISTERED" then
-			newstate,newontime,newofftime = "CREG",ledcregon,ledcregoff
-		elseif simerrsta then
-			newstate,newontime,newofftime = "SIMERR",ledsimerron,ledsimerroff
+			newstate,newontime,newofftime = "CREG",ledcregon,ledcregoff		
 		end
 		--指示灯状态发生变化
 		if newstate~=ledstate then

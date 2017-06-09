@@ -159,17 +159,17 @@ end
 ]]
 function reqend(suc)
 	print("reqend",suc)
-	if not suc then
-		local tmpcb=usercb
-		usercb=nil
-		sys.timer_stop(tmoutfnc)
-		if tmpcb then tmpcb(4) end
-	end
 	--停止重试定时器
 	sys.timer_stop(retry)
 	--断开链接
 	link.close(lid)
 	linksta = false
+	if not suc then
+		local tmpcb=usercb
+		usercb=nil
+		sys.timer_stop(tmoutfnc)
+		if tmpcb then tmpcb(4) end
+	end	
 end
 
 --[[

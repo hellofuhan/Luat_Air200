@@ -642,7 +642,7 @@ local function shutcnf(result)
 	shuting = false
 	if ipstatusind then sys.dispatch("IP_SHUTING_IND",false) end
 	--关闭成功
-	if result == "SHUT OK" then
+	if result == "SHUT OK" or not sim.getstatus() then
 		setIPStatus("IP INITIAL")
 		--断开所有socket连接，不清除socket参数信息
 		for i = 0,MAXLINKS do
