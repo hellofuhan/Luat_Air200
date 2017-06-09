@@ -104,3 +104,6 @@ http://www.luam2m.com/forum.php?mod=viewthread&tid=2479&page=1&extra=#pid6502
 删除：Air200_Reference Design_20170403
 增加: Air200电池供电低功耗参考设计_20170602.pdf
       Air200外部电源供电参考设计_20170602.pdf
+
+20170609：
+更新：lua扩展库V1.3 更新 为V1.4，更新tick时长
