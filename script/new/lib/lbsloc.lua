@@ -24,9 +24,9 @@ local slen,sbyte,ssub,srep = string.len,string.byte,string.sub,string.rep
 local PROTOCOL,SERVER,PORT = "UDP","bs.openluat.com","12411"
 
 --GET命令等待时间
-local CMD_GET_TIMEOUT = 2000
+local CMD_GET_TIMEOUT = 5000
 --错误包(格式不对) 在一段时间后进行重新获取
-local ERROR_PACK_TIMEOUT = 2000
+local ERROR_PACK_TIMEOUT = 5000
 -- 每次GET命令重试次数
 local CMD_GET_RETRY_TIMES = 3
 --socket id
@@ -287,7 +287,7 @@ end
 参数  ：
         cb：获取到经纬度或者超时后的回调函数，调用形式为：cb(result,lat,lng,location)		
 		locstr：是否支持位置字符串返回，true支持，false或者nil不支持，默认不支持
-		tmout：获取经纬度超时时间，单位秒，默认20秒
+		tmout：获取经纬度超时时间，单位秒，默认25秒
 返回值：无
 ]]
 function request(cb,locstr,tmout)
@@ -298,6 +298,6 @@ function request(cb,locstr,tmout)
 		link.connect(lid,PROTOCOL,SERVER,PORT)
 		linksta = true
 	end
-	sys.timer_start(tmoutfnc,(tmout or 20)*1000)
+	sys.timer_start(tmoutfnc,(tmout and tmout*1000 or ((CMD_GET_RETRY_TIMES+2)*CMD_GET_TIMEOUT)))
 	usercb,userlocstr = cb,locstr
 end
