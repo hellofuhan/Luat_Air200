@@ -5,6 +5,8 @@
         支持lib脚本的最小core软件版本号：Luat_V0013_Air200
         (1)lbsloc.lua：超时重试间隔由2秒修改为5秒
         (2)sys.lua：修改timer_start接口参数非法时的重启注释
+    二、demo脚本修改
+        (1)所有项目：添加“S3开发板require"wdt"”的代码注释
 
 
 
