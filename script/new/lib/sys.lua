@@ -138,7 +138,8 @@ end
 ]]
 function timer_start(fnc,ms,...)
 	--回调函数和时长必须有效，否则死机重启
-	assert(fnc~=nil and ms>0,"timer_start:callback function == nil")
+	assert(fnc~=nil,"timer_start:callback function==nil")
+	assert(ms>0,"timer_start:ms==0")
 	--关闭完全相同的定时器
 	if arg.n == 0 then
 		timer_stop(fnc)

@@ -40,7 +40,7 @@ local function pin23set()
 	pins.set(pin23flg,pincfg.PIN23)
 	pin23flg = not pin23flg
 end
---启动1秒的循环定时器，设置PIN22引脚的输出电平
+--启动1秒的循环定时器，设置PIN23引脚的输出电平
 sys.timer_loop_start(pin23set,1000)
 -------------------------PIN23测试结束-------------------------
 
@@ -56,6 +56,6 @@ local function pin20get()
 	local v = pins.get(pincfg.PIN20)
 	print("pin20get",v and "low" or "high")
 end
---启动1秒的循环定时器，读取PIN22引脚的输入电平
+--启动1秒的循环定时器，读取PIN20引脚的输入电平
 sys.timer_loop_start(pin20get,1000)
 -------------------------PIN20测试结束-------------------------
