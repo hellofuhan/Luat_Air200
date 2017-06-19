@@ -365,6 +365,7 @@ int luaopen_rtos( lua_State *L )
     MOD_REG_NUMBER(L, "MSG_TIMER", RTOS_MSG_TIMER);
     MOD_REG_NUMBER(L, "MSG_KEYPAD", RTOS_MSG_KEYPAD);
     MOD_REG_NUMBER(L, "MSG_UART_RXDATA", RTOS_MSG_UART_RX_DATA);
+    MOD_REG_NUMBER(L, "MSG_UART_TX_DONE", RTOS_MSG_UART_TX_DONE);
 /*+\NEW\liweiqiang\2013.4.5\增加lua gpio 中断配置*/
     MOD_REG_NUMBER(L, "MSG_INT", RTOS_MSG_INT);
 /*-\NEW\liweiqiang\2013.4.5\增加lua gpio 中断配置*/

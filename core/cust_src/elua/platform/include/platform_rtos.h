@@ -98,6 +98,7 @@ typedef enum PlatformMsgIdTag
     RTOS_MSG_WAIT_MSG_TIMEOUT, // receive message timeout
     RTOS_MSG_TIMER,
     RTOS_MSG_UART_RX_DATA,
+    RTOS_MSG_UART_TX_DONE,
     RTOS_MSG_KEYPAD,
 /*+\NEW\liweiqiang\2013.4.5\‘ˆº”lua gpio ÷–∂œ≈‰÷√*/
     RTOS_MSG_INT,             

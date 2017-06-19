@@ -54,7 +54,7 @@ void cmn_platform_init()
     if(CON_UART_ID < SERMUX_SERVICE_ID_FIRST)
     {
         // Setup console UART
-        platform_uart_setup( CON_UART_ID, CON_UART_SPEED, 8, PLATFORM_UART_PARITY_NONE, PLATFORM_UART_STOPBITS_1, 1 );  
+        platform_uart_setup( CON_UART_ID, CON_UART_SPEED, 8, PLATFORM_UART_PARITY_NONE, PLATFORM_UART_STOPBITS_1, 1, 0 );  
         //platform_uart_set_flow_control( CON_UART_ID, CON_FLOW_TYPE );
         //platform_uart_set_buffer( CON_UART_ID, CON_BUF_SIZE );
     }

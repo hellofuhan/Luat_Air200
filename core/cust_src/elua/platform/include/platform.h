@@ -155,7 +155,7 @@ enum
 // The platform UART functions
 int platform_uart_exists( unsigned id );
 /*+\NEW\liweiqiang\2013.4.22\增加uart消息提示或者轮询读取数据选择 */
-u32 platform_uart_setup( unsigned id, u32 baud, int databits, int parity, int stopbits, u32 mode );
+u32 platform_uart_setup( unsigned id, u32 baud, int databits, int parity, int stopbits, u32 mode, u32 txDoneReport);
 /*-\NEW\liweiqiang\2013.4.22\增加uart消息提示或者轮询读取数据选择 */
 /*+\NEW\liweiqiang\2013.4.20\增加uart.close接口 */
 u32 platform_uart_close( unsigned id );

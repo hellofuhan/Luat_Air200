@@ -195,7 +195,7 @@ void simulate_uart_write_thread(LPVOID lparam)
     }
 }
 
-u32 platform_uart_setup( unsigned id, u32 baud, int databits, int parity, int stopbits, u32 mode )
+u32 platform_uart_setup( unsigned id, u32 baud, int databits, int parity, int stopbits, u32 mode, u32 txDoneReport)
 {      
     ComDev *dev = _find_com_dev(id);
     DCB dcb;

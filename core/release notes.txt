@@ -1,3 +1,10 @@
+版本号：Luat_V0014_Air200.lod、Luat_V0014_Air200_SSL.lod、Luat_V0014_Air200_SSL_TTS.lod、Luat_V0014_Air200_TTS1.lod、Luat_V0014_Air200_TTS2.lod、Luat_V0014_Air200_TTS3.lod
+发布时间：2017/6/19 15:00
+修改记录：
+    (1)支持“产线的快速校准”功能
+
+
+
 版本号：Luat_V0013_Air200.lod、Luat_V0013_Air200_SSL.lod、Luat_V0013_Air200_SSL_TTS.lod、Luat_V0013_Air200_TTS1.lod、Luat_V0013_Air200_TTS2.lod、Luat_V0013_Air200_TTS3.lod
 发布时间：2017/6/7 16:01
 修改记录：

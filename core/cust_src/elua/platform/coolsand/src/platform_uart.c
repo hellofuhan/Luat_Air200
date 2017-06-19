@@ -157,11 +157,19 @@ static char debugStdoutBuffer[128];//openat½Ó¿ÚµÄprint½Ó¿Úbuff×î´óÎª127×Ö½ÚÓëÆäÍ
 /*-\NEW\liweiqiang\2013.4.7\ÓÅ»¯debug¿ÚÊä³ö*/
 static UINT16 debugStdoutCachedCount = 0;
 
-static void sendUartMessage(int uart_id)
+static void sendUartMessage(int uart_id, E_OPENAT_DRV_EVT event_id)
 {
     PlatformMessage *pMsg = IVTBL(malloc)(sizeof(PlatformMessage));
 
-    pMsg->id = RTOS_MSG_UART_RX_DATA;
+    if(event_id == OPENAT_DRV_EVT_UART_RX_DATA_IND)
+    {
+        pMsg->id = RTOS_MSG_UART_RX_DATA;
+    }
+    else if(event_id == OPENAT_DRV_EVT_UART_TX_DONE_IND)
+    {
+        pMsg->id = RTOS_MSG_UART_TX_DONE;
+    }
+    
     pMsg->data.uart_id = uart_id;
 
     platform_rtos_send(pMsg);
@@ -217,19 +225,26 @@ static void uart_message_handle(uint8 id, T_AMOPENAT_UART_MESSAGE* evt)
 /*+\NEW\liweiqiang\2013.4.7\ÓÅ»¯uart/atcÊı¾İ½ÓÊÕÏûÏ¢ÌáÊ¾,±ÜÃâ·¢ÏûÏ¢¹ıÓÚÆµ·±µ¼ÖÂÏµÍ³ÎŞ·¨ÏìÓ¦ */
     BOOL needMsg = FALSE; // bufferÊÇ¿ÕµÄÊ±ºò,·ÅÈëÊı¾İ²ÅĞèÒª×÷ÌáÊ¾
 
-    length = IVTBL(read_uart)(phyid, uartPhyContext[phyid].temprxbuff, evt->param.dataLen, 0);
-
-    if(length != 0)
+    if(evt->evtId == OPENAT_DRV_EVT_UART_RX_DATA_IND)
     {
-        needMsg = uartPhyContext[phyid].rxqueue.empty ? TRUE : FALSE;
-        
-        // ´Ë´¦ºóĞø×îºÃ¼ÓÉÏ±£»¤,Ğ´Èë»º³åÔÚuartÖĞ¶Ï,¶ÁÈ¡Êı¾İÔÚlua shellÏß³Ì
-        QueueInsert(&uartPhyContext[phyid].rxqueue, uartPhyContext[phyid].temprxbuff, length);
+        length = IVTBL(read_uart)(phyid, uartPhyContext[phyid].temprxbuff, evt->param.dataLen, 0);
+
+        if(length != 0)
+        {
+            needMsg = uartPhyContext[phyid].rxqueue.empty ? TRUE : FALSE;
+            
+            // ´Ë´¦ºóĞø×îºÃ¼ÓÉÏ±£»¤,Ğ´Èë»º³åÔÚuartÖĞ¶Ï,¶ÁÈ¡Êı¾İÔÚlua shellÏß³Ì
+            QueueInsert(&uartPhyContext[phyid].rxqueue, uartPhyContext[phyid].temprxbuff, length);
+        }
+
+        if(needMsg)
+        {
+            sendUartMessage(id, evt->evtId);
+        }
     }
-
-    if(needMsg)
+    else if(evt->evtId == OPENAT_DRV_EVT_UART_TX_DONE_IND)
     {
-        sendUartMessage(id);
+        sendUartMessage(id, evt->evtId);
     }
 /*-\NEW\liweiqiang\2013.4.7\ÓÅ»¯uart/atcÊı¾İ½ÓÊÕÏûÏ¢ÌáÊ¾,±ÜÃâ·¢ÏûÏ¢¹ıÓÚÆµ·±µ¼ÖÂÏµÍ³ÎŞ·¨ÏìÓ¦ */
 }
@@ -271,7 +286,7 @@ static void host_uart_recv(UINT8 *data, UINT32 length)
 
     if(needMsg)
     {
-        sendUartMessage(3);
+        sendUartMessage(3, OPENAT_DRV_EVT_UART_RX_DATA_IND);
     }
 }
 /*-\NEW\liweiqiang\2014.1.2\host uart ID 0xA2Êı¾İÍ¸´«Ö§³Ö */
@@ -288,7 +303,7 @@ static void host_uart_recv(UINT8 *data, UINT32 length)
  * Description: ´ò¿ª´®¿Ú
  *
  ****************************************************************************/
-static u32 uart_phy_open( unsigned id, u32 baud, int databits, int parity, int stopbits, u32 mode )
+static u32 uart_phy_open( unsigned id, u32 baud, int databits, int parity, int stopbits, u32 mode, u32 txDoneReport)
 {
     T_AMOPENAT_UART_PARAM uartParam;
     
@@ -391,6 +406,8 @@ static u32 uart_phy_open( unsigned id, u32 baud, int databits, int parity, int s
         }
     }
 
+    uartParam.txDoneReport = txDoneReport;
+    
     if(TRUE == IVTBL(config_uart)(PHY_PORT(id), &uartParam))
     {
         uartContext[id].opened = 1;
@@ -591,7 +608,7 @@ void RILAPI_ReceiveData(void *data, int len)
 
     if(needMsg)
     {
-        sendUartMessage(PLATFORM_UART_ID_ATC);
+        sendUartMessage(PLATFORM_UART_ID_ATC, OPENAT_DRV_EVT_UART_RX_DATA_IND);
     }
 /*-\NEW\liweiqiang\2013.4.7\ÓÅ»¯uart/atcÊı¾İ½ÓÊÕÏûÏ¢ÌáÊ¾,±ÜÃâ·¢ÏûÏ¢¹ıÓÚÆµ·±µ¼ÖÂÏµÍ³ÎŞ·¨ÏìÓ¦ */
 }
@@ -602,7 +619,7 @@ void platform_setup_vat_queue(void)
     hAtcReadSem = IVTBL(create_semaphore)(1);
 }
 
-u32 platform_uart_setup( unsigned id, u32 baud, int databits, int parity, int stopbits, u32 mode )
+u32 platform_uart_setup( unsigned id, u32 baud, int databits, int parity, int stopbits, u32 mode, u32 txDoneReport)
 {      
     u32 ret = baud;
 
@@ -617,7 +634,7 @@ u32 platform_uart_setup( unsigned id, u32 baud, int databits, int parity, int st
     }    
     else
     {
-        ret = uart_phy_open(id, baud, databits, parity, stopbits, mode);
+        ret = uart_phy_open(id, baud, databits, parity, stopbits, mode, txDoneReport);
     }
 
     return ret;

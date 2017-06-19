@@ -81,7 +81,7 @@ typedef enum
 
   /* UART event */
   OPENAT_DRV_EVT_UART_RX_DATA_IND,
-
+  OPENAT_DRV_EVT_UART_TX_DONE_IND,
   /* ALARM event */
   OPENAT_DRV_EVT_ALARM_IND,
 
@@ -761,6 +761,7 @@ typedef struct
   E_AMOPENAT_UART_PARITY   parity;
   E_AMOPENAT_UART_FLOWCTL  flowControl;
   PUART_MESSAGE            uartMsgHande; /*串口接受到数据主动上报。可以为NULL，即使用阻塞方式读取*/
+  BOOL                     txDoneReport;
 }T_AMOPENAT_UART_PARAM;
 
 /*+\NEW\liweiqiang\2013.12.25\添加host uart发送数据功能 */

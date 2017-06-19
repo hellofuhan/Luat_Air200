@@ -437,6 +437,11 @@ typedef struct T_AMOPENAT_INTERFACE_VTBL_TAG
                                 );
 /*-\NEW\liweiqiang\2014.4.12\增加串口接收中断使能接口 */
 
+/*+\NEW\zhuwangbin\2017.3.10\AIR200 项目添加uart1全pin脚功能*/
+#ifdef PRO_AIR200_VERSION
+	void (*uart1_all_pin_set)(void);
+#endif
+/*+\NEW\zhuwangbin\2017.3.10\AIR200 项目添加uart1全pin脚功能*/
 
 /*+\NEW\liweiqiang\2013.12.25\添加host uart发送数据功能 */
     /****************************** HOST ******************************/
@@ -1024,8 +1029,9 @@ typedef struct T_AMOPENAT_INTERFACE_VTBL_TAG
 /*-\NEW\WZQ\2014.11.7\加入18030字库*/
 
     int (*get_env_usage)(void );
-
+/*+:\NewReq\brezen\2017.2.22\lua加密 */	
     void (*decode)(UINT32* data, INT32 len);
+/*-:\NewReq\brezen\2017.2.22\lua加密 */	
 }T_AMOPENAT_INTERFACE_VTBL;
 
 /*+\BUG WM-656\lifei\2013.03.07\[OpenAT] 修改cust区域检查条件*/

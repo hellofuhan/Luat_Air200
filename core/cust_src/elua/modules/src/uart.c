@@ -27,7 +27,7 @@ static int uart_setup( lua_State* L )
   unsigned id, databits, parity, stopbits;
   u32 baud, res;
   u32 mode;
-  
+  u32 txDoneReport;
   id = luaL_checkinteger( L, 1 );
   MOD_CHECK_ID( uart, id );
   if( id >= SERMUX_SERVICE_ID_FIRST && id != PLATFORM_UART_ID_ATC)
@@ -39,7 +39,10 @@ static int uart_setup( lua_State* L )
   /*+\NEW\liweiqiang\2013.4.22\增加uart消息提示或者轮询读取数据选择 */
   mode = lua_tointeger(L, 6);
   /*-\NEW\liweiqiang\2013.4.22\增加uart消息提示或者轮询读取数据选择 */
-  res = platform_uart_setup( id, baud, databits, parity, stopbits, mode );
+
+  txDoneReport = lua_tointeger(L, 7);
+  
+  res = platform_uart_setup( id, baud, databits, parity, stopbits, mode, txDoneReport);
 
   if(res != baud)
   {
