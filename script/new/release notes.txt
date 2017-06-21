@@ -1,8 +1,17 @@
+发布时间：2017/6/21 10:59
+修改记录：
+    一、lib脚本修改
+        lib脚本版本号：2.1.9
+        支持lib脚本的最小core软件版本号：Luat_V0015_Air200
+        (1)sys.lua：新增reguartx接口，可注册uart发送数据完成的回调函数
+
+
+
 发布时间：2017/6/19 13:14
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.8
-        支持lib脚本的最小core软件版本号：Luat_V0013_Air200
+        支持lib脚本的最小core软件版本号：Luat_V0014_Air200
         (1)lbsloc.lua：超时重试间隔由2秒修改为5秒
         (2)sys.lua：修改timer_start接口参数非法时的重启注释
     二、demo脚本修改

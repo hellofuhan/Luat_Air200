@@ -61,6 +61,7 @@ static int handle_msg(lua_State *L, PlatformMessage *pMsg)
         break;
 
     case RTOS_MSG_UART_RX_DATA:
+    case RTOS_MSG_UART_TX_DONE:
         lua_pushinteger(L, pMsg->id);
         lua_pushinteger(L, pMsg->data.uart_id);
         ret = 2;

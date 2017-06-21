@@ -25,9 +25,9 @@ local assert = base.assert
 local tonumber = base.tonumber
 
 --lib脚本版本号，只要lib中的任何一个脚本做了修改，都需要更新此版本号
-SCRIPT_LIB_VER = "2.1.8"
+SCRIPT_LIB_VER = "2.1.9"
 --支持lib脚本的最小core软件版本号
-CORE_MIN_VER = "Luat_V0014_Air200"
+CORE_MIN_VER = "Luat_V0015_Air200"
 
 --“是否需要刷新界面”的标志，有GUI的项目才会用到此标志
 local refreshflag = false
@@ -664,6 +664,9 @@ end
 --各个物理串口的数据接收处理函数表
 local uartprocs = {}
 
+--各个物理串口的数据发送完成通知函数表
+local uartxprocs = {}
+
 --[[
 函数名：reguart
 功能  ：注册物理串口的数据接收处理函数
@@ -674,6 +677,18 @@ local uartprocs = {}
 ]] 
 function reguart(id,fnc)
 	uartprocs[id] = fnc
+end
+
+--[[
+函数名：reguartx
+功能  ：注册物理串口的数据发送完成处理函数
+参数  ：
+		id：物理串口号，1表示UART1，2表示UART2
+		fnc：数据接收处理函数名
+返回值：无
+]] 
+function reguartx(id,fnc)
+	uartxprocs[id] = fnc
 end
 
 --[[
@@ -718,6 +733,11 @@ function run()
 					else
 						handlers[msg.id](msg)
 					end
+				--串口发送数据完成消息
+				elseif msg.id == rtos.MSG_UART_TX_DONE then
+					if uartxprocs[msgpara] then
+						uartxprocs[msgpara]()				
+					end
 				--其他消息（音频消息、充电管理消息、按键消息等）
 				else
 					handlers[msg.id](msg)
@@ -740,6 +760,11 @@ function run()
 					else
 						handlers[msg](msg,msgpara)
 					end
+				end
+			--串口发送数据完成消息
+			elseif msg == rtos.MSG_UART_TX_DONE then
+				if uartxprocs[msgpara] then
+					uartxprocs[msgpara]()				
 				end
 			end
 		end
