@@ -314,6 +314,7 @@ function connect(id,protocol,address,port)
 	if validaction(id,"CONNECT") == false or linklist[id].state == "CONNECTED" then
 		return false
 	end
+	print("link.connect",id,protocol,address,port,ipstatus,shuting,shutpending)
 
 	linklist[id].state = "CONNECTING"
 
@@ -326,7 +327,7 @@ function connect(id,protocol,address,port)
 
 	local connstr = string.format("AT+CIPSTART=%d,\"%s\",\"%s\",%s",id,protocol,address,port)
 
-	if (ipstatus ~= "IP STATUS" and ipstatus ~= "IP PROCESSING") or shuting then
+	if (ipstatus ~= "IP STATUS" and ipstatus ~= "IP PROCESSING") or shuting or shutpending then
 		--ip环境未准备好先加入等待
 		linklist[id].pending = connstr
 	else

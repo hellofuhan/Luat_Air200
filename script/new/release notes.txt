@@ -8,7 +8,9 @@
 		修正“dbg模块不能上报sys.restart原因值”的问题
 		加快Lua内存自动回收速度
         (2)dbg.lua：修改重启接口的提示前缀
-        (3)link.lua：新增setiperrcb接口，可设置激活IP数据网络超时失败后的回调函数
+        (3)link.lua：
+		新增setiperrcb接口，可设置激活IP数据网络超时失败后的回调函数
+		修正“dbg模块、update模块、ntp模块和用户应用socket重连时”的冲突问题
 
 
 发布时间：2017/6/19 13:14
