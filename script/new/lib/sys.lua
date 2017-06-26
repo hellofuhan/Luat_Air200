@@ -323,7 +323,7 @@ end
 返回值：LIB_ERR_FILE文件中的错误信息
 ]]
 function getextliberr()
-	return extliberr
+	return extliberr or (readtxt(LIB_ERR_FILE) or "")
 end
 
 --[[
@@ -388,6 +388,7 @@ end
 function init(mode,lprfnc)
 	--用户应用脚本中必须定义PROJECT和VERSION两个全局变量，否则会死机重启，如何定义请参考各个demo中的main.lua
 	assert(base.PROJECT and base.PROJECT ~= "" and base.VERSION and base.VERSION ~= "","Undefine PROJECT or VERSION")
+	base.collectgarbage("setpause",80)
 	require"net"
 	--设置AT命令的虚拟串口
 	uart.setup(uart.ATC,0,0,uart.PAR_NONE,uart.STOP_1)

@@ -3,8 +3,12 @@
     一、lib脚本修改
         lib脚本版本号：2.1.9
         支持lib脚本的最小core软件版本号：Luat_V0015_Air200
-        (1)sys.lua：新增reguartx接口，可注册uart发送数据完成的回调函数
-
+        (1)sys.lua：
+		新增reguartx接口，可注册uart发送数据完成的回调函数
+		修正“dbg模块不能上报sys.restart原因值”的问题
+		加快Lua内存自动回收速度
+        (2)dbg.lua：修改重启接口的提示前缀
+        (3)link.lua：新增setiperrcb接口，可设置激活IP数据网络超时失败后的回调函数
 
 
 发布时间：2017/6/19 13:14
