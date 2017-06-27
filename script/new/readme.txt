@@ -78,6 +78,8 @@ uart_prot1项目：通过uart解析外围设备输入的一种报文（起始标志，长度，指令，数据，
 
 update\Luat_iot_server：使用Luat物联云平台进行固件升级的demo项目
 
+update\Luat_iot_server_daemon：支持Luat物联云平台进行远程升级以及调试信息上报功能
+
 update\user_server：使用用户自己的后台进行固件升级的demo项目
 
 wdt：开启开发板上的硬件看门狗功能项目

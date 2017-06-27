@@ -11,6 +11,8 @@
         (3)link.lua：
 		新增setiperrcb接口，可设置激活IP数据网络超时失败后的回调函数
 		修正“dbg模块、update模块、ntp模块和用户应用socket重连时”的冲突问题
+    二、demo脚本修改
+        (1)新增update\Luat_iot_server_daemon的demo：支持iot后台的远程升级以及调试信息上报功能
 
 
 发布时间：2017/6/19 13:14
