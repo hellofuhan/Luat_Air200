@@ -361,51 +361,7 @@ u32 platform_s_uart_send( unsigned id, u8 data )
     return dwWritten;
 }
 
-u32 platform_s_uart_sync_send( unsigned id, u8 data )
-{
-    ComDev *dev = _find_com_dev(id);
-    DWORD dwWritten = 0;
-    OVERLAPPED overlappedWrite;
-    memset(&overlappedWrite, 0, sizeof(overlappedWrite));
-
-    if(id == platform_get_console_port())
-    {
-        printf("%c", data);
-        return 1;
-    }
-
-    if(dev->hCom == INVALID_HANDLE_VALUE)
-    {
-        return 0;
-    }
-
-    WriteFile(dev->hCom, &data, 1, &dwWritten, &overlappedWrite);
-    return dwWritten;
-}
-
 u32 platform_s_uart_send_buff( unsigned id, const u8 *buff, u16 len )
-{
-    ComDev *dev = _find_com_dev(id);
-
-    if(id == platform_get_console_port())
-    {
-        printf("%s", buff);
-        return len;
-    }
-
-    if(dev->hCom == INVALID_HANDLE_VALUE)
-    {
-        return 0;
-    }
-    
-    QueueInsert(&dev->txq, buff, len);
-
-    ReleaseSemaphore(dev->semWrite, 1, NULL);
-
-    return len;
-}
-
-u32 platform_s_uart_sync_send_buff( unsigned id, const u8 *buff, u16 len )
 {
     ComDev *dev = _find_com_dev(id);
 

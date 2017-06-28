@@ -162,15 +162,11 @@ u32 platform_uart_close( unsigned id );
 /*-\NEW\liweiqiang\2013.4.20\增加uart.close接口 */
 int platform_uart_set_buffer( unsigned id, unsigned size );
 u32 platform_uart_send( unsigned id, u8 data );
-u32 platform_uart_sync_send( unsigned id, u8 data ) ;
 u32 platform_s_uart_send( unsigned id, u8 data );
-u32 platform_s_uart_sync_send( unsigned id, u8 data );
 /*+\NEW\liweiqiang\2013.4.7\修改uart数据发送为buffer方式 */
 u32 platform_uart_send_buff( unsigned id, const u8 *buff, u16 len );
 u32 platform_s_uart_send_buff( unsigned id, const u8 *buff, u16 len );
 /*-\NEW\liweiqiang\2013.4.7\修改uart数据发送为buffer方式 */
-u32 platform_uart_sync_send_buff( unsigned id, const u8 *buff, u16 len );
-u32 platform_s_uart_sync_send_buff( unsigned id, const u8 *buff, u16 len );
 int platform_uart_recv( unsigned id, unsigned timer_id, s32 timeout );
 int platform_s_uart_recv( unsigned id, s32 timeout );
 int platform_uart_set_flow_control( unsigned id, int type );

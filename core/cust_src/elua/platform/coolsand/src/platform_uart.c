@@ -467,29 +467,7 @@ static u32 uart_phy_write(u8 id, uint8 *data_p, uint16 length)
     }
 /*-\NEW\liweiqiang\2014.1.2\host uart ID 0xA2数据透传支持 */
     
-    return IVTBL(write_uart)(PHY_PORT(id), data_p, length, FALSE);
-}
-
-static u32 uart_phy_sync_write(u8 id, uint8 *data_p, uint16 length)
-{
-    /*begin\NEW\zhutianhua\2017.2.28 13:53\新增rtos.set_trace接口，可控制是否输出Lua的trace*/
-    if (id>=NUM_UART)
-    {
-        return 0;
-    }
-    /*end\NEW\zhutianhua\2017.2.28 13:53\新增rtos.set_trace接口，可控制是否输出Lua的trace*/
-    if(!uartContext[id].opened)
-        return 0;
-
-/*+\NEW\liweiqiang\2014.1.2\host uart ID 0xA2数据透传支持 */
-    if(PHY_PORT(id) == OPENAT_UART_3 && uartContext[id].workmode == 2)
-    {
-        IVTBL(host_send_data)(data_p, length);
-        return length;
-    }
-/*-\NEW\liweiqiang\2014.1.2\host uart ID 0xA2数据透传支持 */
-    
-    return IVTBL(write_uart)(PHY_PORT(id), data_p, length,TRUE);
+    return IVTBL(write_uart)(PHY_PORT(id), data_p, length);
 }
 
 static u32 uart_phy_read(u8 id, uint8 *data_p, uint16 length, u32 timeout)
@@ -676,28 +654,6 @@ u32 platform_s_uart_send( unsigned id, u8 data )
     return ret;
 }
 
-u32 platform_s_uart_sync_send( unsigned id, u8 data )
-{
-    u32 ret = 1;
-    
-    if(PLATFORM_UART_ID_ATC == id)
-    {
-        IVTBL(send_at_command)(&data, 1);
-    }
-    else if(PLATFORM_PORT_ID_DEBUG == id)
-    {
-/*+\NEW\liweiqiang\2013.4.7\优化debug口输出*/
-        debugPortWrite(&data, 1);
-/*-\NEW\liweiqiang\2013.4.7\优化debug口输出*/
-    }
-    else
-    {
-        return uart_phy_sync_write(id, &data, 1);
-    }
-
-    return ret;
-}
-
 /*+\NEW\liweiqiang\2013.4.7\修改uart数据发送为buffer方式 */
 u32 platform_s_uart_send_buff( unsigned id, const u8 *buff, u16 len )
 {
@@ -719,26 +675,6 @@ u32 platform_s_uart_send_buff( unsigned id, const u8 *buff, u16 len )
     return ret;
 }
 /*-\NEW\liweiqiang\2013.4.7\修改uart数据发送为buffer方式 */
-
-u32 platform_s_uart_sync_send_buff( unsigned id, const u8 *buff, u16 len )
-{
-    u32 ret = len;
-    
-    if(PLATFORM_UART_ID_ATC == id)
-    {
-        IVTBL(send_at_command)((UINT8*)buff, len);
-    }
-    else if(PLATFORM_PORT_ID_DEBUG == id)
-    {
-        debugPortWrite(buff, len);
-    }
-    else
-    {
-        return uart_phy_sync_write(id, (uint8 *)buff, len);
-    }
-
-    return ret;
-}
 
 /* 兼容旧版本的sleep接口 */
 void platform_os_sleep(u32 ms)

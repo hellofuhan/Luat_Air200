@@ -1,7 +1,9 @@
 版本号：Luat_V0015_Air200.lod、Luat_V0015_Air200_SSL.lod、Luat_V0015_Air200_SSL_TTS.lod、Luat_V0015_Air200_TTS1.lod、Luat_V0015_Air200_TTS2.lod、Luat_V0015_Air200_TTS3.lod
-发布时间：2017/6/21 11:00
+发布时间：2017/6/28 11:00
 修改记录：
     (1)新增“串口发送数据结束的异步通知”功能
+    (2)删除uart.sync_write接口
+    (3)修正“写文件后立即重启会概率性死机”的问题
 
 
 
