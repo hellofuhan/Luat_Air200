@@ -111,3 +111,6 @@ http://www.luam2m.com/forum.php?mod=viewthread&tid=2479&page=1&extra=#pid6502
 
 20170626：
 更新：Lua扩展库文件V1.4 更新为V1.5。增加扩展库的使用方法。
+
+20170628:
+更新：Air200模块AT命令手册V3.0 升级成 V3.1
