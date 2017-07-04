@@ -114,3 +114,7 @@ http://www.luam2m.com/forum.php?mod=viewthread&tid=2479&page=1&extra=#pid6502
 
 20170628:
 更新：Air200模块AT命令手册V3.0 升级成 V3.1
+
+20170703：
+更新：Air200_硬件设计手册_V2.4 更新为V2.6版本
+         Air200模块开发板S1,S2使用说明V1.2 更新为V1.3
