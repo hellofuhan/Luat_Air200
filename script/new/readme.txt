@@ -90,5 +90,3 @@ xiaoman_gps_tracker\whole_test£ºÕë¶ÔÐ¡ÂùGPS¶¨Î»Æ÷Ó²¼þÐ´µÄÒ»¸öÍêÕûµÄdemoÏîÄ¿£¬Ö§³
 
 xiaoman_gps_tracker\gps_test£ºÕë¶ÔÐ¡ÂùGPS¶¨Î»Æ÷Ó²¼þÐ´µÄÒ»¸ö²âÊÔgpsµÄdemoÏîÄ¿£¬Ö»ÄÜÓÃÓÚÐ¡ÂùGPS¶¨Î»Æ÷Ó²¼þ£¬²»ÄÜÓÃÓÚ¿ª·¢°å£¬Ò²²»ÄÜÅäºÏÊ±¼äÏßAPPÊ¹ÓÃ¡£gps½Ó¿ÚµÄÊ¹ÓÃ²Î¿¼testgps.lua
 
-ÆäÓàdemoÏîÄ¿³ÖÐø¸üÐÂÖÐ......
-

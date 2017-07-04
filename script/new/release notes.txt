@@ -1,8 +1,20 @@
+发布时间：2017/6/30 14:13
+修改记录：
+    一、lib脚本修改
+        lib脚本版本号：2.2.0
+        (1)sys.lua：
+		底层版本不是最新时，仅打印一个警告，不再上报错误信息到dbg服务器
+		新增“电池电压低于3.4V时，延时1分钟后关机”的功能
+        (2)link.lua：
+		修正“用户设置了激活数据网络失败回调函数后，概率性不会执行回调”的问题
+		新增“设置连接过程和数据发送过程中TCP协议的重连参数”的接口setretrymode
+        (3)mqtt.lua,mqttssl.lua：publish接口支持retain参数的设置
+
+
 发布时间：2017/6/21 10:59
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.9
-        支持lib脚本的最小core软件版本号：Luat_V0015_Air200
         (1)sys.lua：
 		新增reguartx接口，可注册uart发送数据完成的回调函数
 		修正“dbg模块不能上报sys.restart原因值”的问题
@@ -20,7 +32,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.8
-        支持lib脚本的最小core软件版本号：Luat_V0014_Air200
         (1)lbsloc.lua：超时重试间隔由2秒修改为5秒
         (2)sys.lua：修改timer_start接口参数非法时的重启注释
     二、demo脚本修改
@@ -32,7 +43,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.7
-        支持lib脚本的最小core软件版本号：Luat_V0013_Air200
         (1)lbsloc.lua：优化回调函数的调用时间点
 	(2)link.lua，net.lua：修正“热插拔sim卡时，socket连接状态异常以及指示灯异常”的问题
 
@@ -42,7 +52,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.6
-        支持lib脚本的最小core软件版本号：Luat_V0013_Air200
         (1)factory.lua：删除此模块
 	(2)update.lua：修改一处注释
     二、demo脚本修改
@@ -54,7 +63,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.5
-        支持lib脚本的最小core软件版本号：Luat_V0011_Air200
         (1)dbg.lua：新增saverr接口，可上报用户自定义调试信息到dbg服务器
 
 
@@ -63,7 +71,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.4
-        支持lib脚本的最小core软件版本号：Luat_V0011_Air200
         (1)update.lua：修改Luat物联云升级服务器地址
 	(2)luatiot.lua、luatiotssl.lua：精简Luat物联云使用的topic和登陆报文长度
 	(3)mqtt.lua、mqttssl.lua：新增disconnect和getstatus接口
@@ -84,7 +91,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.3
-        支持lib脚本的最小core软件版本号：Luat_V0010_Air200
         (1)update.lua：支持“开机自动升级+定时升级+实时升级”功能
 	(2)luatiot.lua、luatiotssl.lua：连接Luat云平台时，支持设备的自动录入功能
     二、demo脚本修改
@@ -98,7 +104,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.2
-        支持lib脚本的最小core软件版本号：Luat_V0010_Air200
         (1)lbsloc.lua：支持设备密钥以及GPS位置字符串的查询
         (2)luatiot.lua、luatiotssl.lua：连接Luat云平台时，支持设备的自动录入功能
         (3)misc.lua：新增isnvalid接口，判断设备sn是否有效
@@ -119,7 +124,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.1
-        支持lib脚本的最小core软件版本号：Luat_V0010_Air200
         (1)新增luatyun.lua和luatyunssl.lua：支持Luat云后台功能
         (2)新增lbsloc.lua：支持多基站获取经纬度的功能
     二、demo脚本修改
@@ -134,7 +138,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.1.0
-        支持lib脚本的最小core软件版本号：Luat_V0010_Air200
         (1)net.lua：修改两种状态下的网络指示灯定义“注册上GSM网络，未附着上GPRS网络：亮0.3秒，灭1.7秒”、“附着上GPRS网络，未连接上服务器：亮0.3秒，灭0.7秒”
         (2)mqtt.lua：connect接口增加一个sckerrcb参数，如果用户自定了此参数，则socket一直重连失败时，不再自动重启，而是去调用sckerrcb
         (3)nvm.lua：修正“调用restore接口恢复默认参数功能后，内存中的参数没有恢复”的问题
@@ -156,7 +159,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.0.9
-        支持lib脚本的最小core软件版本号：Luat_V0009_Air200
         (1)audio.lua、cc.lua：支持“呼叫时对方振铃时，通知用户应用程序”的功能
     二、demo脚本修改
         (1)call项目：支持“呼叫时对方振铃通知”的处理功能
@@ -174,7 +176,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.0.8
-        支持lib脚本的最小core软件版本号：Luat_V0008_Air200
         (1)net.lua：新增接口getmulticell，实时获取多基站信息
         (2)update.lua：修改升级协议，包索引字段扩大为两个字节表示；http://www.luam2m.com/forum.php?mod=viewthread&tid=2397&page=1&extra=#pid6360中的升级协议已做同步修改
 
@@ -184,7 +185,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.0.7
-        支持lib脚本的最小core软件版本号：Luat_V0007_Air200
         (1)audio.lua：修正“通话中正在播放TTS时，对方挂断电话后，后续再建立通话无法播放TTS”的问题
         (2)record.lua：新增此文件，支持录音功能
         (3)pins.lua：修正“PIN脚配置的valid为0时，初始化pin脚时的电平错误”的问题
@@ -212,7 +212,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.0.6
-        支持lib脚本的最小core软件版本号：Luat_V0007_Air200
         (1)sys.lua：扩展opentrace接口功能，通过设置第2个参数，用户可以配置uart1或者uart2输出Lua脚本的trace，默认波特率为115200
                     注意：配置uart1或者uart2输出trace时，系统不会休眠，如果要求休眠，就不要配置uart输出trace
         (2)cc.lua：支持通话中的DTMF检测功能
@@ -226,7 +225,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.0.5
-        支持lib脚本的最小core软件版本号：Luat_V0006_Air200
         (1)ntp.lua：新增ntp功能模块，可同步网络时间。直接在main.lua中require"ntp"就可以使用打开此功能
     二、demo脚本修改
         (1)ntp项目：新增此项目，测试ntp功能模块
@@ -240,7 +238,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.0.4
-        支持lib脚本的最小core软件版本号：Luat_V0006_Air200
         (1)mqtt.lua：新增接口configwill，支持WILL功能
         (1)完善代码注释
     二、demo脚本修改
@@ -261,7 +258,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.0.3
-        支持lib脚本的最小core软件版本号：Luat_V0006_Air200
         (1)sys.lua：支持lib脚本的最小core软件版本号：Luat_V0006_Air200
     二、demo脚本修改
         (1)uart_at_transparent项目：关闭UART1全PIN脚功能
@@ -273,7 +269,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.0.2
-        支持lib脚本的最小core软件版本号：Luat_V0005_Air200
         (1)audio.lua：mic增益默认设置为1级，用户如果需要监听功能调大mic增益，直接调用接口audio.setmicrophonegain(audio.MIC_VOL15)即可
     二、demo脚本修改
         (1)uart_at_transparent项目：UART1打开全PIN脚功能
@@ -286,7 +281,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.0.1
-        支持lib脚本的最小core软件版本号：Luat_V0003_Air200
         (1)nvm.lua：修正“参数存储后，重启失效”的问题
     二、demo脚本修改
         (1)新增uart_at_transparent_wdt项目
@@ -299,7 +293,6 @@
 修改记录：
     一、lib脚本修改
         lib脚本版本号：2.0.0
-        支持lib脚本的最小core软件版本号：Luat_V0003_Air200
         (1)优化所有功能模块的接口封装
     二、demo脚本修改
         (1)简化所有项目的使用方式

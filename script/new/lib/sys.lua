@@ -25,9 +25,9 @@ local assert = base.assert
 local tonumber = base.tonumber
 
 --lib脚本版本号，只要lib中的任何一个脚本做了修改，都需要更新此版本号
-SCRIPT_LIB_VER = "2.1.9"
---支持lib脚本的最小core软件版本号
-CORE_MIN_VER = "Luat_V0015_Air200"
+SCRIPT_LIB_VER = "2.2.0"
+--脚本发布时的最新core软件版本号
+CORE_MIN_VER = "Luat_V0016_Air200"
 
 --“是否需要刷新界面”的标志，有GUI的项目才会用到此标志
 local refreshflag = false
@@ -372,7 +372,7 @@ local function checkcorever()
 	
 	--lib脚本需要的底层软件版本号大于底层软件的实际版本号
 	if tonumber(string.match(CORE_MIN_VER,"Luat_V(%d+)_Air200"))>tonumber(buildver) then
-		appenderr("checkcorever[core ver match warn]"..realver..","..CORE_MIN_VER..";")
+		print("checkcorever[core ver match warn]"..realver..","..CORE_MIN_VER..";")
 	end
 end
 
@@ -712,7 +712,7 @@ function run()
 		msg,msgpara = rtos.receive(rtos.INF_TIMEOUT)
 
 		--电池电量为0%，用户应用脚本中没有定义“低电关机处理程序”，并且没有启动自动关机定时器		
-		if not lprfun and not lpring and type(msg) == "table" and msg.id == rtos.MSG_PMD and msg.level == 0 then
+		if --[[not lprfun and ]]not lpring and type(msg) == "table" and msg.id == rtos.MSG_PMD and msg.level == 0 then
 			--启动自动关机定时器，60秒后关机
 			lpring = true
 			timer_start(rtos.poweroff,60000,"r1")

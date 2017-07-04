@@ -677,7 +677,7 @@ local function shutcnf(result)
 		--req("AT+CIPSTATUS")
 		sys.timer_start(req,10000,"AT+CIPSTATUS")
 	end
-	if checkciicrtm and result=="SHUT OK" then
+	if checkciicrtm and result=="SHUT OK" and not ciicrerrcb then
 		--关闭“AT+CIICR后，IP网络超时未激活成功”的定时器
 		print("ciicrerrtmfnc stop")
 		sys.timer_stop(ciicrerrtmfnc)
@@ -1043,6 +1043,19 @@ end
 ]]
 function setiperrcb(cb)
 	ciicrerrcb = cb
+end
+
+--[[
+函数名：setretrymode
+功能  ：设置"连接过程和数据发送过程中TCP协议的重连参数"
+参数  ：
+		md：number类型，仅支持0和1
+			0为尽可能多的重连（可能会很长时间才会返回连接或者发送接口）
+			1为适度重连（如果网络较差或者没有网络，可以10几秒返回失败结果）
+返回值：无
+]]
+function setretrymode(md)
+	ril.request("AT+TCPUSERPARAM=6,"..(md==0 and 3 or 2)..",7200")
 end
 
 --注册本模块关注的内部消息的处理函数
