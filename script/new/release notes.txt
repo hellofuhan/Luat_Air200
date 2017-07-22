@@ -3,6 +3,7 @@
     一、lib脚本修改
         lib脚本版本号：2.2.1
         (1)net.lua：修正“移动PLMN被放入FLPMN列表中导致无法注册网络”的问题
+        (2)audio.lua：支持Air200S音频通道的设置；用户在应用脚本中的main.lua中，定义HARDWARE="Air200S"即可
     二、demo脚本修改
         (1)socket_ssl\long_connection的demo：更换服务器CA证书文件
         (2)新增fs：演示文件操作接口的使用
