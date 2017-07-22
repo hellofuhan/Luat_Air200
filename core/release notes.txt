@@ -1,8 +1,17 @@
+版本号：Luat_V0017_Air200.lod、Luat_V0017_Air200_SSL.lod、Luat_V0017_Air200_SSL_TTS.lod、Luat_V0017_Air200_TTS1.lod、Luat_V0017_Air200_TTS2.lod、Luat_V0017_Air200_TTS3.lod
+发布时间：2017/7/22 13:51
+修改记录：
+    (1)修正“移动PLMN被放入FLPMN列表中导致无法注册网络”的问题
+    (2)修正“i2c没有打开，执行关闭动作时会重启”的问题
+    (3)i2c读写超时时间由10ms修改为30毫秒，修改i2c读写超时失败的问题
+
+
+
 版本号：Luat_V0016_Air200.lod、Luat_V0016_Air200_SSL.lod、Luat_V0016_Air200_SSL_TTS.lod、Luat_V0016_Air200_TTS1.lod、Luat_V0016_Air200_TTS2.lod、Luat_V0016_Air200_TTS3.lod
 发布时间：2017/7/4 23:34
 修改记录：
     (1)修正“不识别某些卡”的问题
-    (2)修正“NVM异常导致小概率重启”的问题
+    (2)修正“NVM文件损坏导致重启”的问题
 
 
 
