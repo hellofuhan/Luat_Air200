@@ -25,9 +25,9 @@ local assert = base.assert
 local tonumber = base.tonumber
 
 --lib脚本版本号，只要lib中的任何一个脚本做了修改，都需要更新此版本号
-SCRIPT_LIB_VER = "2.2.0"
+SCRIPT_LIB_VER = "2.2.1"
 --脚本发布时的最新core软件版本号
-CORE_MIN_VER = "Luat_V0016_Air200"
+CORE_MIN_VER = "Luat_V0017_Air200"
 
 --“是否需要刷新界面”的标志，有GUI的项目才会用到此标志
 local refreshflag = false
@@ -685,7 +685,7 @@ end
 功能  ：注册物理串口的数据发送完成处理函数
 参数  ：
 		id：物理串口号，1表示UART1，2表示UART2
-		fnc：数据接收处理函数名
+		fnc：调用uart.write接口发送数据，数据发送完成后的回调函数
 返回值：无
 ]] 
 function reguartx(id,fnc)

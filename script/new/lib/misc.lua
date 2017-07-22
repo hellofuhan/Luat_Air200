@@ -196,6 +196,7 @@ end
 功能  ：获取IMEI
 参数  ：无
 返回值：IMEI号，如果未获取到返回""
+注意：开机lua脚本运行之后，会发送at命令去查询imei，所以需要一定时间才能获取到imei。开机后立即调用此接口，基本上返回""
 ]]
 function getimei()
 	return imei or ""

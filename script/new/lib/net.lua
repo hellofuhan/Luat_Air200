@@ -83,6 +83,9 @@ local function creg(data)
 		s = "REGISTERED"
 	--未注册
 	else
+		if p1=="3" then
+			req("AT+CRSM=176,28539,0,0,12")
+		end
 		s = "UNREGISTER"
 	end
 	--注册状态发生了改变
@@ -178,6 +181,31 @@ local function ceng(data)
 	end
 end
 
+local crsmupdcnt = 0
+--[[
+函数名：crsmrsp
+功能  ：更新FPLMN的应答处理
+参数  ：
+		cmd：此应答对应的AT命令
+		success：AT命令执行结果，true或者false
+		response：AT命令的应答中的执行结果字符串
+		intermediate：AT命令的应答中的中间信息
+返回值：无
+]]
+function crsmrsp(cmd,success,response,intermediate)
+	print("crsmrsp",success)
+	if success then
+		sys.restart("crsmrsp suc")
+	else
+		crsmupdcnt = crsmupdcnt+1
+		if crsmupdcnt>=3 then
+			sys.restart("crsmrsp tmout")
+		else
+			req("AT+CRSM=214,28539,0,0,12,\"64f01064f03064f002fffff\"",nil,crsmrsp)
+		end
+	end
+end
+
 --[[
 函数名：neturc
 功能  ：本功能模块内“注册的底层core通过虚拟串口主动上报的通知”的处理
@@ -195,6 +223,11 @@ local function neturc(data,prefix)
 	elseif prefix == "+CENG" then
 		--解析ceng信息
 		ceng(data)
+	elseif prefix=="+CRSM" then
+		local str = string.lower(data)
+		if smatch(str,"64f000") or smatch(str,"64f020") or smatch(str,"64f040") or smatch(str,"64f070") then
+			req("AT+CRSM=214,28539,0,0,12,\"64f01064f03064f002fffff\"",nil,crsmrsp)
+		end
 	end
 end
 
@@ -720,6 +753,7 @@ sys.regapp(procer)
 --注册+CREG和+CENG通知的处理函数
 ril.regurc("+CREG",neturc)
 ril.regurc("+CENG",neturc)
+ril.regurc("+CRSM",neturc)
 --注册AT+CCSQ和AT+CENG?命令的应答处理函数
 ril.regrsp("+CSQ",rsp)
 ril.regrsp("+CENG",rsp)
