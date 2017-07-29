@@ -6,8 +6,6 @@ Luat 是合宙（AirM2M）推出的物联网开源架构，依托于通信模块
 
 其中， Air200是一款GPRS模块； Air810是一款支持GPRS+北斗GPS的二合一模块。
 
-百度云盘：https://pan.baidu.com/s/1eSxFHrs
-
 开源社区：bbs.openluat.com
 
 GitHub：https://github.com/airm2m-open/Luat_Air200
