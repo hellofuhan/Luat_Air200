@@ -1,3 +1,18 @@
+发布时间：2017/7/29 23:19
+修改记录：
+    一、lib脚本修改
+        lib脚本版本号：2.2.2
+        (1)mqtt.lua、mqttssl.lua：
+		修正“tmqtt:disconnect接口断开连接后，又自动重连”的问题
+		新增tmqtt:setcleansession接口
+        (2)aliyuniotssl.lua、aliyuniotsslauth.lua：支持阿里云华东2节点
+    二、demo脚本修改
+        (1)crypto：完善注释
+        (2)mqtt、mqtt_ssl：演示tmqtt:setcleansession接口的使用说明
+        (3)新增aliyun_ssl_huadong2：支持阿里云华东2节点
+
+
+
 发布时间：2017/7/18 16:47
 修改记录：
     一、lib脚本修改
