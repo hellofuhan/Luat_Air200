@@ -131,3 +131,6 @@ http://www.luam2m.com/forum.php?mod=viewthread&tid=2479&page=1&extra=#pid6502
 
 20170724:
 更新：Air200_硬件设计手册_V2.7 更新为 V2.8，加了关于GPIO初始电平的描述。
+
+20170802:
+更新：Air200T模块AT命令手册V3.1 更新为 Air200T模块AT命令手册V3.2
