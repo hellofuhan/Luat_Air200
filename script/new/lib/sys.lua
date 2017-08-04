@@ -25,7 +25,7 @@ local assert = base.assert
 local tonumber = base.tonumber
 
 --lib脚本版本号，只要lib中的任何一个脚本做了修改，都需要更新此版本号
-SCRIPT_LIB_VER = "2.2.2"
+SCRIPT_LIB_VER = "2.2.3"
 --脚本发布时的最新core软件版本号
 CORE_MIN_VER = "Luat_V0017_Air200"
 
@@ -204,6 +204,7 @@ function timer_stop(val,...)
 	--val为定时器id
 	if type(val) == "number" then
 		tpool[val],para[val],loop[val] = nil
+		rtos.timer_stop(val)
 	else
 		for k,v in pairs(tpool) do
 			--回调函数相同

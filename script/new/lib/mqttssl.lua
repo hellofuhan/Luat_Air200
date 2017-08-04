@@ -891,6 +891,7 @@ end
 ]]
 function tmqtt:disconnect(discb)
 	print("tmqtt:disconnect",self.discing,self.mqttconnected,self.sckconnected)
+	sys.timer_stop(datinactive,self.sckidx)
 	if self.discing or not self.mqttconnected or not self.sckconnected then
 		if discb then discb() end
 		return

@@ -34,6 +34,8 @@ gpio\i2c_gpio_switch：i2c和gpio功能切换控制demo项目
 
 gpio\uart_gpio_switch：uart和gpio功能切换控制demo项目
 
+http：http client demo项目
+
 i2c：i2c通信demo项目
 
 json：json编解码测试demo项目
