@@ -137,3 +137,7 @@ http://www.luam2m.com/forum.php?mod=viewthread&tid=2479&page=1&extra=#pid6502
 
 20170803:
 更新：Air200_硬件设计手册_V2.8 更新为 V2.9，删除关机模式部分的描述。
+
+20170809:
+更新：Air200_硬件设计手册_V2.9 更新为 V3.0，增加对AT命令版本闪灯规则的描述
+         Lua扩展库文件V1.5 更新为V1.6，开机原因值reason补充进去数值。
