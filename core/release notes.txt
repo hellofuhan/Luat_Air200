@@ -1,3 +1,10 @@
+版本号：Luat_V0018_Air200.lod、Luat_V0018_Air200_SSL.lod、Luat_V0018_Air200_SSL_TTS.lod、Luat_V0018_Air200_TTS1.lod、Luat_V0018_Air200_TTS2.lod、Luat_V0018_Air200_TTS3.lod
+发布时间：2017/8/11 18:02
+修改记录：
+    (1)修正“小概率无法清除垃圾文件”的问题
+
+
+
 版本号：Luat_V0017_Air200.lod、Luat_V0017_Air200_SSL.lod、Luat_V0017_Air200_SSL_TTS.lod、Luat_V0017_Air200_TTS1.lod、Luat_V0017_Air200_TTS2.lod、Luat_V0017_Air200_TTS3.lod
 发布时间：2017/7/22 13:51
 修改记录：
