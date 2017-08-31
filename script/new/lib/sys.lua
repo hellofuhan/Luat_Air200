@@ -25,9 +25,9 @@ local assert = base.assert
 local tonumber = base.tonumber
 
 --lib脚本版本号，只要lib中的任何一个脚本做了修改，都需要更新此版本号
-SCRIPT_LIB_VER = "2.2.3"
+SCRIPT_LIB_VER = "2.2.4"
 --脚本发布时的最新core软件版本号
-CORE_MIN_VER = "Luat_V0017_Air200"
+CORE_MIN_VER = "Luat_V0019_Air200"
 
 --“是否需要刷新界面”的标志，有GUI的项目才会用到此标志
 local refreshflag = false
@@ -292,7 +292,7 @@ local function writetxt(f,v)
 end
 
 --[[
-函数名：restart
+函数名：appenderr
 功能  ：追加错误信息到LIB_ERR_FILE文件中
 参数  ：
 		s：错误信息，用户自定义，一般是string类型，重启后的trace中会打印出此错误信息
@@ -393,7 +393,7 @@ function init(mode,lprfnc)
 	require"net"
 	--设置AT命令的虚拟串口
 	uart.setup(uart.ATC,0,0,uart.PAR_NONE,uart.STOP_1)
-	print("poweron reason:",rtos.poweron_reason(),base.PROJECT,base.VERSION,SCRIPT_LIB_VER,CORE_MIN_VER,getcorever())
+	print("poweron reason:",rtos.poweron_reason(),base.PROJECT,base.VERSION,SCRIPT_LIB_VER,getcorever())
 	if mode == 1 then
 		--充电开机
 		if rtos.poweron_reason() == rtos.POWERON_CHARGER then

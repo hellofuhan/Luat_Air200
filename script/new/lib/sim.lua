@@ -119,7 +119,7 @@ local function urc(data,prefix)
 		else
 			--sim¿¨pin¿ªÆô
 			if data == "+CPIN: SIM PIN" then
-				sys.dispatch("SIM_IND_SIM_PIN")	
+				sys.dispatch("SIM_IND","SIM_PIN")	
 			end
 			sys.dispatch("SIM_IND","NORDY")
 		end

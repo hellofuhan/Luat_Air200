@@ -20,7 +20,7 @@ local FREQ,prot,addr,port,lid,linksta = 1800000
 local DBG_FILE,inf,luaerr,d1,d2 = "/dbg.txt",""
 
 --[[
-函数名：writetxt
+函数名：readtxt
 功能  ：读取文本文件中的全部内容
 参数  ：
 		f：文件路径
@@ -150,7 +150,7 @@ local function reconn()
 end
 
 --[[
-函数名：reconn
+函数名：endntfy
 功能  ：一个dbg功能周期结束
 参数  ：无
 返回值：无
