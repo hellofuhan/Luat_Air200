@@ -1,3 +1,14 @@
+版本号：Luat_V0019_Air200.lod、Luat_V0019_Air200_SSL.lod、Luat_V0019_Air200_SSL_TTS.lod、Luat_V0019_Air200_TTS1.lod、Luat_V0019_Air200_TTS2.lod、Luat_V0019_Air200_TTS3.lod
+发布时间：2017/8/30 15:13
+修改记录：
+    (1)支持“i2c外设无寄存器地址的读写”功能
+    (2)删除“uart1和uart2下载脚本”的功能
+    (3)修正“开机配置GPIO输出时，会有一个几微秒的异常高电平”的问题
+    (4)支持“uart发送数据后异步消息通知”的功能
+    (5)支持“sha1和hmac_sha1算法”
+
+
+
 版本号：Luat_V0018_Air200.lod、Luat_V0018_Air200_SSL.lod、Luat_V0018_Air200_SSL_TTS.lod、Luat_V0018_Air200_TTS1.lod、Luat_V0018_Air200_TTS2.lod、Luat_V0018_Air200_TTS3.lod
 发布时间：2017/8/11 18:02
 修改记录：
