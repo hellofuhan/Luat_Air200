@@ -156,6 +156,8 @@ end
 ∑µªÿ÷µ£∫Œﬁ
 ]]
 function endntfy()
+	sys.setrestart(true,2)
+	sys.timer_stop(sys.setrestart,true,2)
 	sys.dispatch("DBG_END_IND")
 	sys.timer_stop(sys.dispatch,"DBG_END_IND")
 end
@@ -231,6 +233,9 @@ local function init()
 		end
 		sys.dispatch("DBG_BEGIN_IND")
 		sys.timer_start(sys.dispatch,120000,"DBG_END_IND")
+	else
+		sys.setrestart(true,2)
+		sys.timer_stop(sys.setrestart,true,2)
 	end
 end
 
@@ -273,3 +278,6 @@ function setup(inProt,inAddr,inPort)
 		init()
 	end
 end
+
+sys.setrestart(false,2)
+sys.timer_start(sys.setrestart,120000,true,2)
