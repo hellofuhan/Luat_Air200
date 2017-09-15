@@ -1,3 +1,11 @@
+版本号：Luat_V0020_Air200.lod、Luat_V0020_Air200_SSL.lod、Luat_V0020_Air200_SSL_TTS.lod、Luat_V0020_Air200_TTS1.lod、Luat_V0020_Air200_TTS2.lod、Luat_V0020_Air200_TTS3.lod
+发布时间：2017/9/15 13:54
+修改记录：
+    (1)修正“字符串过长时，utf8接口转换出错”的问题
+    (2)增加get_fs_free_size接口，脚本中使用方式为rtos.get_fs_free_size()
+
+
+
 版本号：Luat_V0019_Air200.lod、Luat_V0019_Air200_SSL.lod、Luat_V0019_Air200_SSL_TTS.lod、Luat_V0019_Air200_TTS1.lod、Luat_V0019_Air200_TTS2.lod、Luat_V0019_Air200_TTS3.lod
 发布时间：2017/8/30 15:13
 修改记录：
