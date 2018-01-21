@@ -1,3 +1,15 @@
+版本号：Luat_V0021_Air200.lod、Luat_V0021_Air200_SSL.lod、Luat_V0021_Air200_SSL_TTS.lod、Luat_V0021_Air200_TTS1.lod、Luat_V0021_Air200_TTS2.lod、Luat_V0021_Air200_TTS3.lod
+发布时间：2018/1/21 22:11
+修改记录：
+    (1)修正“Air200S模块上MIC无声”的问题
+	【问题重要性】：严重
+	【问题影响模块】：Air200S
+	【问题出现概率】：必现；使用到MIC的功能必现，例如录音，双向通话
+	【问题出现原因】：core软件中配置的MIC通道有误，导致MIC无声
+	【问题解决方式】：core软件中配置为正确的MIC通道
+
+
+
 版本号：Luat_V0020_Air200.lod、Luat_V0020_Air200_SSL.lod、Luat_V0020_Air200_SSL_TTS.lod、Luat_V0020_Air200_TTS1.lod、Luat_V0020_Air200_TTS2.lod、Luat_V0020_Air200_TTS3.lod
 发布时间：2017/9/15 13:54
 修改记录：
